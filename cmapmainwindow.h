@@ -161,6 +161,7 @@ class CSimulationWidget;
 class CRecordingWidget;
 class CHealthMonitorWidget;
 class CPredictiveMaintenanceWidget;
+class CVideoPlayerWindow;
 
 namespace Ui {
 class CMapMainWindow;
@@ -295,6 +296,11 @@ private:
     CPredictiveMaintenanceWidget *m_predictiveMaintenanceWidget;
 
     /**
+     * @brief Video player window for replay
+     */
+    CVideoPlayerWindow *m_videoPlayerWindow;
+
+    /**
      * @brief Initialize and setup the dockable track table
      */
     void setupTrackTable();
@@ -348,6 +354,9 @@ private:
 
     void setupChartsWidget();
     void onChartsRequested();
+    
+    void setupVideoPlayerWindow();
+    void onVideoReplayRequested();
 };
 
 #endif // CMAPMAINWINDOW_H

@@ -51,6 +51,7 @@ SOURCES += \
         MapDisplay/csimulationwidget.cpp \
         MapDisplay/ctracklayer.cpp \
         MapDisplay/ctracktablewidget.cpp \
+        MapDisplay/cvideoplayerwindow.cpp \
         MapDisplay/customgradiantfillsymbollayer.cpp \
         cdatawarehouse.cpp \
         cudpreceiver.cpp \
@@ -73,6 +74,7 @@ HEADERS += \
         MapDisplay/csimulationwidget.h \
         MapDisplay/ctracklayer.h \
         MapDisplay/ctracktablewidget.h \
+        MapDisplay/cvideoplayerwindow.h \
         MapDisplay/customgradiantfillsymbollayer.h \
         cdatawarehouse.h \
         cmapmainwindow.h \
