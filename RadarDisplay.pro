@@ -7,12 +7,12 @@
 QT       += core gui widgets xml network concurrent qml quick quickwidgets quickcontrols2 charts
 
 
-OBJECTS_DIR = ../obj/OBJ
-MOC_DIR = ../obj/MOC
-UI_DIR = ../obj/UI
-RCC_DIR = ../obj/RCC
+OBJECTS_DIR = obj/OBJ
+MOC_DIR = obj/MOC
+UI_DIR = obj/UI
+RCC_DIR = obj/RCC
 
-TARGET = ../bin/RadarDisplay
+TARGET = bin/RadarDisplay
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -47,6 +47,7 @@ SOURCES += \
         MapDisplay/cpredictivemaintenancewidget.cpp \
         MapDisplay/cppilayer.cpp \
         MapDisplay/crecordingwidget.cpp \
+        MapDisplay/creplaywindow.cpp \
         MapDisplay/csearchbeamlayer.cpp \
         MapDisplay/csimulationwidget.cpp \
         MapDisplay/ctracklayer.cpp \
@@ -69,6 +70,7 @@ HEADERS += \
         MapDisplay/cpredictivemaintenancewidget.h \
         MapDisplay/cppilayer.h \
         MapDisplay/crecordingwidget.h \
+        MapDisplay/creplaywindow.h \
         MapDisplay/csearchbeamlayer.h \
         MapDisplay/csimulationwidget.h \
         MapDisplay/ctracklayer.h \

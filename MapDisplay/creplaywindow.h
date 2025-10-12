@@ -9,8 +9,9 @@
 #include <QSlider>
 #include <QProgressBar>
 #include <QTimer>
-#include <QVideoWidget>
-#include <QMediaPlayer>
+// Multimedia headers temporarily commented out
+// #include <QVideoWidget>
+// #include <QMediaPlayer>
 #include <QFrame>
 #include <QSpacerItem>
 
@@ -46,7 +47,7 @@ public slots:
 private slots:
     void onPositionChanged(qint64 position);
     void onDurationChanged(qint64 duration);
-    void onStateChanged(QMediaPlayer::State state);
+    // void onStateChanged(QMediaPlayer::State state);  // Commented out
     void onSpeedChanged(int value);
     void minimizeWindow();
     void maximizeWindow();
@@ -74,9 +75,11 @@ private:
     QPushButton *m_maximizeButton;
     QPushButton *m_closeButton;
     
-    // Video area
-    QVideoWidget *m_videoWidget;
-    QMediaPlayer *m_mediaPlayer;
+    // Video area (temporarily commented out)
+    // QVideoWidget *m_videoWidget;
+    // QMediaPlayer *m_mediaPlayer;
+    QWidget *m_videoWidget;  // Placeholder
+    QWidget *m_mediaPlayer;  // Placeholder
     
     // Controls area
     QFrame *m_controlsFrame;

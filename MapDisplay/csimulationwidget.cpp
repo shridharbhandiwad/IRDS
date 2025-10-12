@@ -500,7 +500,7 @@ stTrackRecvInfo CSimulationWidget::createRandomTrack(int trackId)
     track.nTrkId = trackId;
     
     // Generate random position within max range
-    double range = QRandomGenerator::global()->bounded(1000.0, m_maxRange);
+    double range = QRandomGenerator::global()->bounded(1000, static_cast<int>(m_maxRange));
     
     // Distribute azimuth angles evenly across the spread
     double azimuthStart = (360.0 - m_azimuthSpread) / 2.0;
@@ -511,13 +511,13 @@ stTrackRecvInfo CSimulationWidget::createRandomTrack(int trackId)
     double azimuthRad = qDegreesToRadians(azimuth);
     track.x = range * qCos(azimuthRad);
     track.y = range * qSin(azimuthRad);
-    track.z = QRandomGenerator::global()->bounded(0.0, 5000.0); // 0-5km altitude
+    track.z = QRandomGenerator::global()->bounded(0, 5000); // 0-5km altitude
     
     // Random velocity
-    track.velocity = QRandomGenerator::global()->bounded(m_minSpeed, m_maxSpeed);
+    track.velocity = QRandomGenerator::global()->bounded(static_cast<int>(m_minSpeed), static_cast<int>(m_maxSpeed));
     
     // Random heading
-    track.heading = QRandomGenerator::global()->bounded(0.0, 360.0);
+    track.heading = QRandomGenerator::global()->bounded(0, 360);
     
     // Assign identity
     int identitySelection = m_identityCombo->currentData().toInt();
@@ -548,7 +548,7 @@ void CSimulationWidget::updateTrackPositions()
         // Random movement if enabled
         if (m_randomMovementCheckBox->isChecked()) {
             // Randomly adjust heading slightly
-            double headingChange = QRandomGenerator::global()->bounded(-10.0, 10.0);
+            double headingChange = QRandomGenerator::global()->bounded(-10, 10);
             track.heading = fmod(track.heading + headingChange + 360.0, 360.0);
         }
         
