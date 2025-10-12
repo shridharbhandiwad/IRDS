@@ -563,6 +563,7 @@ void CSimulationWidget::updateTrackPositions()
 
 void CSimulationWidget::sendTrackData(const stTrackRecvInfo &track)
 {
+    // Send via UDP for compatibility
     QByteArray datagram(reinterpret_cast<const char*>(&track), sizeof(stTrackRecvInfo));
     
     qint64 bytesSent = m_udpSocket->writeDatagram(
@@ -576,6 +577,9 @@ void CSimulationWidget::sendTrackData(const stTrackRecvInfo &track)
     } else {
         qWarning() << "[Simulation] Failed to send track" << track.nTrkId;
     }
+    
+    // Also emit signal for direct connection to data warehouse
+    emit simulatedTrackData(track);
 }
 
 void CSimulationWidget::updateTrackTable()
