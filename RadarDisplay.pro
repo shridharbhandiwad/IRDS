@@ -39,6 +39,7 @@ LIBS += -lgeos_c -lproj -lspatialindex
 
 SOURCES += \
         CoordinateConverter.cpp \
+        MapDisplay/canalyticswidget.cpp \
         MapDisplay/cchartswidget.cpp \
         MapDisplay/cconfigpanelwidget.cpp \
         MapDisplay/cinterfacespanelwidget.cpp \
@@ -56,6 +57,7 @@ SOURCES += \
 
 HEADERS += \
         CoordinateConverter.h \
+        MapDisplay/canalyticswidget.h \
         MapDisplay/cchartswidget.h \
         MapDisplay/cconfigpanelwidget.h \
         MapDisplay/cinterfacespanelwidget.h \

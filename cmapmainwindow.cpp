@@ -379,6 +379,7 @@
 #include "MapDisplay/cconfigpanelwidget.h"
 #include "MapDisplay/cchartswidget.h"
 #include "MapDisplay/cinterfacespanelwidget.h"
+#include "MapDisplay/canalyticswidget.h"
 #include <QFileDialog>
 #include <QDebug>
 #include <qgspoint.h>
@@ -396,6 +397,7 @@ CMapMainWindow::CMapMainWindow(QWidget *parent) :
     setupConfigPanel();
     setupInterfacesPanel();
     setupChartsWidget();
+    setupAnalyticsWidget();
 
     // Hide the old widgets
     if (ui->tableWidget) {
@@ -428,11 +430,15 @@ void CMapMainWindow::setupTrackTable()
     // Add as dockable widget to right side
     addDockWidget(Qt::RightDockWidgetArea, m_trackTable);
 
+    // Set preferred size for better space utilization
+    m_trackTable->setMinimumWidth(350);
+    m_trackTable->setMaximumWidth(500);
+
     // Make it initially visible
     m_trackTable->setVisible(true);
 
-    // Allow docking on all sides
-    m_trackTable->setAllowedAreas(Qt::AllDockWidgetAreas);
+    // Allow docking on left and right sides only
+    m_trackTable->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
     // Enable floating
     m_trackTable->setFeatures(
@@ -454,6 +460,10 @@ void CMapMainWindow::setupConfigPanel()
 
     // Add as dockable widget to left side
     addDockWidget(Qt::LeftDockWidgetArea, m_configPanel);
+
+    // Set preferred size for better space utilization
+    m_configPanel->setMinimumWidth(300);
+    m_configPanel->setMaximumWidth(400);
 
     // Make it initially visible
     m_configPanel->setVisible(true);
@@ -582,6 +592,10 @@ void CMapMainWindow::keyPressEvent(QKeyEvent *event)
         // Toggle interfaces panel visibility
         m_interfacesPanel->setVisible(!m_interfacesPanel->isVisible());
         break;
+    case Qt::Key_A:
+        // Toggle analytics panel visibility
+        m_analyticsWidget->setVisible(!m_analyticsWidget->isVisible());
+        break;
     }
     QMainWindow::keyPressEvent(event);
 }
@@ -629,7 +643,7 @@ void CMapMainWindow::updateTrackTable()
     QList<stTrackDisplayInfo> listTracks = CDataWarehouse::getInstance()->getTrackList();
 
     // Update status bar
-    QString statusMsg = QString("🎯 Tracks: %1 | 📊 'T': Table | ⚙️ 'C': Controls | ⚡ 'I': Interfaces | 🏠 'H': Home")
+    QString statusMsg = QString("🎯 Tracks: %1 | 📊 'T': Table | ⚙️ 'C': Controls | ⚡ 'I': Interfaces | 📈 'A': Analytics | 🏠 'H': Home")
         .arg(listTracks.count());
 
     ui->statusBar->showMessage(statusMsg);
@@ -762,6 +776,13 @@ void CMapMainWindow::setupInterfacesPanel()
 
     // Add as dockable widget to left side, below config panel
     addDockWidget(Qt::LeftDockWidgetArea, m_interfacesPanel);
+    
+    // Stack it below the config panel
+    tabifyDockWidget(m_configPanel, m_interfacesPanel);
+
+    // Set preferred size for better space utilization
+    m_interfacesPanel->setMinimumWidth(300);
+    m_interfacesPanel->setMaximumWidth(400);
 
     // Make it initially visible
     m_interfacesPanel->setVisible(true);
@@ -802,6 +823,11 @@ void CMapMainWindow::setupChartsWidget()
 {
     m_chartsWidget = new CChartsWidget(this);
     addDockWidget(Qt::BottomDockWidgetArea, m_chartsWidget);
+    
+    // Set preferred size for better space utilization
+    m_chartsWidget->setMinimumHeight(300);
+    m_chartsWidget->setMaximumHeight(500);
+    
     m_chartsWidget->setVisible(false); // Hidden by default
 
     m_chartsWidget->setAllowedAreas(Qt::BottomDockWidgetArea | Qt::TopDockWidgetArea);
@@ -815,4 +841,36 @@ void CMapMainWindow::setupChartsWidget()
 void CMapMainWindow::onChartsRequested()
 {
     m_chartsWidget->setVisible(!m_chartsWidget->isVisible());
+}
+
+void CMapMainWindow::setupAnalyticsWidget()
+{
+    m_analyticsWidget = new CAnalyticsWidget(this);
+    
+    // Add as dockable widget to right side, below track table
+    addDockWidget(Qt::RightDockWidgetArea, m_analyticsWidget);
+    
+    // Stack it below the track table
+    tabifyDockWidget(m_trackTable, m_analyticsWidget);
+    
+    // Set preferred size for better space utilization
+    m_analyticsWidget->setMinimumWidth(350);
+    m_analyticsWidget->setMaximumWidth(500);
+    
+    // Make it initially visible
+    m_analyticsWidget->setVisible(true);
+    
+    // Allow docking on left and right
+    m_analyticsWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    
+    // Enable features
+    m_analyticsWidget->setFeatures(
+        QDockWidget::DockWidgetClosable |
+        QDockWidget::DockWidgetMovable |
+        QDockWidget::DockWidgetFloatable
+    );
+    
+    // Connect track selection signals
+    connect(m_trackTable, &CTrackTableWidget::trackSelected,
+            m_analyticsWidget, &CAnalyticsWidget::onTrackSelected);
 }

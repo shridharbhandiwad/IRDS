@@ -156,6 +156,7 @@ class CTrackTableWidget;
 class CConfigPanelWidget;
 class CChartsWidget;
 class CInterfacesPanelWidget;
+class CAnalyticsWidget;
 
 namespace Ui {
 class CMapMainWindow;
@@ -260,6 +261,11 @@ private:
     CInterfacesPanelWidget *m_interfacesPanel;
 
     /**
+     * @brief Rich dockable analytics panel for track statistics
+     */
+    CAnalyticsWidget *m_analyticsWidget;
+
+    /**
      * @brief Initialize and setup the dockable track table
      */
     void setupTrackTable();
@@ -273,6 +279,11 @@ private:
      * @brief Initialize and setup the dockable interfaces panel
      */
     void setupInterfacesPanel();
+
+    /**
+     * @brief Initialize and setup the dockable analytics panel
+     */
+    void setupAnalyticsWidget();
 
     /**
      * @brief Apply modern dark theme to the application
