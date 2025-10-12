@@ -380,6 +380,10 @@
 #include "MapDisplay/cchartswidget.h"
 #include "MapDisplay/cinterfacespanelwidget.h"
 #include "MapDisplay/canalyticswidget.h"
+#include "MapDisplay/csimulationwidget.h"
+#include "MapDisplay/crecordingwidget.h"
+#include "MapDisplay/chealthmonitorwidget.h"
+#include "MapDisplay/cpredictivemaintenancewidget.h"
 #include <QFileDialog>
 #include <QDebug>
 #include <qgspoint.h>
@@ -398,6 +402,10 @@ CMapMainWindow::CMapMainWindow(QWidget *parent) :
     setupInterfacesPanel();
     setupChartsWidget();
     setupAnalyticsWidget();
+    setupSimulationWidget();
+    setupRecordingWidget();
+    setupHealthMonitorWidget();
+    setupPredictiveMaintenanceWidget();
 
     // Hide the old widgets
     if (ui->tableWidget) {
@@ -596,6 +604,22 @@ void CMapMainWindow::keyPressEvent(QKeyEvent *event)
         // Toggle analytics panel visibility
         m_analyticsWidget->setVisible(!m_analyticsWidget->isVisible());
         break;
+    case Qt::Key_S:
+        // Toggle simulation panel visibility
+        m_simulationWidget->setVisible(!m_simulationWidget->isVisible());
+        break;
+    case Qt::Key_R:
+        // Toggle recording panel visibility
+        m_recordingWidget->setVisible(!m_recordingWidget->isVisible());
+        break;
+    case Qt::Key_M:
+        // Toggle health monitor visibility
+        m_healthMonitorWidget->setVisible(!m_healthMonitorWidget->isVisible());
+        break;
+    case Qt::Key_P:
+        // Toggle predictive maintenance visibility
+        m_predictiveMaintenanceWidget->setVisible(!m_predictiveMaintenanceWidget->isVisible());
+        break;
     }
     QMainWindow::keyPressEvent(event);
 }
@@ -642,8 +666,8 @@ void CMapMainWindow::updateTrackTable()
 {
     QList<stTrackDisplayInfo> listTracks = CDataWarehouse::getInstance()->getTrackList();
 
-    // Update status bar
-    QString statusMsg = QString("🎯 Tracks: %1 | 📊 'T': Table | ⚙️ 'C': Controls | ⚡ 'I': Interfaces | 📈 'A': Analytics | 🏠 'H': Home")
+    // Update status bar with keyboard shortcuts
+    QString statusMsg = QString("🎯 Tracks: %1 | T:Table C:Controls I:Interfaces A:Analytics S:Simulation R:Recording M:Health P:Maintenance H:Home")
         .arg(listTracks.count());
 
     ui->statusBar->showMessage(statusMsg);
@@ -824,9 +848,9 @@ void CMapMainWindow::setupChartsWidget()
     m_chartsWidget = new CChartsWidget(this);
     addDockWidget(Qt::BottomDockWidgetArea, m_chartsWidget);
     
-    // Set preferred size for better space utilization
-    m_chartsWidget->setMinimumHeight(300);
-    m_chartsWidget->setMaximumHeight(500);
+    // Set smaller size for better space utilization
+    m_chartsWidget->setMinimumHeight(250);
+    m_chartsWidget->setMaximumHeight(350);
     
     m_chartsWidget->setVisible(false); // Hidden by default
 
@@ -850,15 +874,15 @@ void CMapMainWindow::setupAnalyticsWidget()
     // Add as dockable widget to right side, below track table
     addDockWidget(Qt::RightDockWidgetArea, m_analyticsWidget);
     
-    // Stack it below the track table
+    // Stack it below the track table (tabbed)
     tabifyDockWidget(m_trackTable, m_analyticsWidget);
     
     // Set preferred size for better space utilization
     m_analyticsWidget->setMinimumWidth(350);
     m_analyticsWidget->setMaximumWidth(500);
     
-    // Make it initially visible
-    m_analyticsWidget->setVisible(true);
+    // Make track table the default visible tab
+    m_trackTable->raise();
     
     // Allow docking on left and right
     m_analyticsWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -873,4 +897,110 @@ void CMapMainWindow::setupAnalyticsWidget()
     // Connect track selection signals
     connect(m_trackTable, &CTrackTableWidget::trackSelected,
             m_analyticsWidget, &CAnalyticsWidget::onTrackSelected);
+}
+
+void CMapMainWindow::setupSimulationWidget()
+{
+    m_simulationWidget = new CSimulationWidget(this);
+    
+    // Add as dockable widget to left side
+    addDockWidget(Qt::LeftDockWidgetArea, m_simulationWidget);
+    
+    // Set preferred size
+    m_simulationWidget->setMinimumWidth(400);
+    m_simulationWidget->setMaximumWidth(550);
+    
+    // Make it initially visible
+    m_simulationWidget->setVisible(true);
+    
+    // Allow docking on left and right
+    m_simulationWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    
+    // Enable features
+    m_simulationWidget->setFeatures(
+        QDockWidget::DockWidgetClosable |
+        QDockWidget::DockWidgetMovable |
+        QDockWidget::DockWidgetFloatable
+    );
+}
+
+void CMapMainWindow::setupRecordingWidget()
+{
+    m_recordingWidget = new CRecordingWidget(this);
+    
+    // Add as dockable widget to left side, tabbed with simulation
+    addDockWidget(Qt::LeftDockWidgetArea, m_recordingWidget);
+    tabifyDockWidget(m_simulationWidget, m_recordingWidget);
+    
+    // Set preferred size
+    m_recordingWidget->setMinimumWidth(400);
+    m_recordingWidget->setMaximumWidth(550);
+    
+    // Make simulation the default visible tab
+    m_simulationWidget->raise();
+    
+    // Allow docking on left and right
+    m_recordingWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    
+    // Enable features
+    m_recordingWidget->setFeatures(
+        QDockWidget::DockWidgetClosable |
+        QDockWidget::DockWidgetMovable |
+        QDockWidget::DockWidgetFloatable
+    );
+    
+    // Connect replay signal to data warehouse
+    connect(m_recordingWidget, &CRecordingWidget::replayTrackData,
+            CDataWarehouse::getInstance(), &CDataWarehouse::slotUpdateTrackData);
+}
+
+void CMapMainWindow::setupHealthMonitorWidget()
+{
+    m_healthMonitorWidget = new CHealthMonitorWidget(this);
+    
+    // Add as dockable widget to right side
+    addDockWidget(Qt::RightDockWidgetArea, m_healthMonitorWidget);
+    
+    // Set preferred size
+    m_healthMonitorWidget->setMinimumWidth(350);
+    m_healthMonitorWidget->setMaximumWidth(500);
+    
+    // Make it initially visible
+    m_healthMonitorWidget->setVisible(true);
+    
+    // Allow docking on left and right
+    m_healthMonitorWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    
+    // Enable features
+    m_healthMonitorWidget->setFeatures(
+        QDockWidget::DockWidgetClosable |
+        QDockWidget::DockWidgetMovable |
+        QDockWidget::DockWidgetFloatable
+    );
+}
+
+void CMapMainWindow::setupPredictiveMaintenanceWidget()
+{
+    m_predictiveMaintenanceWidget = new CPredictiveMaintenanceWidget(this);
+    
+    // Add as dockable widget to right side, tabbed with health monitor
+    addDockWidget(Qt::RightDockWidgetArea, m_predictiveMaintenanceWidget);
+    tabifyDockWidget(m_healthMonitorWidget, m_predictiveMaintenanceWidget);
+    
+    // Set preferred size
+    m_predictiveMaintenanceWidget->setMinimumWidth(350);
+    m_predictiveMaintenanceWidget->setMaximumWidth(500);
+    
+    // Make health monitor the default visible tab
+    m_healthMonitorWidget->raise();
+    
+    // Allow docking on left and right
+    m_predictiveMaintenanceWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    
+    // Enable features
+    m_predictiveMaintenanceWidget->setFeatures(
+        QDockWidget::DockWidgetClosable |
+        QDockWidget::DockWidgetMovable |
+        QDockWidget::DockWidgetFloatable
+    );
 }

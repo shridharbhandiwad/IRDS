@@ -42,9 +42,13 @@ SOURCES += \
         MapDisplay/canalyticswidget.cpp \
         MapDisplay/cchartswidget.cpp \
         MapDisplay/cconfigpanelwidget.cpp \
+        MapDisplay/chealthmonitorwidget.cpp \
         MapDisplay/cinterfacespanelwidget.cpp \
+        MapDisplay/cpredictivemaintenancewidget.cpp \
         MapDisplay/cppilayer.cpp \
+        MapDisplay/crecordingwidget.cpp \
         MapDisplay/csearchbeamlayer.cpp \
+        MapDisplay/csimulationwidget.cpp \
         MapDisplay/ctracklayer.cpp \
         MapDisplay/ctracktablewidget.cpp \
         MapDisplay/customgradiantfillsymbollayer.cpp \
@@ -60,9 +64,13 @@ HEADERS += \
         MapDisplay/canalyticswidget.h \
         MapDisplay/cchartswidget.h \
         MapDisplay/cconfigpanelwidget.h \
+        MapDisplay/chealthmonitorwidget.h \
         MapDisplay/cinterfacespanelwidget.h \
+        MapDisplay/cpredictivemaintenancewidget.h \
         MapDisplay/cppilayer.h \
+        MapDisplay/crecordingwidget.h \
         MapDisplay/csearchbeamlayer.h \
+        MapDisplay/csimulationwidget.h \
         MapDisplay/ctracklayer.h \
         MapDisplay/ctracktablewidget.h \
         MapDisplay/customgradiantfillsymbollayer.h \
