@@ -379,9 +379,12 @@
 #include "MapDisplay/cconfigpanelwidget.h"
 #include "MapDisplay/cchartswidget.h"
 #include "MapDisplay/cinterfacespanelwidget.h"
+#include "MapDisplay/canalyticspanelwidget.h"
 #include <QFileDialog>
 #include <QDebug>
 #include <qgspoint.h>
+#include <QScreen>
+#include <QApplication>
 
 CMapMainWindow::CMapMainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -391,10 +394,26 @@ CMapMainWindow::CMapMainWindow(QWidget *parent) :
     ui->widgetMapCanvas->Initialize();
     setWindowTitle("⚡ Radar Display - Advanced Control System");
 
+    // Get the primary screen size
+    QScreen *screen = QApplication::primaryScreen();
+    QRect screenGeometry = screen->availableGeometry();
+    
+    // Set window to 90% of screen size for better space utilization
+    int width = static_cast<int>(screenGeometry.width() * 0.9);
+    int height = static_cast<int>(screenGeometry.height() * 0.9);
+    resize(width, height);
+    
+    // Center the window on screen
+    move(screenGeometry.center() - rect().center());
+    
+    // Enable maximize/minimize buttons
+    setWindowFlags(windowFlags() | Qt::WindowMaximizeButtonHint | Qt::WindowMinimizeButtonHint);
+
     // Setup rich dockable widgets
     setupTrackTable();
     setupConfigPanel();
     setupInterfacesPanel();
+    setupAnalyticsPanel();
     setupChartsWidget();
 
     // Hide the old widgets
@@ -441,6 +460,10 @@ void CMapMainWindow::setupTrackTable()
         QDockWidget::DockWidgetFloatable
     );
 
+    // Set reasonable size
+    m_trackTable->setMinimumWidth(300);
+    m_trackTable->resize(400, height());
+
     // Connect signals for track interaction
     connect(m_trackTable, &CTrackTableWidget::trackSelected,
             this, &CMapMainWindow::onTrackSelected);
@@ -467,6 +490,10 @@ void CMapMainWindow::setupConfigPanel()
         QDockWidget::DockWidgetMovable |
         QDockWidget::DockWidgetFloatable
     );
+
+    // Set reasonable size
+    m_configPanel->setMinimumWidth(280);
+    m_configPanel->resize(320, height());
 
     // Connect all signals
     connect(m_configPanel, &CConfigPanelWidget::mapHomeRequested,
@@ -582,6 +609,10 @@ void CMapMainWindow::keyPressEvent(QKeyEvent *event)
         // Toggle interfaces panel visibility
         m_interfacesPanel->setVisible(!m_interfacesPanel->isVisible());
         break;
+    case Qt::Key_A:
+        // Toggle analytics panel visibility
+        m_analyticsPanel->setVisible(!m_analyticsPanel->isVisible());
+        break;
     }
     QMainWindow::keyPressEvent(event);
 }
@@ -629,7 +660,7 @@ void CMapMainWindow::updateTrackTable()
     QList<stTrackDisplayInfo> listTracks = CDataWarehouse::getInstance()->getTrackList();
 
     // Update status bar
-    QString statusMsg = QString("🎯 Tracks: %1 | 📊 'T': Table | ⚙️ 'C': Controls | ⚡ 'I': Interfaces | 🏠 'H': Home")
+    QString statusMsg = QString("🎯 Tracks: %1 | 📊 'T': Table | 📈 'A': Analytics | ⚙️ 'C': Controls | ⚡ 'I': Interfaces | 🏠 'H': Home")
         .arg(listTracks.count());
 
     ui->statusBar->showMessage(statusMsg);
@@ -638,6 +669,9 @@ void CMapMainWindow::updateTrackTable()
 void CMapMainWindow::onTrackSelected(int trackId)
 {
     qDebug() << "Track selected:" << trackId;
+
+    // Update analytics panel with selected track
+    m_analyticsPanel->setSelectedTrack(trackId);
 
     QList<stTrackDisplayInfo> tracks = CDataWarehouse::getInstance()->getTrackList();
     for (const stTrackDisplayInfo &track : tracks) {
@@ -776,6 +810,13 @@ void CMapMainWindow::setupInterfacesPanel()
         QDockWidget::DockWidgetFloatable
     );
 
+    // Set reasonable size
+    m_interfacesPanel->setMinimumWidth(280);
+    m_interfacesPanel->resize(320, height());
+
+    // Stack below config panel
+    splitDockWidget(m_configPanel, m_interfacesPanel, Qt::Vertical);
+
     // Connect interface signals to debug slots
     connect(m_interfacesPanel, &CInterfacesPanelWidget::servoAzimuthChanged, this, [](double az) {
         qDebug() << "Servo azimuth changed to:" << az;
@@ -796,6 +837,34 @@ void CMapMainWindow::setupInterfacesPanel()
         qDebug() << "Logging started";
         m_interfacesPanel->appendLogMessage("Logging session started");
     });
+}
+
+void CMapMainWindow::setupAnalyticsPanel()
+{
+    m_analyticsPanel = new CAnalyticsPanelWidget(this);
+
+    // Add as dockable widget to right side, below track table
+    addDockWidget(Qt::RightDockWidgetArea, m_analyticsPanel);
+
+    // Make it initially visible
+    m_analyticsPanel->setVisible(true);
+
+    // Allow docking on left and right
+    m_analyticsPanel->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+
+    // Enable features
+    m_analyticsPanel->setFeatures(
+        QDockWidget::DockWidgetClosable |
+        QDockWidget::DockWidgetMovable |
+        QDockWidget::DockWidgetFloatable
+    );
+
+    // Set reasonable size
+    m_analyticsPanel->setMinimumWidth(300);
+    m_analyticsPanel->resize(350, height());
+
+    // Stack below track table
+    splitDockWidget(m_trackTable, m_analyticsPanel, Qt::Vertical);
 }
 
 void CMapMainWindow::setupChartsWidget()
