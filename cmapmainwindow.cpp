@@ -616,9 +616,9 @@ void CMapMainWindow::setupDockWidgetLayout()
     m_configPanel->setVisible(true);
     m_trackTable->setVisible(true);
     m_simulationWidget->setVisible(true);
-    m_analyticsWidget->setVisible(false);  // Hidden by default
+    m_analyticsWidget->setVisible(true);  // Visible by default
     m_chartsWidget->setVisible(false);     // Hidden by default
-    m_interfacesPanel->setVisible(false);  // Hidden by default
+    m_interfacesPanel->setVisible(true);  // Visible by default
     m_recordingWidget->setVisible(false);  // Hidden by default
     m_healthMonitorWidget->setVisible(false);  // Hidden by default
     m_predictiveMaintenanceWidget->setVisible(false);  // Hidden by default
