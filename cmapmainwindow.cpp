@@ -421,6 +421,9 @@ CMapMainWindow::CMapMainWindow(QWidget *parent) :
     // Apply modern dark theme to main window
     applyModernTheme();
 
+    // Set better dock widget layout
+    setupDockWidgetLayout();
+
     // Start update timer for status bar
     connect(&_m_updateTimer, &QTimer::timeout, this, &CMapMainWindow::updateTrackTable);
     _m_updateTimer.start(1000);
@@ -577,6 +580,48 @@ void CMapMainWindow::applyModernTheme()
         "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #667eea, stop:1 #764ba2);"
         "}"
     );
+}
+
+void CMapMainWindow::setupDockWidgetLayout()
+{
+    // Set dock widget size constraints to prevent overlapping
+    setDockNestingEnabled(true);
+    
+    // Set minimum dock widget sizes
+    setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
+    setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
+    setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
+    setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
+    
+    // Resize dock areas to reasonable proportions
+    QList<int> leftSizes;
+    QList<int> rightSizes;
+    QList<int> bottomSizes;
+    
+    // Left area: Config/Interfaces (top), Simulation/Recording (bottom)
+    leftSizes << 400 << 400;  // Equal split
+    
+    // Right area: Track Table (top), Analytics/Health/Maintenance (bottom)
+    rightSizes << 350 << 350;  // Equal split
+    
+    // Bottom area: Charts
+    bottomSizes << 200;
+    
+    // Apply size constraints
+    resizeDocks({m_configPanel, m_simulationWidget}, leftSizes, Qt::Vertical);
+    resizeDocks({m_trackTable, m_analyticsWidget}, rightSizes, Qt::Vertical);
+    resizeDocks({m_chartsWidget}, bottomSizes, Qt::Horizontal);
+    
+    // Set initial visibility state
+    m_configPanel->setVisible(true);
+    m_trackTable->setVisible(true);
+    m_simulationWidget->setVisible(true);
+    m_analyticsWidget->setVisible(false);  // Hidden by default
+    m_chartsWidget->setVisible(false);     // Hidden by default
+    m_interfacesPanel->setVisible(false);  // Hidden by default
+    m_recordingWidget->setVisible(false);  // Hidden by default
+    m_healthMonitorWidget->setVisible(false);  // Hidden by default
+    m_predictiveMaintenanceWidget->setVisible(false);  // Hidden by default
 }
 
 void CMapMainWindow::keyPressEvent(QKeyEvent *event)
@@ -810,6 +855,9 @@ void CMapMainWindow::setupInterfacesPanel()
 
     // Make it initially visible
     m_interfacesPanel->setVisible(true);
+    
+    // Make config panel the default visible tab
+    m_configPanel->raise();
 
     // Allow docking on left and right
     m_interfacesPanel->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -922,6 +970,10 @@ void CMapMainWindow::setupSimulationWidget()
         QDockWidget::DockWidgetMovable |
         QDockWidget::DockWidgetFloatable
     );
+    
+    // Connect simulation signal to data warehouse for direct track updates
+    connect(m_simulationWidget, &CSimulationWidget::simulatedTrackData,
+            CDataWarehouse::getInstance(), &CDataWarehouse::slotUpdateTrackData);
 }
 
 void CMapMainWindow::setupRecordingWidget()

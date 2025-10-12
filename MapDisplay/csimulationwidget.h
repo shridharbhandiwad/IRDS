@@ -43,6 +43,9 @@ public slots:
     void pauseSimulation();
     void resetSimulation();
 
+signals:
+    void simulatedTrackData(stTrackRecvInfo track);
+
 private slots:
     void updateSimulation();
     void onTrackCountChanged(int count);

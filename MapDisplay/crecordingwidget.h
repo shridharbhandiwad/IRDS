@@ -14,6 +14,9 @@
 #include <QDataStream>
 #include "../globalstructs.h"
 
+// Forward declaration
+class CReplayWindow;
+
 /**
  * @brief Widget for recording and replaying radar sessions
  * 
@@ -50,6 +53,8 @@ private slots:
     void exportRecording();
     void refreshRecordings();
     void onReplaySpeedChanged(int index);
+    void openReplayWindow();
+    void onReplayWindowClosed();
 
 private:
     void setupUI();
@@ -115,6 +120,10 @@ private:
     qint64 m_replayStartTime;
     QTimer *m_replayTimer;
     double m_replaySpeed;
+    
+    // Replay window
+    CReplayWindow *m_replayWindow;
+    QPushButton *m_replayWindowButton;
     
     static const QString RECORDINGS_DIR;
     static constexpr int RECORD_INTERVAL = 1000; // 1 second

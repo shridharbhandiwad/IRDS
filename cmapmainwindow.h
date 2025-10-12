@@ -339,6 +339,11 @@ private:
      */
     void applyModernTheme();
 
+    /**
+     * @brief Setup better dock widget layout to prevent overlapping
+     */
+    void setupDockWidgetLayout();
+
     CChartsWidget *m_chartsWidget;
 
     void setupChartsWidget();
