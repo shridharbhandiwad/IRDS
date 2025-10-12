@@ -157,6 +157,10 @@ class CConfigPanelWidget;
 class CChartsWidget;
 class CInterfacesPanelWidget;
 class CAnalyticsWidget;
+class CSimulationWidget;
+class CScreenRecorderWidget;
+class CHealthMonitorWidget;
+class CPredictiveMaintenanceWidget;
 
 namespace Ui {
 class CMapMainWindow;
@@ -179,6 +183,10 @@ protected:
      * - T: Toggle track table visibility
      * - C: Toggle control panel visibility
      * - I: Toggle interfaces panel visibility
+     * - S: Toggle simulation widget visibility
+     * - R: Toggle screen recorder widget visibility
+     * - M: Toggle health monitor widget visibility
+     * - P: Toggle predictive maintenance widget visibility
      * - H: Map home view
      * - F: Toggle old controls (deprecated)
      */
@@ -266,6 +274,26 @@ private:
     CAnalyticsWidget *m_analyticsWidget;
 
     /**
+     * @brief Simulation control widget for generating test tracks
+     */
+    CSimulationWidget *m_simulationWidget;
+
+    /**
+     * @brief Screen recording and replay widget
+     */
+    CScreenRecorderWidget *m_screenRecorderWidget;
+
+    /**
+     * @brief Health monitoring widget for system status
+     */
+    CHealthMonitorWidget *m_healthMonitorWidget;
+
+    /**
+     * @brief Predictive maintenance widget
+     */
+    CPredictiveMaintenanceWidget *m_predictiveMaintenanceWidget;
+
+    /**
      * @brief Initialize and setup the dockable track table
      */
     void setupTrackTable();
@@ -284,6 +312,26 @@ private:
      * @brief Initialize and setup the dockable analytics panel
      */
     void setupAnalyticsWidget();
+
+    /**
+     * @brief Initialize and setup the simulation widget
+     */
+    void setupSimulationWidget();
+
+    /**
+     * @brief Initialize and setup the screen recorder widget
+     */
+    void setupScreenRecorderWidget();
+
+    /**
+     * @brief Initialize and setup the health monitor widget
+     */
+    void setupHealthMonitorWidget();
+
+    /**
+     * @brief Initialize and setup the predictive maintenance widget
+     */
+    void setupPredictiveMaintenanceWidget();
 
     /**
      * @brief Apply modern dark theme to the application

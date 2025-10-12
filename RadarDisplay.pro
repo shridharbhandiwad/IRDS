@@ -48,6 +48,10 @@ SOURCES += \
         MapDisplay/ctracklayer.cpp \
         MapDisplay/ctracktablewidget.cpp \
         MapDisplay/customgradiantfillsymbollayer.cpp \
+        MapDisplay/csimulationwidget.cpp \
+        MapDisplay/cscreenrecorderwidget.cpp \
+        MapDisplay/chealthmonitorwidget.cpp \
+        MapDisplay/cpredictivemaintenancewidget.cpp \
         cdatawarehouse.cpp \
         cudpreceiver.cpp \
         main.cpp \
@@ -66,6 +70,10 @@ HEADERS += \
         MapDisplay/ctracklayer.h \
         MapDisplay/ctracktablewidget.h \
         MapDisplay/customgradiantfillsymbollayer.h \
+        MapDisplay/csimulationwidget.h \
+        MapDisplay/cscreenrecorderwidget.h \
+        MapDisplay/chealthmonitorwidget.h \
+        MapDisplay/cpredictivemaintenancewidget.h \
         cdatawarehouse.h \
         cmapmainwindow.h \
         MapDisplay/cmapcanvas.h \

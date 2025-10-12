@@ -380,6 +380,10 @@
 #include "MapDisplay/cchartswidget.h"
 #include "MapDisplay/cinterfacespanelwidget.h"
 #include "MapDisplay/canalyticswidget.h"
+#include "MapDisplay/csimulationwidget.h"
+#include "MapDisplay/cscreenrecorderwidget.h"
+#include "MapDisplay/chealthmonitorwidget.h"
+#include "MapDisplay/cpredictivemaintenancewidget.h"
 #include <QFileDialog>
 #include <QDebug>
 #include <qgspoint.h>
@@ -398,6 +402,10 @@ CMapMainWindow::CMapMainWindow(QWidget *parent) :
     setupInterfacesPanel();
     setupChartsWidget();
     setupAnalyticsWidget();
+    setupSimulationWidget();
+    setupScreenRecorderWidget();
+    setupHealthMonitorWidget();
+    setupPredictiveMaintenanceWidget();
 
     // Hide the old widgets
     if (ui->tableWidget) {
@@ -595,6 +603,22 @@ void CMapMainWindow::keyPressEvent(QKeyEvent *event)
     case Qt::Key_A:
         // Toggle analytics panel visibility
         m_analyticsWidget->setVisible(!m_analyticsWidget->isVisible());
+        break;
+    case Qt::Key_S:
+        // Toggle simulation widget visibility
+        m_simulationWidget->setVisible(!m_simulationWidget->isVisible());
+        break;
+    case Qt::Key_R:
+        // Toggle screen recorder widget visibility
+        m_screenRecorderWidget->setVisible(!m_screenRecorderWidget->isVisible());
+        break;
+    case Qt::Key_M:
+        // Toggle health monitor widget visibility
+        m_healthMonitorWidget->setVisible(!m_healthMonitorWidget->isVisible());
+        break;
+    case Qt::Key_P:
+        // Toggle predictive maintenance widget visibility
+        m_predictiveMaintenanceWidget->setVisible(!m_predictiveMaintenanceWidget->isVisible());
         break;
     }
     QMainWindow::keyPressEvent(event);
@@ -824,9 +848,11 @@ void CMapMainWindow::setupChartsWidget()
     m_chartsWidget = new CChartsWidget(this);
     addDockWidget(Qt::BottomDockWidgetArea, m_chartsWidget);
     
-    // Set preferred size for better space utilization
-    m_chartsWidget->setMinimumHeight(300);
-    m_chartsWidget->setMaximumHeight(500);
+    // Set preferred size for better space utilization - optimized for horizontal space
+    m_chartsWidget->setMinimumHeight(200);
+    m_chartsWidget->setMaximumHeight(350);
+    m_chartsWidget->setMinimumWidth(400);
+    m_chartsWidget->setMaximumWidth(800);
     
     m_chartsWidget->setVisible(false); // Hidden by default
 
@@ -857,8 +883,11 @@ void CMapMainWindow::setupAnalyticsWidget()
     m_analyticsWidget->setMinimumWidth(350);
     m_analyticsWidget->setMaximumWidth(500);
     
-    // Make it initially visible
-    m_analyticsWidget->setVisible(true);
+    // Make it initially hidden so track table is shown on startup
+    m_analyticsWidget->setVisible(false);
+    
+    // Ensure track table is the active tab on startup
+    m_trackTable->raise();
     
     // Allow docking on left and right
     m_analyticsWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -873,4 +902,113 @@ void CMapMainWindow::setupAnalyticsWidget()
     // Connect track selection signals
     connect(m_trackTable, &CTrackTableWidget::trackSelected,
             m_analyticsWidget, &CAnalyticsWidget::onTrackSelected);
+}
+
+void CMapMainWindow::setupSimulationWidget()
+{
+    m_simulationWidget = new CSimulationWidget(this);
+    
+    // Add as dockable widget to left side, below config panel
+    addDockWidget(Qt::LeftDockWidgetArea, m_simulationWidget);
+    
+    // Stack it below the config panel
+    tabifyDockWidget(m_configPanel, m_simulationWidget);
+    
+    // Set preferred size for better space utilization
+    m_simulationWidget->setMinimumWidth(300);
+    m_simulationWidget->setMaximumWidth(400);
+    
+    // Make it initially visible
+    m_simulationWidget->setVisible(true);
+    
+    // Allow docking on left and right
+    m_simulationWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    
+    // Enable features
+    m_simulationWidget->setFeatures(
+        QDockWidget::DockWidgetClosable |
+        QDockWidget::DockWidgetMovable |
+        QDockWidget::DockWidgetFloatable
+    );
+}
+
+void CMapMainWindow::setupScreenRecorderWidget()
+{
+    m_screenRecorderWidget = new CScreenRecorderWidget(this);
+    
+    // Add as dockable widget to bottom area
+    addDockWidget(Qt::BottomDockWidgetArea, m_screenRecorderWidget);
+    
+    // Set preferred size for better space utilization
+    m_screenRecorderWidget->setMinimumHeight(200);
+    m_screenRecorderWidget->setMaximumHeight(400);
+    
+    // Make it initially visible
+    m_screenRecorderWidget->setVisible(true);
+    
+    // Allow docking on all sides
+    m_screenRecorderWidget->setAllowedAreas(Qt::AllDockWidgetAreas);
+    
+    // Enable features
+    m_screenRecorderWidget->setFeatures(
+        QDockWidget::DockWidgetClosable |
+        QDockWidget::DockWidgetMovable |
+        QDockWidget::DockWidgetFloatable
+    );
+}
+
+void CMapMainWindow::setupHealthMonitorWidget()
+{
+    m_healthMonitorWidget = new CHealthMonitorWidget(this);
+    
+    // Add as dockable widget to bottom area
+    addDockWidget(Qt::BottomDockWidgetArea, m_healthMonitorWidget);
+    
+    // Stack it with screen recorder
+    tabifyDockWidget(m_screenRecorderWidget, m_healthMonitorWidget);
+    
+    // Set preferred size for better space utilization
+    m_healthMonitorWidget->setMinimumHeight(200);
+    m_healthMonitorWidget->setMaximumHeight(400);
+    
+    // Make it initially visible
+    m_healthMonitorWidget->setVisible(true);
+    
+    // Allow docking on all sides
+    m_healthMonitorWidget->setAllowedAreas(Qt::AllDockWidgetAreas);
+    
+    // Enable features
+    m_healthMonitorWidget->setFeatures(
+        QDockWidget::DockWidgetClosable |
+        QDockWidget::DockWidgetMovable |
+        QDockWidget::DockWidgetFloatable
+    );
+}
+
+void CMapMainWindow::setupPredictiveMaintenanceWidget()
+{
+    m_predictiveMaintenanceWidget = new CPredictiveMaintenanceWidget(this);
+    
+    // Add as dockable widget to bottom area
+    addDockWidget(Qt::BottomDockWidgetArea, m_predictiveMaintenanceWidget);
+    
+    // Stack it with other bottom widgets
+    tabifyDockWidget(m_healthMonitorWidget, m_predictiveMaintenanceWidget);
+    
+    // Set preferred size for better space utilization
+    m_predictiveMaintenanceWidget->setMinimumHeight(200);
+    m_predictiveMaintenanceWidget->setMaximumHeight(400);
+    
+    // Make it initially visible
+    m_predictiveMaintenanceWidget->setVisible(true);
+    
+    // Allow docking on all sides
+    m_predictiveMaintenanceWidget->setAllowedAreas(Qt::AllDockWidgetAreas);
+    
+    // Enable features
+    m_predictiveMaintenanceWidget->setFeatures(
+        QDockWidget::DockWidgetClosable |
+        QDockWidget::DockWidgetMovable |
+        QDockWidget::DockWidgetFloatable
+    );
 }
