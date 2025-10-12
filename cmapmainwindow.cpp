@@ -384,6 +384,7 @@
 #include "MapDisplay/crecordingwidget.h"
 #include "MapDisplay/chealthmonitorwidget.h"
 #include "MapDisplay/cpredictivemaintenancewidget.h"
+#include "MapDisplay/cvideoplayerwindow.h"
 #include <QFileDialog>
 #include <QDebug>
 #include <qgspoint.h>
@@ -439,8 +440,8 @@ void CMapMainWindow::setupTrackTable()
     addDockWidget(Qt::RightDockWidgetArea, m_trackTable);
 
     // Set preferred size for better space utilization
-    m_trackTable->setMinimumWidth(350);
-    m_trackTable->setMaximumWidth(500);
+    m_trackTable->setMinimumWidth(300);
+    m_trackTable->setMaximumWidth(400);
 
     // Make it initially visible
     m_trackTable->setVisible(true);
@@ -470,8 +471,8 @@ void CMapMainWindow::setupConfigPanel()
     addDockWidget(Qt::LeftDockWidgetArea, m_configPanel);
 
     // Set preferred size for better space utilization
-    m_configPanel->setMinimumWidth(300);
-    m_configPanel->setMaximumWidth(400);
+    m_configPanel->setMinimumWidth(280);
+    m_configPanel->setMaximumWidth(350);
 
     // Make it initially visible
     m_configPanel->setVisible(true);
@@ -620,6 +621,10 @@ void CMapMainWindow::keyPressEvent(QKeyEvent *event)
         // Toggle predictive maintenance visibility
         m_predictiveMaintenanceWidget->setVisible(!m_predictiveMaintenanceWidget->isVisible());
         break;
+    case Qt::Key_V:
+        // Toggle video player window visibility
+        onVideoReplayRequested();
+        break;
     }
     QMainWindow::keyPressEvent(event);
 }
@@ -667,7 +672,7 @@ void CMapMainWindow::updateTrackTable()
     QList<stTrackDisplayInfo> listTracks = CDataWarehouse::getInstance()->getTrackList();
 
     // Update status bar with keyboard shortcuts
-    QString statusMsg = QString("🎯 Tracks: %1 | T:Table C:Controls I:Interfaces A:Analytics S:Simulation R:Recording M:Health P:Maintenance H:Home")
+    QString statusMsg = QString("🎯 Tracks: %1 | T:Table C:Controls I:Interfaces A:Analytics S:Simulation R:Recording V:Video M:Health P:Maintenance H:Home")
         .arg(listTracks.count());
 
     ui->statusBar->showMessage(statusMsg);
@@ -798,15 +803,15 @@ void CMapMainWindow::setupInterfacesPanel()
 {
     m_interfacesPanel = new CInterfacesPanelWidget(this);
 
-    // Add as dockable widget to left side, below config panel
+    // Add as dockable widget to left side, split below config panel
     addDockWidget(Qt::LeftDockWidgetArea, m_interfacesPanel);
     
-    // Stack it below the config panel
-    tabifyDockWidget(m_configPanel, m_interfacesPanel);
+    // Split it vertically below the config panel instead of tabifying
+    splitDockWidget(m_configPanel, m_interfacesPanel, Qt::Vertical);
 
     // Set preferred size for better space utilization
-    m_interfacesPanel->setMinimumWidth(300);
-    m_interfacesPanel->setMaximumWidth(400);
+    m_interfacesPanel->setMinimumWidth(280);
+    m_interfacesPanel->setMaximumWidth(350);
 
     // Make it initially visible
     m_interfacesPanel->setVisible(true);
@@ -871,18 +876,15 @@ void CMapMainWindow::setupAnalyticsWidget()
 {
     m_analyticsWidget = new CAnalyticsWidget(this);
     
-    // Add as dockable widget to right side, below track table
+    // Add as dockable widget to right side, split below track table
     addDockWidget(Qt::RightDockWidgetArea, m_analyticsWidget);
     
-    // Stack it below the track table (tabbed)
-    tabifyDockWidget(m_trackTable, m_analyticsWidget);
+    // Split it vertically below the track table instead of tabifying
+    splitDockWidget(m_trackTable, m_analyticsWidget, Qt::Vertical);
     
     // Set preferred size for better space utilization
-    m_analyticsWidget->setMinimumWidth(350);
-    m_analyticsWidget->setMaximumWidth(500);
-    
-    // Make track table the default visible tab
-    m_trackTable->raise();
+    m_analyticsWidget->setMinimumWidth(300);
+    m_analyticsWidget->setMaximumWidth(400);
     
     // Allow docking on left and right
     m_analyticsWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -903,18 +905,18 @@ void CMapMainWindow::setupSimulationWidget()
 {
     m_simulationWidget = new CSimulationWidget(this);
     
-    // Add as dockable widget to left side
-    addDockWidget(Qt::LeftDockWidgetArea, m_simulationWidget);
+    // Add as dockable widget to bottom area
+    addDockWidget(Qt::BottomDockWidgetArea, m_simulationWidget);
     
     // Set preferred size
-    m_simulationWidget->setMinimumWidth(400);
-    m_simulationWidget->setMaximumWidth(550);
+    m_simulationWidget->setMinimumHeight(250);
+    m_simulationWidget->setMaximumHeight(400);
     
     // Make it initially visible
     m_simulationWidget->setVisible(true);
     
-    // Allow docking on left and right
-    m_simulationWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    // Allow docking on bottom and top
+    m_simulationWidget->setAllowedAreas(Qt::BottomDockWidgetArea | Qt::TopDockWidgetArea);
     
     // Enable features
     m_simulationWidget->setFeatures(
@@ -958,15 +960,16 @@ void CMapMainWindow::setupHealthMonitorWidget()
 {
     m_healthMonitorWidget = new CHealthMonitorWidget(this);
     
-    // Add as dockable widget to right side
+    // Add as dockable widget to right side, but tabbed with analytics
     addDockWidget(Qt::RightDockWidgetArea, m_healthMonitorWidget);
+    tabifyDockWidget(m_analyticsWidget, m_healthMonitorWidget);
     
     // Set preferred size
-    m_healthMonitorWidget->setMinimumWidth(350);
-    m_healthMonitorWidget->setMaximumWidth(500);
+    m_healthMonitorWidget->setMinimumWidth(300);
+    m_healthMonitorWidget->setMaximumWidth(400);
     
-    // Make it initially visible
-    m_healthMonitorWidget->setVisible(true);
+    // Make analytics the default visible tab
+    m_analyticsWidget->raise();
     
     // Allow docking on left and right
     m_healthMonitorWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -983,16 +986,13 @@ void CMapMainWindow::setupPredictiveMaintenanceWidget()
 {
     m_predictiveMaintenanceWidget = new CPredictiveMaintenanceWidget(this);
     
-    // Add as dockable widget to right side, tabbed with health monitor
+    // Add as dockable widget to right side, tabbed with health monitor and analytics
     addDockWidget(Qt::RightDockWidgetArea, m_predictiveMaintenanceWidget);
     tabifyDockWidget(m_healthMonitorWidget, m_predictiveMaintenanceWidget);
     
     // Set preferred size
-    m_predictiveMaintenanceWidget->setMinimumWidth(350);
-    m_predictiveMaintenanceWidget->setMaximumWidth(500);
-    
-    // Make health monitor the default visible tab
-    m_healthMonitorWidget->raise();
+    m_predictiveMaintenanceWidget->setMinimumWidth(300);
+    m_predictiveMaintenanceWidget->setMaximumWidth(400);
     
     // Allow docking on left and right
     m_predictiveMaintenanceWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -1003,4 +1003,31 @@ void CMapMainWindow::setupPredictiveMaintenanceWidget()
         QDockWidget::DockWidgetMovable |
         QDockWidget::DockWidgetFloatable
     );
+}
+
+void CMapMainWindow::setupVideoPlayerWindow()
+{
+    m_videoPlayerWindow = new CVideoPlayerWindow(this);
+    
+    // Set initial size and position
+    m_videoPlayerWindow->resize(720, 540);
+    m_videoPlayerWindow->move(100, 100);
+    
+    // Initially hidden
+    m_videoPlayerWindow->setVisible(false);
+    
+    // Connect recording widget button to show video player
+    connect(m_recordingWidget, &CRecordingWidget::replayStarted,
+            this, &CMapMainWindow::onVideoReplayRequested);
+}
+
+void CMapMainWindow::onVideoReplayRequested()
+{
+    if (m_videoPlayerWindow->isVisible()) {
+        m_videoPlayerWindow->hide();
+    } else {
+        m_videoPlayerWindow->show();
+        m_videoPlayerWindow->raise();
+        m_videoPlayerWindow->activateWindow();
+    }
 }
