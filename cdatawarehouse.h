@@ -23,8 +23,11 @@ public :
     QList<stTrackDisplayInfo> getTrackList();
 
     const QPointF getRadarPos();
-private slots:
+
+public slots:
     void slotUpdateTrackData(stTrackRecvInfo trackRecvInfo);
+
+private slots:
     void slotClearTracksOnTimeOut();
 private:
     /**
