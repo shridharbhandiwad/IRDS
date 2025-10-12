@@ -156,6 +156,7 @@ class CTrackTableWidget;
 class CConfigPanelWidget;
 class CChartsWidget;
 class CInterfacesPanelWidget;
+class CAnalyticsPanelWidget;
 
 namespace Ui {
 class CMapMainWindow;
@@ -176,6 +177,7 @@ protected:
      *
      * Shortcuts:
      * - T: Toggle track table visibility
+     * - A: Toggle analytics panel visibility
      * - C: Toggle control panel visibility
      * - I: Toggle interfaces panel visibility
      * - H: Map home view
@@ -260,6 +262,11 @@ private:
     CInterfacesPanelWidget *m_interfacesPanel;
 
     /**
+     * @brief Rich dockable analytics panel for track statistics
+     */
+    CAnalyticsPanelWidget *m_analyticsPanel;
+
+    /**
      * @brief Initialize and setup the dockable track table
      */
     void setupTrackTable();
@@ -273,6 +280,11 @@ private:
      * @brief Initialize and setup the dockable interfaces panel
      */
     void setupInterfacesPanel();
+
+    /**
+     * @brief Initialize and setup the dockable analytics panel
+     */
+    void setupAnalyticsPanel();
 
     /**
      * @brief Apply modern dark theme to the application
