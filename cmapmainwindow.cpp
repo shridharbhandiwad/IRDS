@@ -612,13 +612,13 @@ void CMapMainWindow::setupDockWidgetLayout()
     resizeDocks({m_trackTable, m_analyticsWidget}, rightSizes, Qt::Vertical);
     resizeDocks({m_chartsWidget}, bottomSizes, Qt::Horizontal);
     
-    // Set initial visibility state
+    // Set initial visibility state - ALL interfaces and analytics visible on startup
     m_configPanel->setVisible(true);
     m_trackTable->setVisible(true);
     m_simulationWidget->setVisible(true);
-    m_analyticsWidget->setVisible(false);  // Hidden by default
+    m_analyticsWidget->setVisible(true);   // Now visible by default
     m_chartsWidget->setVisible(false);     // Hidden by default
-    m_interfacesPanel->setVisible(false);  // Hidden by default
+    m_interfacesPanel->setVisible(true);   // Now visible by default
     m_recordingWidget->setVisible(false);  // Hidden by default
     m_healthMonitorWidget->setVisible(false);  // Hidden by default
     m_predictiveMaintenanceWidget->setVisible(false);  // Hidden by default
@@ -856,8 +856,8 @@ void CMapMainWindow::setupInterfacesPanel()
     // Make it initially visible
     m_interfacesPanel->setVisible(true);
     
-    // Make config panel the default visible tab
-    m_configPanel->raise();
+    // Make interfaces panel the visible tab on startup (instead of config panel)
+    m_interfacesPanel->raise();
 
     // Allow docking on left and right
     m_interfacesPanel->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -929,8 +929,8 @@ void CMapMainWindow::setupAnalyticsWidget()
     m_analyticsWidget->setMinimumWidth(350);
     m_analyticsWidget->setMaximumWidth(500);
     
-    // Make track table the default visible tab
-    m_trackTable->raise();
+    // Make analytics widget the visible tab on startup (instead of track table)
+    m_analyticsWidget->raise();
     
     // Allow docking on left and right
     m_analyticsWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
