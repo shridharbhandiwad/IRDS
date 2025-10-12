@@ -157,6 +157,10 @@ class CConfigPanelWidget;
 class CChartsWidget;
 class CInterfacesPanelWidget;
 class CAnalyticsWidget;
+class CSimulationWidget;
+class CRecordingWidget;
+class CHealthMonitorWidget;
+class CPredictiveMaintenanceWidget;
 
 namespace Ui {
 class CMapMainWindow;
@@ -179,6 +183,11 @@ protected:
      * - T: Toggle track table visibility
      * - C: Toggle control panel visibility
      * - I: Toggle interfaces panel visibility
+     * - A: Toggle analytics widget visibility
+     * - S: Toggle simulation widget visibility
+     * - R: Toggle recording widget visibility
+     * - M: Toggle health monitor visibility
+     * - P: Toggle predictive maintenance visibility
      * - H: Map home view
      * - F: Toggle old controls (deprecated)
      */
@@ -266,6 +275,26 @@ private:
     CAnalyticsWidget *m_analyticsWidget;
 
     /**
+     * @brief Simulation control widget for track generation
+     */
+    CSimulationWidget *m_simulationWidget;
+
+    /**
+     * @brief Recording and replay widget
+     */
+    CRecordingWidget *m_recordingWidget;
+
+    /**
+     * @brief System health monitoring widget
+     */
+    CHealthMonitorWidget *m_healthMonitorWidget;
+
+    /**
+     * @brief Predictive maintenance widget
+     */
+    CPredictiveMaintenanceWidget *m_predictiveMaintenanceWidget;
+
+    /**
      * @brief Initialize and setup the dockable track table
      */
     void setupTrackTable();
@@ -284,6 +313,26 @@ private:
      * @brief Initialize and setup the dockable analytics panel
      */
     void setupAnalyticsWidget();
+
+    /**
+     * @brief Initialize and setup the simulation widget
+     */
+    void setupSimulationWidget();
+
+    /**
+     * @brief Initialize and setup the recording widget
+     */
+    void setupRecordingWidget();
+
+    /**
+     * @brief Initialize and setup the health monitor widget
+     */
+    void setupHealthMonitorWidget();
+
+    /**
+     * @brief Initialize and setup the predictive maintenance widget
+     */
+    void setupPredictiveMaintenanceWidget();
 
     /**
      * @brief Apply modern dark theme to the application
