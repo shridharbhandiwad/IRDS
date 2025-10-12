@@ -41,6 +41,7 @@ SOURCES += \
         CoordinateConverter.cpp \
         MapDisplay/cchartswidget.cpp \
         MapDisplay/cconfigpanelwidget.cpp \
+        MapDisplay/cinterfacespanelwidget.cpp \
         MapDisplay/cppilayer.cpp \
         MapDisplay/csearchbeamlayer.cpp \
         MapDisplay/ctracklayer.cpp \
@@ -57,6 +58,7 @@ HEADERS += \
         CoordinateConverter.h \
         MapDisplay/cchartswidget.h \
         MapDisplay/cconfigpanelwidget.h \
+        MapDisplay/cinterfacespanelwidget.h \
         MapDisplay/cppilayer.h \
         MapDisplay/csearchbeamlayer.h \
         MapDisplay/ctracklayer.h \

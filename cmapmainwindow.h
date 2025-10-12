@@ -155,6 +155,7 @@
 class CTrackTableWidget;
 class CConfigPanelWidget;
 class CChartsWidget;
+class CInterfacesPanelWidget;
 
 namespace Ui {
 class CMapMainWindow;
@@ -176,6 +177,7 @@ protected:
      * Shortcuts:
      * - T: Toggle track table visibility
      * - C: Toggle control panel visibility
+     * - I: Toggle interfaces panel visibility
      * - H: Map home view
      * - F: Toggle old controls (deprecated)
      */
@@ -253,6 +255,11 @@ private:
     CConfigPanelWidget *m_configPanel;
 
     /**
+     * @brief Rich dockable interfaces panel for controllers
+     */
+    CInterfacesPanelWidget *m_interfacesPanel;
+
+    /**
      * @brief Initialize and setup the dockable track table
      */
     void setupTrackTable();
@@ -263,14 +270,19 @@ private:
     void setupConfigPanel();
 
     /**
+     * @brief Initialize and setup the dockable interfaces panel
+     */
+    void setupInterfacesPanel();
+
+    /**
      * @brief Apply modern dark theme to the application
      */
     void applyModernTheme();
 
-    CChartsWidget *m_chartsWidget;  // ADD THIS member
+    CChartsWidget *m_chartsWidget;
 
-    void setupChartsWidget();  // ADD THIS method
-    void onChartsRequested();  // ADD THIS slot
+    void setupChartsWidget();
+    void onChartsRequested();
 };
 
 #endif // CMAPMAINWINDOW_H

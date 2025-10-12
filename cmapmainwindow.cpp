@@ -378,6 +378,7 @@
 #include "MapDisplay/ctracktablewidget.h"
 #include "MapDisplay/cconfigpanelwidget.h"
 #include "MapDisplay/cchartswidget.h"
+#include "MapDisplay/cinterfacespanelwidget.h"
 #include <QFileDialog>
 #include <QDebug>
 #include <qgspoint.h>
@@ -393,6 +394,7 @@ CMapMainWindow::CMapMainWindow(QWidget *parent) :
     // Setup rich dockable widgets
     setupTrackTable();
     setupConfigPanel();
+    setupInterfacesPanel();
     setupChartsWidget();
 
     // Hide the old widgets
@@ -576,6 +578,10 @@ void CMapMainWindow::keyPressEvent(QKeyEvent *event)
         // Toggle config panel visibility
         m_configPanel->setVisible(!m_configPanel->isVisible());
         break;
+    case Qt::Key_I:
+        // Toggle interfaces panel visibility
+        m_interfacesPanel->setVisible(!m_interfacesPanel->isVisible());
+        break;
     }
     QMainWindow::keyPressEvent(event);
 }
@@ -623,7 +629,7 @@ void CMapMainWindow::updateTrackTable()
     QList<stTrackDisplayInfo> listTracks = CDataWarehouse::getInstance()->getTrackList();
 
     // Update status bar
-    QString statusMsg = QString("🎯 Tracks: %1 | 📊 Press 'T' for table | ⚙️ Press 'C' for controls | 🏠 Press 'H' for home")
+    QString statusMsg = QString("🎯 Tracks: %1 | 📊 'T': Table | ⚙️ 'C': Controls | ⚡ 'I': Interfaces | 🏠 'H': Home")
         .arg(listTracks.count());
 
     ui->statusBar->showMessage(statusMsg);
@@ -748,6 +754,48 @@ void CMapMainWindow::onCompassVisibilityChanged(bool visible)
     qDebug() << "Compass visibility:" << visible;
     // Implement compass visibility
     ui->statusBar->showMessage(visible ? "🧭 Compass enabled" : "🧭 Compass disabled", 1000);
+}
+
+void CMapMainWindow::setupInterfacesPanel()
+{
+    m_interfacesPanel = new CInterfacesPanelWidget(this);
+
+    // Add as dockable widget to left side, below config panel
+    addDockWidget(Qt::LeftDockWidgetArea, m_interfacesPanel);
+
+    // Make it initially visible
+    m_interfacesPanel->setVisible(true);
+
+    // Allow docking on left and right
+    m_interfacesPanel->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+
+    // Enable features
+    m_interfacesPanel->setFeatures(
+        QDockWidget::DockWidgetClosable |
+        QDockWidget::DockWidgetMovable |
+        QDockWidget::DockWidgetFloatable
+    );
+
+    // Connect interface signals to debug slots
+    connect(m_interfacesPanel, &CInterfacesPanelWidget::servoAzimuthChanged, this, [](double az) {
+        qDebug() << "Servo azimuth changed to:" << az;
+    });
+    connect(m_interfacesPanel, &CInterfacesPanelWidget::servoElevationChanged, this, [](double el) {
+        qDebug() << "Servo elevation changed to:" << el;
+    });
+    connect(m_interfacesPanel, &CInterfacesPanelWidget::radarScanStartRequested, this, []() {
+        qDebug() << "Radar scan start requested";
+    });
+    connect(m_interfacesPanel, &CInterfacesPanelWidget::gunFireRequested, this, []() {
+        qDebug() << "Gun fire requested!";
+    });
+    connect(m_interfacesPanel, &CInterfacesPanelWidget::missileLaunchRequested, this, []() {
+        qDebug() << "Missile launch requested!";
+    });
+    connect(m_interfacesPanel, &CInterfacesPanelWidget::loggingStarted, this, [this]() {
+        qDebug() << "Logging started";
+        m_interfacesPanel->appendLogMessage("Logging session started");
+    });
 }
 
 void CMapMainWindow::setupChartsWidget()
