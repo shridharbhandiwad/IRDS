@@ -155,6 +155,7 @@
 class CTrackTableWidget;
 class CConfigPanelWidget;
 class CChartsWidget;
+class CInterfacesWidget;
 
 namespace Ui {
 class CMapMainWindow;
@@ -267,10 +268,13 @@ private:
      */
     void applyModernTheme();
 
-    CChartsWidget *m_chartsWidget;  // ADD THIS member
+    CChartsWidget *m_chartsWidget;  // Charts widget member
+    CInterfacesWidget *m_interfacesWidget;  // Interfaces widget member
 
-    void setupChartsWidget();  // ADD THIS method
-    void onChartsRequested();  // ADD THIS slot
+    void setupChartsWidget();  // Setup charts widget
+    void setupInterfacesWidget();  // Setup interfaces widget
+    void onChartsRequested();  // Charts requested slot
+    void onInterfacesRequested();  // Interfaces requested slot
 };
 
 #endif // CMAPMAINWINDOW_H

@@ -32,6 +32,7 @@ signals:
     void gridVisibilityChanged(bool visible);
     void compassVisibilityChanged(bool visible);
     void chartsRequested();
+    void interfacesRequested();
 
 private:
     void setupUI();

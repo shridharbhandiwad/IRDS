@@ -538,6 +538,21 @@ void CConfigPanelWidget::createSystemTab()
     actionsLayout->addWidget(m_btnExit);
 
     layout->addWidget(actionsGroup);
+    
+    // Interface Controls Group
+    QGroupBox *interfaceGroup = createStyledGroup("Interface Controls");
+    QVBoxLayout *interfaceLayout = new QVBoxLayout(interfaceGroup);
+    interfaceLayout->setSpacing(10);
+
+    QPushButton *btnInterfaces = createStyledButton("System Interfaces", "🎛️", QColor(16, 185, 129));
+    connect(btnInterfaces, &QPushButton::clicked, this, &CConfigPanelWidget::interfacesRequested);
+    interfaceLayout->addWidget(btnInterfaces);
+
+    QPushButton *btnCharts = createStyledButton("Performance Charts", "📊", QColor(59, 130, 246));
+    connect(btnCharts, &QPushButton::clicked, this, &CConfigPanelWidget::chartsRequested);
+    interfaceLayout->addWidget(btnCharts);
+
+    layout->addWidget(interfaceGroup);
 
     // Auto Update Group
     QGroupBox *updateGroup = createStyledGroup("Auto Update");

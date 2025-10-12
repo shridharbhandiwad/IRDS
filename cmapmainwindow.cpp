@@ -378,6 +378,7 @@
 #include "MapDisplay/ctracktablewidget.h"
 #include "MapDisplay/cconfigpanelwidget.h"
 #include "MapDisplay/cchartswidget.h"
+#include "MapDisplay/cinterfaceswidget.h"
 #include <QFileDialog>
 #include <QDebug>
 #include <qgspoint.h>
@@ -394,6 +395,7 @@ CMapMainWindow::CMapMainWindow(QWidget *parent) :
     setupTrackTable();
     setupConfigPanel();
     setupChartsWidget();
+    setupInterfacesWidget();
 
     // Hide the old widgets
     if (ui->tableWidget) {
@@ -491,6 +493,8 @@ void CMapMainWindow::setupConfigPanel()
             this, &CMapMainWindow::onCompassVisibilityChanged);
     connect(m_configPanel, &CConfigPanelWidget::chartsRequested,
             this, &CMapMainWindow::onChartsRequested);
+    connect(m_configPanel, &CConfigPanelWidget::interfacesRequested,
+            this, &CMapMainWindow::onInterfacesRequested);
 }
 
 void CMapMainWindow::applyModernTheme()
@@ -576,6 +580,10 @@ void CMapMainWindow::keyPressEvent(QKeyEvent *event)
         // Toggle config panel visibility
         m_configPanel->setVisible(!m_configPanel->isVisible());
         break;
+    case Qt::Key_I:
+        // Toggle interfaces widget visibility
+        m_interfacesWidget->setVisible(!m_interfacesWidget->isVisible());
+        break;
     }
     QMainWindow::keyPressEvent(event);
 }
@@ -623,7 +631,7 @@ void CMapMainWindow::updateTrackTable()
     QList<stTrackDisplayInfo> listTracks = CDataWarehouse::getInstance()->getTrackList();
 
     // Update status bar
-    QString statusMsg = QString("🎯 Tracks: %1 | 📊 Press 'T' for table | ⚙️ Press 'C' for controls | 🏠 Press 'H' for home")
+    QString statusMsg = QString("🎯 Tracks: %1 | 📊 Press 'T' for table | ⚙️ Press 'C' for controls | 🎛️ Press 'I' for interfaces | 🏠 Press 'H' for home")
         .arg(listTracks.count());
 
     ui->statusBar->showMessage(statusMsg);
@@ -767,4 +775,26 @@ void CMapMainWindow::setupChartsWidget()
 void CMapMainWindow::onChartsRequested()
 {
     m_chartsWidget->setVisible(!m_chartsWidget->isVisible());
+}
+
+void CMapMainWindow::setupInterfacesWidget()
+{
+    m_interfacesWidget = new CInterfacesWidget(this);
+    addDockWidget(Qt::TopDockWidgetArea, m_interfacesWidget);
+    m_interfacesWidget->setVisible(false); // Hidden by default
+
+    m_interfacesWidget->setAllowedAreas(Qt::AllDockWidgetAreas);
+    m_interfacesWidget->setFeatures(
+        QDockWidget::DockWidgetClosable |
+        QDockWidget::DockWidgetMovable |
+        QDockWidget::DockWidgetFloatable
+    );
+    
+    // Connect interface widget signals to main window slots if needed
+    // You can add specific signal connections here for controller integration
+}
+
+void CMapMainWindow::onInterfacesRequested()
+{
+    m_interfacesWidget->setVisible(!m_interfacesWidget->isVisible());
 }
