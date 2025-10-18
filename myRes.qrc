@@ -2,4 +2,8 @@
     <qresource prefix="/qml">
         <file>MainView.qml</file>
     </qresource>
+    <qresource prefix="/images">
+        <file>resources/drone_icon.svg</file>
+        <file>resources/drone_icon.png</file>
+    </qresource>
 </RCC>
