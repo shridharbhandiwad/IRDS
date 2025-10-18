@@ -34,6 +34,7 @@
 #include <QMenu>
 #include <QSet>
 #include <QPixmap>
+#include <QHash>
 #include <QMap>
 
 // Forward declaration
@@ -82,10 +83,17 @@ private:
     QPixmap m_droneIcon;           //!< Default drone icon image
     QMap<int, QPixmap> m_trackImages; //!< Custom images for specific track IDs
 
+    // Cached images for track icons
+    QHash<int, QPixmap> m_trackPixmaps; //!< Cache of loaded images by track ID
+    QHash<QString, QPixmap> m_defaultIconCache; //!< Cache for generated default icons
+
     /**
      * @brief Creates the context menu for tracks
      */
     void createContextMenu();
+
+    // Helpers for icon rendering
+    QPixmap getDefaultDronePixmap(int size, const QColor &color, const QColor &accent);
 
     /**
      * @brief Detects if a track is at the given position

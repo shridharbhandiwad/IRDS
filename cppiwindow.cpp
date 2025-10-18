@@ -176,6 +176,8 @@ void CPPIWindow::setupTrackTable()
             this, &CPPIWindow::onTrackSelected);
     connect(m_trackTable, &CTrackTableWidget::trackDoubleClicked,
             this, &CPPIWindow::onTrackDoubleClicked);
+    connect(m_trackTable, &CTrackTableWidget::trackImageLoaded,
+            this, &CPPIWindow::onTrackImageLoaded);
 }
 
 void CPPIWindow::applyLightTheme()
@@ -456,7 +458,7 @@ void CPPIWindow::onLoadTrackImage()
     );
     
     if (!imagePath.isEmpty()) {
-        // TODO: Implement track image loading
+        CDataWarehouse::getInstance()->setTrackImagePath(m_selectedTrackId, imagePath);
         m_statusLabel->setText(QString("Image loaded for Track #%1").arg(m_selectedTrackId));
         qDebug() << "Load image for track" << m_selectedTrackId << ":" << imagePath;
     }
@@ -516,6 +518,14 @@ void CPPIWindow::onTrackRightClicked(int trackId, const QPoint& globalPos)
 {
     m_selectedTrackId = trackId;
     m_trackContextMenu->exec(globalPos);
+}
+
+void CPPIWindow::onTrackImageLoaded(int trackId, const QString &imagePath)
+{
+    Q_UNUSED(imagePath);
+    if (trackId <= 0) return;
+    CDataWarehouse::getInstance()->setTrackImagePath(trackId, imagePath);
+    m_statusLabel->setText(QString("Image loaded for Track #%1").arg(trackId));
 }
 
 void CPPIWindow::updateStatusBar()

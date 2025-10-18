@@ -29,6 +29,7 @@ public :
     void setHistoryLimit(int limit);
     int getHistoryLimit() const;
     void deleteTrack(int trackId);
+    void setTrackImagePath(int trackId, const QString &imagePath);
     
     // Drone management functions
     CDrone* getDrone(int trackId);

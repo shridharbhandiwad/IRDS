@@ -118,6 +118,9 @@
 #include <QMessageBox>
 #include <cmath>
 #include "../cdrone.h"
+#include <QPixmap>
+#include <QTransform>
+#include <QPainterPath>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -338,6 +341,16 @@ void CTrackLayer::onLoadTrackImage()
     );
     
     if (!imagePath.isEmpty()) {
+        qDebug() << "Load image for track" << m_rightClickedTrackId << ":" << imagePath;
+        // Cache pixmap
+        QPixmap pix(imagePath);
+        if (!pix.isNull()) {
+            m_trackPixmaps.insert(m_rightClickedTrackId, pix);
+            // Persist path in data warehouse so it survives refresh
+            CDataWarehouse::getInstance()->setTrackImagePath(m_rightClickedTrackId, imagePath);
+            update();
+        } else {
+            QMessageBox::warning(nullptr, "Invalid Image", "Failed to load the selected image.");
         QPixmap customImage(imagePath);
         
         if (customImage.isNull()) {
@@ -1052,6 +1065,58 @@ void CTrackLayer::paint(QPainter *pPainter)
                 pPainter->drawEllipse(ptScreen, trackSize + 8, trackSize + 8);
             }
 
+            bool drawnCustomImage = false;
+            // Draw custom image if available for this track
+            if (!track.imagePath.isEmpty()) {
+                // Ensure pixmap cached; if not, attempt load
+                if (!m_trackPixmaps.contains(track.nTrkId)) {
+                    QPixmap pix(track.imagePath);
+                    if (!pix.isNull()) {
+                        m_trackPixmaps.insert(track.nTrkId, pix);
+                    }
+                }
+
+                if (m_trackPixmaps.contains(track.nTrkId)) {
+                    const QPixmap &pix = m_trackPixmaps.value(track.nTrkId);
+                    // Scale to a reasonable on-screen size based on focus/highlight
+                    int baseSize = isFocused ? 40 : (isHighlighted ? 32 : 24);
+                    QPixmap scaled = pix.scaled(baseSize, baseSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+                    // Rotate so that image points along heading (assume up=0°, clockwise)
+                    QTransform transform;
+                    transform.translate(scaled.width() / 2.0, scaled.height() / 2.0);
+                    transform.rotate(-track.heading); // Qt rotates counter-clockwise; invert to align
+                    transform.translate(-scaled.width() / 2.0, -scaled.height() / 2.0);
+                    QPixmap rotated = scaled.transformed(transform, Qt::SmoothTransformation);
+
+                    // Draw centered at ptScreen
+                    QPointF topLeft(ptScreen.x() - rotated.width() / 2.0,
+                                    ptScreen.y() - rotated.height() / 2.0);
+                    pPainter->drawPixmap(topLeft, rotated);
+                    drawnCustomImage = true;
+                }
+            }
+
+            if (!drawnCustomImage) {
+                // Fallback: draw a small default drone-like marker oriented by heading
+                int baseSize = isFocused ? 28 : (isHighlighted ? 22 : 16);
+                // Generate default icon tinted by identity color (cache by color+size)
+                QString cacheKey = QString("%1x%2_%3").arg(baseSize).arg(baseSize).arg(clr.name());
+                QPixmap defaultIcon;
+                if (m_defaultIconCache.contains(cacheKey)) {
+                    defaultIcon = m_defaultIconCache.value(cacheKey);
+                } else {
+                    defaultIcon = getDefaultDronePixmap(baseSize, clr, Qt::white);
+                    m_defaultIconCache.insert(cacheKey, defaultIcon);
+                }
+                QTransform transform;
+                transform.translate(defaultIcon.width() / 2.0, defaultIcon.height() / 2.0);
+                transform.rotate(-track.heading);
+                transform.translate(-defaultIcon.width() / 2.0, -defaultIcon.height() / 2.0);
+                QPixmap rotated = defaultIcon.transformed(transform, Qt::SmoothTransformation);
+                QPointF topLeft(ptScreen.x() - rotated.width() / 2.0,
+                                ptScreen.y() - rotated.height() / 2.0);
+                pPainter->drawPixmap(topLeft, rotated);
             // Draw drone image if available and track has a drone, otherwise draw core dot
             bool useDroneImage = false;
             QPixmap imageToUse;
@@ -1187,4 +1252,60 @@ void CTrackLayer::paint(QPainter *pPainter)
     if (hasHoveredTrack && m_hoveredTrackId != -1 && m_hoveredTrackId != m_focusedTrackId) {
         drawTooltip(pPainter, hoveredTrack, m_mousePos);
     }
+}
+
+QPixmap CTrackLayer::getDefaultDronePixmap(int size, const QColor &color, const QColor &accent)
+{
+    // Create a triangular arrow-like shape to represent a drone nose-forward
+    QPixmap pix(size, size);
+    pix.fill(Qt::transparent);
+
+    QPainter painter(&pix);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+
+    QPointF center(size / 2.0, size / 2.0);
+    double bodyRadius = size * 0.35;
+
+    // Body circle
+    painter.setPen(Qt::NoPen);
+    QColor bodyColor = color;
+    bodyColor.setAlpha(230);
+    painter.setBrush(bodyColor);
+    painter.drawEllipse(center, bodyRadius, bodyRadius);
+
+    // Nose triangle pointing up (will be rotated later)
+    QPainterPath nose;
+    double tipY = size * 0.08;
+    double baseY = size * 0.45;
+    double halfWidth = size * 0.18;
+    nose.moveTo(center.x(), tipY);
+    nose.lineTo(center.x() - halfWidth, baseY);
+    nose.lineTo(center.x() + halfWidth, baseY);
+    nose.closeSubpath();
+    QColor noseColor = accent;
+    noseColor.setAlpha(240);
+    painter.setBrush(noseColor);
+    painter.drawPath(nose);
+
+    // Tail fin
+    QPainterPath tail;
+    double tailTop = size * 0.55;
+    double tailBottom = size * 0.9;
+    double tailHalfWidth = size * 0.12;
+    tail.moveTo(center.x(), tailTop);
+    tail.lineTo(center.x() - tailHalfWidth, tailBottom);
+    tail.lineTo(center.x() + tailHalfWidth, tailBottom);
+    tail.closeSubpath();
+    QColor tailColor = color.darker(130);
+    tailColor.setAlpha(220);
+    painter.setBrush(tailColor);
+    painter.drawPath(tail);
+
+    // Outline
+    painter.setBrush(Qt::NoBrush);
+    painter.setPen(QPen(QColor(255,255,255,180), 1));
+    painter.drawEllipse(center, bodyRadius, bodyRadius);
+
+    painter.end();
+    return pix;
 }

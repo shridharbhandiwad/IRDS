@@ -52,6 +52,7 @@ struct stTrackDisplayInfo {
     int nTrackIden;
     long long nTrackTime;
     QString tooltip;  // ADD THIS LINE
+    QString imagePath;          //!< Optional image path for custom track/drone icon
     QList<stTrackHistoryPoint> historyPoints;  //!< Track history points
     bool showHistory;           //!< Flag to show/hide history trail
     CDrone* pDrone;             //!< Pointer to associated drone object (nullptr if not a drone)

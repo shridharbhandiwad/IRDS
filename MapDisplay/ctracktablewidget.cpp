@@ -457,6 +457,7 @@ void CTrackTableWidget::createContextMenu()
             
             if (!imagePath.isEmpty()) {
                 qDebug() << "Load image for track" << m_rightClickedTrackId << ":" << imagePath;
+                emit trackImageLoaded(m_rightClickedTrackId, imagePath);
             }
         }
     });
