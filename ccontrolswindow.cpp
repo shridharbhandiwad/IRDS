@@ -31,7 +31,8 @@ CControlsWindow::CControlsWindow(QWidget *parent)
     , m_settings(new QSettings("RadarDisplay", "ControlsWindow", this))
 {
     setWindowTitle("🎛️ Control Center - System Management");
-    setMinimumSize(1000, 700);
+    setMinimumSize(1200, 800);  // Increased minimum size
+    resize(1400, 900);          // Better default size
     
     setupUI();
     applyLightTheme();
@@ -55,20 +56,21 @@ void CControlsWindow::setupUI()
     setCentralWidget(m_centralWidget);
     
     m_mainLayout = new QVBoxLayout(m_centralWidget);
-    m_mainLayout->setContentsMargins(8, 8, 8, 8);
-    m_mainLayout->setSpacing(8);
+    m_mainLayout->setContentsMargins(12, 12, 12, 12);  // Increased margins
+    m_mainLayout->setSpacing(12);                       // Increased spacing
     
     setupTabs();
     
-    // Setup status bar
+    // Setup status bar with better styling
     statusBar()->setStyleSheet(
         "QStatusBar {"
         "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #f8fafc, stop:1 #e2e8f0);"
         "   color: #334155;"
-        "   border-top: 2px solid #3b82f6;"
-        "   font-size: 12px;"
+        "   border-top: 3px solid #3b82f6;"
+        "   font-size: 13px;"
         "   font-weight: 500;"
-        "   padding: 6px;"
+        "   padding: 8px 12px;"
+        "   min-height: 25px;"
         "}"
     );
 }
@@ -79,6 +81,7 @@ void CControlsWindow::setupTabs()
     m_tabWidget->setTabPosition(QTabWidget::North);
     m_tabWidget->setMovable(true);
     m_tabWidget->setTabsClosable(false);
+    m_tabWidget->setElideMode(Qt::ElideNone);  // Don't elide tab text
     
     // Create all widgets
     m_configPanel = new CConfigPanelWidget(this);
@@ -90,25 +93,25 @@ void CControlsWindow::setupTabs()
     m_healthMonitorWidget = new CHealthMonitorWidget(this);
     m_predictiveMaintenanceWidget = new CPredictiveMaintenanceWidget(this);
     
-    // Add tabs with icons and rich descriptions
-    m_tabWidget->addTab(m_configPanel, "⚙️ Configuration");
-    m_tabWidget->addTab(m_interfacesPanel, "🔌 Interfaces");
-    m_tabWidget->addTab(m_simulationWidget, "🎮 Simulation");
-    m_tabWidget->addTab(m_recordingWidget, "📹 Recording");
-    m_tabWidget->addTab(m_analyticsWidget, "📊 Analytics");
-    m_tabWidget->addTab(m_chartsWidget, "📈 Charts");
-    m_tabWidget->addTab(m_healthMonitorWidget, "💚 Health");
-    m_tabWidget->addTab(m_predictiveMaintenanceWidget, "🔧 Maintenance");
+    // Add tabs with better spacing and icons
+    m_tabWidget->addTab(m_configPanel, "  ⚙️  Configuration  ");
+    m_tabWidget->addTab(m_interfacesPanel, "  🔌  Interfaces  ");
+    m_tabWidget->addTab(m_simulationWidget, "  🎮  Simulation  ");
+    m_tabWidget->addTab(m_recordingWidget, "  📹  Recording  ");
+    m_tabWidget->addTab(m_analyticsWidget, "  📊  Analytics  ");
+    m_tabWidget->addTab(m_chartsWidget, "  📈  Charts  ");
+    m_tabWidget->addTab(m_healthMonitorWidget, "  💚  Health  ");
+    m_tabWidget->addTab(m_predictiveMaintenanceWidget, "  🔧  Maintenance  ");
     
-    // Set tab tooltips
-    m_tabWidget->setTabToolTip(TAB_CONFIG, "System configuration and map controls");
-    m_tabWidget->setTabToolTip(TAB_INTERFACES, "Hardware interfaces and servo controls");
-    m_tabWidget->setTabToolTip(TAB_SIMULATION, "Track simulation and scenario generation");
-    m_tabWidget->setTabToolTip(TAB_RECORDING, "Data recording and replay functionality");
-    m_tabWidget->setTabToolTip(TAB_ANALYTICS, "Track analytics and statistics");
-    m_tabWidget->setTabToolTip(TAB_CHARTS, "Real-time charts and graphs");
-    m_tabWidget->setTabToolTip(TAB_HEALTH, "System health monitoring");
-    m_tabWidget->setTabToolTip(TAB_MAINTENANCE, "Predictive maintenance and diagnostics");
+    // Set comprehensive tab tooltips
+    m_tabWidget->setTabToolTip(TAB_CONFIG, "System configuration and map controls\nKeyboard shortcut: Ctrl+1");
+    m_tabWidget->setTabToolTip(TAB_INTERFACES, "Hardware interfaces and servo controls\nKeyboard shortcut: Ctrl+2");
+    m_tabWidget->setTabToolTip(TAB_SIMULATION, "Track simulation and scenario generation\nKeyboard shortcut: Ctrl+3");
+    m_tabWidget->setTabToolTip(TAB_RECORDING, "Data recording and replay functionality\nKeyboard shortcut: Ctrl+4");
+    m_tabWidget->setTabToolTip(TAB_ANALYTICS, "Track analytics and statistics\nKeyboard shortcut: Ctrl+5");
+    m_tabWidget->setTabToolTip(TAB_CHARTS, "Real-time charts and graphs\nKeyboard shortcut: Ctrl+6");
+    m_tabWidget->setTabToolTip(TAB_HEALTH, "System health monitoring\nKeyboard shortcut: Ctrl+7");
+    m_tabWidget->setTabToolTip(TAB_MAINTENANCE, "Predictive maintenance and diagnostics\nKeyboard shortcut: Ctrl+8");
     
     // Connect tab change signal
     connect(m_tabWidget, &QTabWidget::currentChanged, this, &CControlsWindow::onTabChanged);
@@ -148,13 +151,14 @@ void CControlsWindow::applyLightTheme()
         "   color: #475569;"
         "   border: 2px solid #e2e8f0;"
         "   border-bottom: none;"
-        "   border-top-left-radius: 8px;"
-        "   border-top-right-radius: 8px;"
-        "   padding: 10px 20px;"
-        "   margin-right: 2px;"
+        "   border-top-left-radius: 10px;"
+        "   border-top-right-radius: 10px;"
+        "   padding: 12px 24px;"
+        "   margin-right: 3px;"
         "   font-weight: 600;"
-        "   font-size: 13px;"
-        "   min-width: 120px;"
+        "   font-size: 14px;"
+        "   min-width: 140px;"
+        "   min-height: 20px;"
         "}"
         "QTabBar::tab:selected {"
         "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3b82f6, stop:1 #2563eb);"
@@ -169,11 +173,12 @@ void CControlsWindow::applyLightTheme()
         "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3b82f6, stop:1 #2563eb);"
         "   color: white;"
         "   border: none;"
-        "   border-radius: 8px;"
-        "   padding: 8px 16px;"
+        "   border-radius: 10px;"
+        "   padding: 10px 20px;"
         "   font-weight: 600;"
-        "   font-size: 12px;"
-        "   min-height: 28px;"
+        "   font-size: 13px;"
+        "   min-height: 32px;"
+        "   min-width: 100px;"
         "}"
         "QPushButton:hover {"
         "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #2563eb, stop:1 #1d4ed8);"
@@ -192,20 +197,22 @@ void CControlsWindow::applyLightTheme()
         "QGroupBox {"
         "   background-color: #ffffff;"
         "   border: 2px solid #e2e8f0;"
-        "   border-radius: 8px;"
-        "   margin-top: 12px;"
-        "   padding-top: 12px;"
+        "   border-radius: 12px;"
+        "   margin-top: 15px;"
+        "   padding-top: 15px;"
         "   font-weight: 600;"
+        "   font-size: 14px;"
         "   color: #1e293b;"
         "}"
         "QGroupBox::title {"
         "   subcontrol-origin: margin;"
         "   subcontrol-position: top left;"
-        "   padding: 4px 12px;"
+        "   padding: 6px 16px;"
         "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3b82f6, stop:1 #2563eb);"
-        "   border-radius: 4px;"
+        "   border-radius: 6px;"
         "   color: white;"
         "   font-weight: 600;"
+        "   font-size: 13px;"
         "}"
         "QLabel {"
         "   color: #334155;"
@@ -303,38 +310,39 @@ void CControlsWindow::connectSignals()
 
 void CControlsWindow::keyPressEvent(QKeyEvent *event)
 {
-    switch (event->key()) {
-    case Qt::Key_1:
-        m_tabWidget->setCurrentIndex(TAB_CONFIG);
-        break;
-    case Qt::Key_2:
-        m_tabWidget->setCurrentIndex(TAB_INTERFACES);
-        break;
-    case Qt::Key_3:
-        m_tabWidget->setCurrentIndex(TAB_SIMULATION);
-        break;
-    case Qt::Key_4:
-        m_tabWidget->setCurrentIndex(TAB_RECORDING);
-        break;
-    case Qt::Key_5:
-        m_tabWidget->setCurrentIndex(TAB_ANALYTICS);
-        break;
-    case Qt::Key_6:
-        m_tabWidget->setCurrentIndex(TAB_CHARTS);
-        break;
-    case Qt::Key_7:
-        m_tabWidget->setCurrentIndex(TAB_HEALTH);
-        break;
-    case Qt::Key_8:
-        m_tabWidget->setCurrentIndex(TAB_MAINTENANCE);
-        break;
-    case Qt::Key_Tab:
-        // Cycle through tabs
-        if (event->modifiers() & Qt::ControlModifier) {
+    // Handle Ctrl+Number shortcuts
+    if (event->modifiers() & Qt::ControlModifier) {
+        switch (event->key()) {
+        case Qt::Key_1:
+            m_tabWidget->setCurrentIndex(TAB_CONFIG);
+            break;
+        case Qt::Key_2:
+            m_tabWidget->setCurrentIndex(TAB_INTERFACES);
+            break;
+        case Qt::Key_3:
+            m_tabWidget->setCurrentIndex(TAB_SIMULATION);
+            break;
+        case Qt::Key_4:
+            m_tabWidget->setCurrentIndex(TAB_RECORDING);
+            break;
+        case Qt::Key_5:
+            m_tabWidget->setCurrentIndex(TAB_ANALYTICS);
+            break;
+        case Qt::Key_6:
+            m_tabWidget->setCurrentIndex(TAB_CHARTS);
+            break;
+        case Qt::Key_7:
+            m_tabWidget->setCurrentIndex(TAB_HEALTH);
+            break;
+        case Qt::Key_8:
+            m_tabWidget->setCurrentIndex(TAB_MAINTENANCE);
+            break;
+        case Qt::Key_Tab:
+            // Cycle through tabs
             int nextIndex = (m_tabWidget->currentIndex() + 1) % m_tabWidget->count();
             m_tabWidget->setCurrentIndex(nextIndex);
+            break;
         }
-        break;
     }
     QMainWindow::keyPressEvent(event);
 }
@@ -356,9 +364,9 @@ void CControlsWindow::onTabChanged(int index)
 void CControlsWindow::updateStatusBar()
 {
     QList<stTrackDisplayInfo> tracks = CDataWarehouse::getInstance()->getTrackList();
-    QString currentTab = m_tabWidget->tabText(m_tabWidget->currentIndex());
+    QString currentTab = m_tabWidget->tabText(m_tabWidget->currentIndex()).trimmed();
     
-    QString statusMsg = QString("🎛️ Control Center | Active Tab: %1 | Tracks: %2 | Keys: 1-8 for tabs, Ctrl+Tab to cycle")
+    QString statusMsg = QString("🎛️ Control Center | Active: %1 | Tracks: %2 | Shortcuts: Ctrl+1-8 for tabs, Ctrl+Tab to cycle")
         .arg(currentTab)
         .arg(tracks.count());
     

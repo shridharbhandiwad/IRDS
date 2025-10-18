@@ -6,7 +6,7 @@ import QtCharts 2.15
 Rectangle {
     id: root
     anchors.fill: parent
-    color: "#0a0d1a" // Dark holographic background
+    color: "#f8fafc" // Light modern background
 
     ColumnLayout {
         anchors.fill: parent
@@ -32,15 +32,24 @@ Rectangle {
             // Line Chart
             ChartView {
                 antialiasing: true
-                theme: ChartView.ChartThemeDark
-                backgroundColor: "#111"
+                theme: ChartView.ChartThemeLight
+                backgroundColor: "#ffffff"
                 LineSeries {
                     name: "Signal"
+                    color: "#3b82f6"
                    // points: [Qt.point(0,1), Qt.point(1,3), Qt.point(2,1), Qt.point(3,4)]
                 }
                 axes {
-                    ValueAxis { min: 0; max: 3 }
-                    ValueAxis { min: 0; max: 5 }
+                    ValueAxis { 
+                        min: 0; max: 3
+                        color: "#334155"
+                        labelsColor: "#64748b"
+                    }
+                    ValueAxis { 
+                        min: 0; max: 5
+                        color: "#334155"
+                        labelsColor: "#64748b"
+                    }
                 }
             }
         }
@@ -49,13 +58,23 @@ Rectangle {
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            color: "#111"
-            radius: 10
-            border.color: "#00ffff"
+            color: "#ffffff"
+            radius: 12
+            border.color: "#3b82f6"
+            border.width: 2
+            
+            // Subtle gradient background
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: "#ffffff" }
+                GradientStop { position: 1.0; color: "#f8fafc" }
+            }
+            
             Text {
                 anchors.centerIn: parent
-                text: "Radar Placeholder"
-                color: "#00ffff"
+                text: "🎯 Radar Display Area"
+                color: "#334155"
+                font.pixelSize: 18
+                font.weight: Font.Medium
             }
         }
     }

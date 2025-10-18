@@ -7,6 +7,8 @@
 #include <QPushButton>
 #include <QLineEdit>
 #include <QComboBox>
+#include <QMenu>
+#include <QAction>
 
 class CTrackTableWidget : public QDockWidget
 {
@@ -23,14 +25,22 @@ private slots:
     void onIdentityFilterChanged(int index);
     void onClearAllTracks();
     void onExportTracks();
+    void onTableContextMenuRequested(const QPoint& pos);
+    void onFocusTrack();
+    void onDeleteTrack();
+    void onLoadTrackImage();
+    void onToggleTrackHistory();
+    void onHighlightTrack();
 
 signals:
     void trackSelected(int trackId);
     void trackDoubleClicked(int trackId);
+    void trackRightClicked(int trackId, const QPoint& globalPos);
 
 private:
     void setupUI();
     void applyFilters();
+    void setupContextMenu();
     QString getIdentityString(int identity);
     QColor getIdentityColor(int identity);
 
@@ -43,6 +53,15 @@ private:
 
     QString m_currentFilter;
     int m_currentIdentityFilter;
+    
+    // Context menu
+    QMenu *m_contextMenu;
+    QAction *m_focusAction;
+    QAction *m_deleteAction;
+    QAction *m_loadImageAction;
+    QAction *m_toggleHistoryAction;
+    QAction *m_highlightAction;
+    int m_contextTrackId;
 };
 
 #endif // CTRACKTABLEWIDGET_H

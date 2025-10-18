@@ -22,6 +22,8 @@ CPPIWindow::CPPIWindow(QWidget *parent)
     , m_gridVisible(true)
     , m_compassVisible(true)
     , m_mapEnabled(true)
+    , m_mapExpanded(false)
+    , m_tableExpanded(false)
     , m_maxHistoryPoints(50)
     , m_statusTimer(new QTimer(this))
     , m_settings(new QSettings("RadarDisplay", "PPIWindow", this))
@@ -59,22 +61,23 @@ void CPPIWindow::setupUI()
     setupSettingsToolbar();
     
     // Create horizontal splitter for map and track table
-    QSplitter *splitter = new QSplitter(Qt::Horizontal, this);
-    splitter->setChildrenCollapsible(false);
+    m_splitter = new QSplitter(Qt::Horizontal, this);
+    m_splitter->setChildrenCollapsible(true);
     
     setupMapCanvas();
     setupTrackTable();
     
     // Add to splitter
-    splitter->addWidget(m_mapCanvas);
-    splitter->addWidget(m_trackTable);
+    m_splitter->addWidget(m_mapCanvas);
+    m_splitter->addWidget(m_trackTable);
     
     // Set splitter proportions (70% map, 30% table)
-    splitter->setSizes({700, 300});
-    splitter->setStretchFactor(0, 7);
-    splitter->setStretchFactor(1, 3);
+    m_normalSplitterSizes = {700, 300};
+    m_splitter->setSizes(m_normalSplitterSizes);
+    m_splitter->setStretchFactor(0, 7);
+    m_splitter->setStretchFactor(1, 3);
     
-    m_mainLayout->addWidget(splitter);
+    m_mainLayout->addWidget(m_splitter);
     
     // Setup status bar
     statusBar()->setStyleSheet(
@@ -102,6 +105,8 @@ void CPPIWindow::setupSettingsToolbar()
     m_homeBtn = new QPushButton("🏠 Home", this);
     m_gridBtn = new QPushButton("📐 Grid", this);
     m_compassBtn = new QPushButton("🧭 Compass", this);
+    m_expandMapBtn = new QPushButton("🗺️ Expand Map", this);
+    m_expandTableBtn = new QPushButton("📊 Expand Table", this);
     m_settingsBtn = new QPushButton("⚙️ Settings", this);
     
     // Make toggle buttons checkable
@@ -111,6 +116,10 @@ void CPPIWindow::setupSettingsToolbar()
     m_compassBtn->setChecked(m_compassVisible);
     m_disableMapBtn->setCheckable(true);
     m_disableMapBtn->setChecked(!m_mapEnabled);
+    m_expandMapBtn->setCheckable(true);
+    m_expandMapBtn->setChecked(m_mapExpanded);
+    m_expandTableBtn->setCheckable(true);
+    m_expandTableBtn->setChecked(m_tableExpanded);
     
     // Status label
     m_statusLabel = new QLabel("Ready", this);
@@ -129,6 +138,9 @@ void CPPIWindow::setupSettingsToolbar()
     m_settingsLayout->addWidget(m_homeBtn);
     m_settingsLayout->addWidget(m_gridBtn);
     m_settingsLayout->addWidget(m_compassBtn);
+    m_settingsLayout->addSpacing(10);
+    m_settingsLayout->addWidget(m_expandMapBtn);
+    m_settingsLayout->addWidget(m_expandTableBtn);
     m_settingsLayout->addStretch();
     m_settingsLayout->addWidget(m_statusLabel);
     m_settingsLayout->addWidget(m_settingsBtn);
@@ -140,6 +152,8 @@ void CPPIWindow::setupSettingsToolbar()
     connect(m_homeBtn, &QPushButton::clicked, this, &CPPIWindow::onMapHome);
     connect(m_gridBtn, &QPushButton::clicked, this, &CPPIWindow::onToggleGrid);
     connect(m_compassBtn, &QPushButton::clicked, this, &CPPIWindow::onToggleCompass);
+    connect(m_expandMapBtn, &QPushButton::clicked, this, &CPPIWindow::onExpandMap);
+    connect(m_expandTableBtn, &QPushButton::clicked, this, &CPPIWindow::onExpandTable);
     connect(m_settingsBtn, &QPushButton::clicked, this, &CPPIWindow::onSettings);
     
     m_mainLayout->addLayout(m_settingsLayout);
@@ -154,6 +168,12 @@ void CPPIWindow::setupMapCanvas()
     // Connect map canvas signals
     connect(m_mapCanvas, SIGNAL(signalMouseRead(QString)), 
             this, SLOT(updateStatusBar()));
+    
+    // Connect track layer right-click signal
+    if (m_mapCanvas->getTrackLayer()) {
+        connect(m_mapCanvas->getTrackLayer(), &CTrackLayer::trackRightClicked,
+                this, &CPPIWindow::onTrackRightClicked);
+    }
 }
 
 void CPPIWindow::setupTrackTable()
@@ -167,6 +187,8 @@ void CPPIWindow::setupTrackTable()
             this, &CPPIWindow::onTrackSelected);
     connect(m_trackTable, &CTrackTableWidget::trackDoubleClicked,
             this, &CPPIWindow::onTrackDoubleClicked);
+    connect(m_trackTable, &CTrackTableWidget::trackRightClicked,
+            this, &CPPIWindow::onTrackRightClicked);
 }
 
 void CPPIWindow::applyLightTheme()
@@ -290,6 +312,12 @@ void CPPIWindow::keyPressEvent(QKeyEvent *event)
     case Qt::Key_L:
         onLoadNewMap();
         break;
+    case Qt::Key_M:
+        onExpandMap();
+        break;
+    case Qt::Key_T:
+        onExpandTable();
+        break;
     case Qt::Key_S:
         onSettings();
         break;
@@ -330,15 +358,17 @@ void CPPIWindow::onDisableMap()
     m_mapEnabled = !m_mapEnabled;
     m_disableMapBtn->setChecked(!m_mapEnabled);
     
+    // Enable/disable map in the canvas
+    m_mapCanvas->enableMap(m_mapEnabled);
+    
     if (m_mapEnabled) {
-        m_statusLabel->setText("Map enabled");
+        m_statusLabel->setText("Map enabled - Showing map layers with PPI overlay");
         m_disableMapBtn->setText("🚫 Disable Map");
     } else {
-        m_statusLabel->setText("Map disabled");
+        m_statusLabel->setText("Map disabled - PPI only mode");
         m_disableMapBtn->setText("✅ Enable Map");
     }
     
-    // TODO: Implement actual map disable/enable functionality
     qDebug() << "Map enabled:" << m_mapEnabled;
 }
 
@@ -376,6 +406,58 @@ void CPPIWindow::onToggleCompass()
     qDebug() << "Compass visibility:" << m_compassVisible;
 }
 
+void CPPIWindow::onExpandMap()
+{
+    m_mapExpanded = !m_mapExpanded;
+    m_expandMapBtn->setChecked(m_mapExpanded);
+    
+    if (m_mapExpanded) {
+        // Collapse table, expand map
+        if (!m_tableExpanded) {
+            m_normalSplitterSizes = m_splitter->sizes();
+        }
+        m_splitter->setSizes({1000, 0});
+        m_expandMapBtn->setText("📊 Show Table");
+        m_statusLabel->setText("Map expanded - Table hidden");
+        
+        // Ensure table expand is unchecked
+        m_tableExpanded = false;
+        m_expandTableBtn->setChecked(false);
+        m_expandTableBtn->setText("🗺️ Expand Table");
+    } else {
+        // Restore normal view
+        m_splitter->setSizes(m_normalSplitterSizes);
+        m_expandMapBtn->setText("🗺️ Expand Map");
+        m_statusLabel->setText("Normal view restored");
+    }
+}
+
+void CPPIWindow::onExpandTable()
+{
+    m_tableExpanded = !m_tableExpanded;
+    m_expandTableBtn->setChecked(m_tableExpanded);
+    
+    if (m_tableExpanded) {
+        // Collapse map, expand table
+        if (!m_mapExpanded) {
+            m_normalSplitterSizes = m_splitter->sizes();
+        }
+        m_splitter->setSizes({0, 1000});
+        m_expandTableBtn->setText("🗺️ Show Map");
+        m_statusLabel->setText("Table expanded - Map hidden");
+        
+        // Ensure map expand is unchecked
+        m_mapExpanded = false;
+        m_expandMapBtn->setChecked(false);
+        m_expandMapBtn->setText("🗺️ Expand Map");
+    } else {
+        // Restore normal view
+        m_splitter->setSizes(m_normalSplitterSizes);
+        m_expandTableBtn->setText("📊 Expand Table");
+        m_statusLabel->setText("Normal view restored");
+    }
+}
+
 void CPPIWindow::onSettings()
 {
     QMessageBox::information(this, "Settings", 
@@ -386,6 +468,9 @@ void CPPIWindow::onSettings()
         "• F: Zoom Fit\n"
         "• L: Load Map\n"
         "• S: Settings\n\n"
+        "Expand Controls:\n"
+        "• Expand Map: Hide table, show only map\n"
+        "• Expand Table: Hide map, show only table\n\n"
         "Right-click on tracks for context menu.\n"
         "History points limited to " + QString::number(m_maxHistoryPoints) + " per track.");
 }
@@ -518,7 +603,13 @@ void CPPIWindow::saveSettings()
     m_settings->setValue("gridVisible", m_gridVisible);
     m_settings->setValue("compassVisible", m_compassVisible);
     m_settings->setValue("mapEnabled", m_mapEnabled);
+    m_settings->setValue("mapExpanded", m_mapExpanded);
+    m_settings->setValue("tableExpanded", m_tableExpanded);
     m_settings->setValue("maxHistoryPoints", m_maxHistoryPoints);
+    
+    // Save splitter sizes
+    QByteArray splitterState = m_splitter->saveState();
+    m_settings->setValue("splitterState", splitterState);
 }
 
 void CPPIWindow::loadSettings()
@@ -529,11 +620,30 @@ void CPPIWindow::loadSettings()
     m_gridVisible = m_settings->value("gridVisible", true).toBool();
     m_compassVisible = m_settings->value("compassVisible", true).toBool();
     m_mapEnabled = m_settings->value("mapEnabled", true).toBool();
+    m_mapExpanded = m_settings->value("mapExpanded", false).toBool();
+    m_tableExpanded = m_settings->value("tableExpanded", false).toBool();
     m_maxHistoryPoints = m_settings->value("maxHistoryPoints", 50).toInt();
+    
+    // Restore splitter state
+    QByteArray splitterState = m_settings->value("splitterState").toByteArray();
+    if (!splitterState.isEmpty()) {
+        m_splitter->restoreState(splitterState);
+        m_normalSplitterSizes = m_splitter->sizes();
+    }
     
     // Update UI state
     m_gridBtn->setChecked(m_gridVisible);
     m_compassBtn->setChecked(m_compassVisible);
     m_disableMapBtn->setChecked(!m_mapEnabled);
     m_disableMapBtn->setText(m_mapEnabled ? "🚫 Disable Map" : "✅ Enable Map");
+    m_expandMapBtn->setChecked(m_mapExpanded);
+    m_expandTableBtn->setChecked(m_tableExpanded);
+    
+    // Apply expand state
+    if (m_mapExpanded) {
+        m_expandMapBtn->setText("📊 Show Table");
+    }
+    if (m_tableExpanded) {
+        m_expandTableBtn->setText("🗺️ Show Map");
+    }
 }

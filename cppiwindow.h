@@ -62,6 +62,8 @@ private slots:
     void onMapHome();
     void onToggleGrid();
     void onToggleCompass();
+    void onExpandMap();
+    void onExpandTable();
     void onSettings();
     
     // Track context menu actions
@@ -107,12 +109,15 @@ private:
     QPushButton *m_homeBtn;
     QPushButton *m_gridBtn;
     QPushButton *m_compassBtn;
+    QPushButton *m_expandMapBtn;
+    QPushButton *m_expandTableBtn;
     QPushButton *m_settingsBtn;
     QLabel *m_statusLabel;
     
     // Main components
     CMapCanvas *m_mapCanvas;
     CTrackTableWidget *m_trackTable;
+    QSplitter *m_splitter;
     
     // Context menu
     QMenu *m_trackContextMenu;
@@ -127,7 +132,10 @@ private:
     bool m_gridVisible;
     bool m_compassVisible;
     bool m_mapEnabled;
+    bool m_mapExpanded;
+    bool m_tableExpanded;
     int m_maxHistoryPoints;
+    QList<int> m_normalSplitterSizes;
     
     // Timer for status updates
     QTimer *m_statusTimer;
