@@ -150,22 +150,27 @@
 #include <QMainWindow>
 #include <QTimer>
 #include <QKeyEvent>
+#include <QApplication>
+#include <QDesktopWidget>
+#include <QScreen>
 
 // Forward declarations
-class CTrackTableWidget;
-class CConfigPanelWidget;
-class CChartsWidget;
-class CInterfacesPanelWidget;
-class CAnalyticsWidget;
-class CSimulationWidget;
-class CRecordingWidget;
-class CHealthMonitorWidget;
-class CPredictiveMaintenanceWidget;
+class CPPIWindow;
+class CControlsWindow;
 
 namespace Ui {
 class CMapMainWindow;
 }
 
+/**
+ * @brief Main Window Manager for Dual Monitor Setup
+ * 
+ * This class manages two separate windows:
+ * 1. PPI Window: Map canvas + Track table
+ * 2. Controls Window: All control panels and widgets
+ * 
+ * Designed for dual monitor radar display systems.
+ */
 class CMapMainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -176,69 +181,33 @@ public:
 
 protected:
     /**
-     * @brief Handle keyboard shortcuts
+     * @brief Handle keyboard shortcuts for window management
      * @param event Key event
      *
      * Shortcuts:
-     * - T: Toggle track table visibility
-     * - C: Toggle control panel visibility
-     * - I: Toggle interfaces panel visibility
-     * - A: Toggle analytics widget visibility
-     * - S: Toggle simulation widget visibility
-     * - R: Toggle recording widget visibility
-     * - M: Toggle health monitor visibility
-     * - P: Toggle predictive maintenance visibility
-     * - H: Map home view
-     * - F: Toggle old controls (deprecated)
+     * - F1: Show/Hide PPI Window
+     * - F2: Show/Hide Controls Window
+     * - F3: Arrange windows for dual monitor
+     * - F4: Toggle fullscreen mode
+     * - ESC: Exit fullscreen
      */
     void keyPressEvent(QKeyEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
 
 private slots:
-    /**
-     * @brief Update status bar with mouse position
-     * @param mouseRead Mouse position string
-     */
-    void slotMouseRead(QString mouseRead);
-
-    /**
-     * @brief Reset map to home view
-     */
-    void on_pushButton_MapHome_clicked();
-
-    /**
-     * @brief Open raster map file dialog
-     */
-    void on_pushButton_OpenMaps_clicked();
-
-    /**
-     * @brief Flush/clear operation
-     */
-    void on_pushButton_FLUSH_clicked();
-
-    /**
-     * @brief Exit application
-     */
-    void on_pushButton_EXIT_clicked();
-
-    /**
-     * @brief Update track table with current data
-     */
-    void updateTrackTable();
-
-    /**
-     * @brief Handle track selection from table
-     * @param trackId Selected track ID
-     */
+    // Window management slots
+    void onShowPPIWindow();
+    void onShowControlsWindow();
+    void onArrangeDualMonitor();
+    void onToggleFullscreen();
+    
+    // Inter-window communication slots
     void onTrackSelected(int trackId);
-
-    /**
-     * @brief Handle track double-click from table
-     * @param trackId Double-clicked track ID
-     */
     void onTrackDoubleClicked(int trackId);
-
-    // Config panel slots
     void onMapHomeRequested();
+    void onNewMapRequested(const QString& mapPath);
+    
+    // Control panel forwarding slots
     void onOpenMapsRequested();
     void onFlushRequested();
     void onExitRequested();
@@ -249,105 +218,53 @@ private slots:
     void onAnimationSpeedChanged(int speed);
     void onGridVisibilityChanged(bool visible);
     void onCompassVisibilityChanged(bool visible);
+    void onChartsRequested();
 
 private:
+    /**
+     * @brief Setup dual window architecture
+     */
+    void setupDualWindows();
+    
+    /**
+     * @brief Connect signals between windows
+     */
+    void connectWindowSignals();
+    
+    /**
+     * @brief Connect manager window buttons
+     */
+    void connectManagerButtons();
+    
+    /**
+     * @brief Detect and setup monitors
+     */
+    void setupMonitors();
+    
+    /**
+     * @brief Save window positions and states
+     */
+    void saveWindowSettings();
+    
+    /**
+     * @brief Load window positions and states
+     */
+    void loadWindowSettings();
+
+    // UI
     Ui::CMapMainWindow *ui;
-    QTimer _m_updateTimer;
-
-    /**
-     * @brief Rich dockable track table widget
-     */
-    CTrackTableWidget *m_trackTable;
-
-    /**
-     * @brief Rich dockable configuration panel
-     */
-    CConfigPanelWidget *m_configPanel;
-
-    /**
-     * @brief Rich dockable interfaces panel for controllers
-     */
-    CInterfacesPanelWidget *m_interfacesPanel;
-
-    /**
-     * @brief Rich dockable analytics panel for track statistics
-     */
-    CAnalyticsWidget *m_analyticsWidget;
-
-    /**
-     * @brief Simulation control widget for track generation
-     */
-    CSimulationWidget *m_simulationWidget;
-
-    /**
-     * @brief Recording and replay widget
-     */
-    CRecordingWidget *m_recordingWidget;
-
-    /**
-     * @brief System health monitoring widget
-     */
-    CHealthMonitorWidget *m_healthMonitorWidget;
-
-    /**
-     * @brief Predictive maintenance widget
-     */
-    CPredictiveMaintenanceWidget *m_predictiveMaintenanceWidget;
-
-    /**
-     * @brief Initialize and setup the dockable track table
-     */
-    void setupTrackTable();
-
-    /**
-     * @brief Initialize and setup the dockable config panel
-     */
-    void setupConfigPanel();
-
-    /**
-     * @brief Initialize and setup the dockable interfaces panel
-     */
-    void setupInterfacesPanel();
-
-    /**
-     * @brief Initialize and setup the dockable analytics panel
-     */
-    void setupAnalyticsWidget();
-
-    /**
-     * @brief Initialize and setup the simulation widget
-     */
-    void setupSimulationWidget();
-
-    /**
-     * @brief Initialize and setup the recording widget
-     */
-    void setupRecordingWidget();
-
-    /**
-     * @brief Initialize and setup the health monitor widget
-     */
-    void setupHealthMonitorWidget();
-
-    /**
-     * @brief Initialize and setup the predictive maintenance widget
-     */
-    void setupPredictiveMaintenanceWidget();
-
-    /**
-     * @brief Apply modern dark theme to the application
-     */
-    void applyModernTheme();
-
-    /**
-     * @brief Setup better dock widget layout to prevent overlapping
-     */
-    void setupDockWidgetLayout();
-
-    CChartsWidget *m_chartsWidget;
-
-    void setupChartsWidget();
-    void onChartsRequested();
+    
+    // Window instances
+    CPPIWindow *m_ppiWindow;
+    CControlsWindow *m_controlsWindow;
+    
+    // Monitor information
+    QList<QScreen*> m_screens;
+    bool m_isDualMonitor;
+    bool m_isFullscreen;
+    
+    // Settings
+    QSettings *m_settings;
 };
 
 #endif // CMAPMAINWINDOW_H
