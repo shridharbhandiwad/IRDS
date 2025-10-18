@@ -33,6 +33,8 @@
 #include <QTimer>
 #include <QMenu>
 #include <QSet>
+#include <QPixmap>
+#include <QMap>
 
 // Forward declaration
 struct stTrackDisplayInfo;
@@ -75,6 +77,10 @@ private:
     // Track state members
     QSet<int> m_highlightedTracks; //!< Set of highlighted track IDs
     int m_focusedTrackId;          //!< Currently focused track ID (-1 if none)
+    
+    // Drone image members
+    QPixmap m_droneIcon;           //!< Default drone icon image
+    QMap<int, QPixmap> m_trackImages; //!< Custom images for specific track IDs
 
     /**
      * @brief Creates the context menu for tracks
@@ -123,6 +129,17 @@ private:
      */
     void drawDroneInternalDetails(QPainter *pPainter, const stTrackDisplayInfo &trackInfo, 
                                   const QPointF &screenPos);
+    
+    /**
+     * @brief Draws a rotated drone image based on heading
+     * @param pPainter QPainter instance
+     * @param image Drone image to draw
+     * @param screenPos Screen position of track
+     * @param heading Heading angle in degrees
+     * @param scale Scale factor for the image
+     */
+    void drawRotatedDroneImage(QPainter *pPainter, const QPixmap &image, 
+                               const QPointF &screenPos, double heading, double scale = 1.0);
 
 private slots:
     void onFocusTrack();
