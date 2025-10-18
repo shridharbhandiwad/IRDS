@@ -116,6 +116,7 @@
 #include <QMouseEvent>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QInputDialog>
 
 int nAnimFrame = 0;
 
@@ -197,6 +198,10 @@ bool CTrackLayer::eventFilter(QObject *obj, QEvent *event)
                 
                 if (trackId != -1) {
                     m_rightClickedTrackId = trackId;
+                    
+                    // Update context menu items based on current state
+                    updateContextMenuItems();
+                    
                     QPoint globalPos = m_canvas->viewport()->mapToGlobal(mouseEvent->pos());
                     m_contextMenu->exec(globalPos);
                     return true; // Consume the event
@@ -220,8 +225,8 @@ void CTrackLayer::createContextMenu()
     
     m_contextMenu->addSeparator();
     
-    QAction *historyAction = m_contextMenu->addAction("📍 Toggle History (Max 50)");
-    connect(historyAction, &QAction::triggered, this, &CTrackLayer::onToggleTrackHistory);
+    m_historyAction = m_contextMenu->addAction("📍 Toggle History (Max 50)");
+    connect(m_historyAction, &QAction::triggered, this, &CTrackLayer::onToggleTrackHistory);
     
     QAction *highlightAction = m_contextMenu->addAction("✨ Highlight & Follow");
     connect(highlightAction, &QAction::triggered, this, &CTrackLayer::onHighlightTrack);
@@ -230,6 +235,11 @@ void CTrackLayer::createContextMenu()
     
     QAction *imageAction = m_contextMenu->addAction("🖼️ Load Track Image");
     connect(imageAction, &QAction::triggered, this, &CTrackLayer::onLoadTrackImage);
+    
+    m_contextMenu->addSeparator();
+    
+    QAction *configAction = m_contextMenu->addAction("⚙️ Configure History");
+    connect(configAction, &QAction::triggered, this, &CTrackLayer::onConfigureHistory);
     
     m_contextMenu->addSeparator();
     
@@ -260,6 +270,24 @@ void CTrackLayer::createContextMenu()
         "   margin: 4px 16px;"
         "}"
     );
+}
+
+/**
+ * @brief Updates context menu items based on current track state
+ */
+void CTrackLayer::updateContextMenuItems()
+{
+    if (m_rightClickedTrackId == -1 || !m_historyAction) return;
+    
+    bool historyEnabled = CDataWarehouse::getInstance()->isTrackHistoryEnabled(m_rightClickedTrackId);
+    stTrackHistoryConfig config = CDataWarehouse::getInstance()->getHistoryConfig();
+    
+    if (historyEnabled) {
+        QList<stTrackHistoryPoint> history = CDataWarehouse::getInstance()->getTrackHistory(m_rightClickedTrackId);
+        m_historyAction->setText(QString("📍 Hide History (%1/%2 points)").arg(history.size()).arg(config.maxHistoryPoints));
+    } else {
+        m_historyAction->setText(QString("📍 Show History (Max %1 points)").arg(config.maxHistoryPoints));
+    }
 }
 
 /**
@@ -311,8 +339,16 @@ void CTrackLayer::onToggleTrackHistory()
 {
     if (m_rightClickedTrackId == -1) return;
     
-    qDebug() << "Toggle history for track" << m_rightClickedTrackId;
-    // TODO: Implement track history with max 50 points
+    bool historyEnabled = CDataWarehouse::getInstance()->toggleTrackHistory(m_rightClickedTrackId);
+    
+    if (historyEnabled) {
+        qDebug() << "History enabled for track" << m_rightClickedTrackId;
+    } else {
+        qDebug() << "History disabled for track" << m_rightClickedTrackId;
+    }
+    
+    // Force redraw to show/hide history
+    update();
 }
 
 void CTrackLayer::onHighlightTrack()
@@ -321,6 +357,31 @@ void CTrackLayer::onHighlightTrack()
     
     qDebug() << "Highlight and follow track" << m_rightClickedTrackId;
     // TODO: Implement track highlighting and following
+}
+
+void CTrackLayer::onConfigureHistory()
+{
+    stTrackHistoryConfig config = CDataWarehouse::getInstance()->getHistoryConfig();
+    
+    bool ok;
+    int newMaxPoints = QInputDialog::getInt(
+        nullptr,
+        "Configure History Points",
+        QString("Maximum history points per track:\n(Current: %1, Range: 1-1000)").arg(config.maxHistoryPoints),
+        config.maxHistoryPoints,
+        1,
+        1000,
+        1,
+        &ok
+    );
+    
+    if (ok && newMaxPoints != config.maxHistoryPoints) {
+        CDataWarehouse::getInstance()->setMaxHistoryPoints(newMaxPoints);
+        qDebug() << "History configuration updated: max points =" << newMaxPoints;
+        
+        // Force redraw to apply changes
+        update();
+    }
 }
 
 /**
@@ -513,6 +574,87 @@ void CTrackLayer::drawTooltip(QPainter *pPainter, const stTrackDisplayInfo &trac
     pPainter->setBrush(Qt::NoBrush);
     pPainter->drawPath(connectorPath);
 }
+
+/**
+ * @brief Draws track history trail
+ * @param pPainter QPainter instance
+ * @param trackId Track ID to draw history for
+ * @param mapToPixel Map to pixel transformation
+ */
+void CTrackLayer::drawTrackHistory(QPainter *pPainter, int trackId, const QgsMapToPixel &mapToPixel)
+{
+    QList<stTrackHistoryPoint> history = CDataWarehouse::getInstance()->getTrackHistory(trackId);
+    if (history.size() < 2) return; // Need at least 2 points to draw a line
+    
+    stTrackHistoryConfig config = CDataWarehouse::getInstance()->getHistoryConfig();
+    
+    // Get track identity for color
+    QList<stTrackDisplayInfo> tracks = CDataWarehouse::getInstance()->getTrackList();
+    QColor baseColor = Qt::cyan;
+    for (const stTrackDisplayInfo &track : tracks) {
+        if (track.nTrkId == trackId) {
+            switch (track.nTrackIden) {
+                case TRACK_IDENTITY_FRIEND:
+                    baseColor = Qt::green;
+                    break;
+                case TRACK_IDENTITY_HOSTILE:
+                    baseColor = Qt::red;
+                    break;
+                case TRACK_IDENTITY_UNKNOWN:
+                    baseColor = Qt::yellow;
+                    break;
+                default:
+                    baseColor = Qt::cyan;
+                    break;
+            }
+            break;
+        }
+    }
+    
+    // Draw history trail with fading effect
+    QPainterPath historyPath;
+    QPointF firstPoint = mapToPixel.transform(QgsPointXY(history[0].lon, history[0].lat)).toQPointF();
+    historyPath.moveTo(firstPoint);
+    
+    for (int i = 1; i < history.size(); ++i) {
+        QPointF point = mapToPixel.transform(QgsPointXY(history[i].lon, history[i].lat)).toQPointF();
+        historyPath.lineTo(point);
+        
+        // Calculate alpha based on age (newer points are more opaque)
+        double alpha = config.historyAlpha * (double(i) / double(history.size() - 1));
+        alpha = qMax(0.2, alpha); // Minimum visibility
+        
+        QColor lineColor = baseColor;
+        lineColor.setAlphaF(alpha);
+        
+        // Draw line segment
+        pPainter->setPen(QPen(lineColor, config.historyLineWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+        pPainter->setBrush(Qt::NoBrush);
+        
+        if (i > 0) {
+            QPointF prevPoint = mapToPixel.transform(QgsPointXY(history[i-1].lon, history[i-1].lat)).toQPointF();
+            pPainter->drawLine(prevPoint, point);
+        }
+    }
+    
+    // Draw small dots at history points
+    for (int i = 0; i < history.size(); ++i) {
+        QPointF point = mapToPixel.transform(QgsPointXY(history[i].lon, history[i].lat)).toQPointF();
+        
+        // Calculate alpha and size based on age
+        double alpha = config.historyAlpha * (double(i) / double(history.size() - 1));
+        alpha = qMax(0.3, alpha);
+        
+        double dotSize = 2.0 + (2.0 * alpha); // Newer points are larger
+        
+        QColor dotColor = baseColor;
+        dotColor.setAlphaF(alpha);
+        
+        pPainter->setPen(Qt::NoPen);
+        pPainter->setBrush(dotColor);
+        pPainter->drawEllipse(point, dotSize, dotSize);
+    }
+}
 /**
  * @brief Paints the tracks on the canvas
  * @param pPainter QPainter instance used for drawing
@@ -541,6 +683,11 @@ void CTrackLayer::paint(QPainter *pPainter)
         if (isHovered) {
             hoveredTrack = track;
             hasHoveredTrack = true;
+        }
+        
+        // Draw track history if enabled
+        if (CDataWarehouse::getInstance()->isTrackHistoryEnabled(track.nTrkId)) {
+            drawTrackHistory(pPainter, track.nTrkId, mapToPixel);
         }
 
         switch (track.nTrackIden) {

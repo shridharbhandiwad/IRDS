@@ -461,7 +461,8 @@ void CTrackTableWidget::createContextMenu()
     
     connect(historyAction, &QAction::triggered, [this]() {
         if (m_rightClickedTrackId != -1) {
-            qDebug() << "Toggle history for track" << m_rightClickedTrackId;
+            bool historyEnabled = CDataWarehouse::getInstance()->toggleTrackHistory(m_rightClickedTrackId);
+            qDebug() << "History" << (historyEnabled ? "enabled" : "disabled") << "for track" << m_rightClickedTrackId;
         }
     });
     

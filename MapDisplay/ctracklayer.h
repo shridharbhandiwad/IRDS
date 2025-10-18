@@ -65,6 +65,7 @@ private:
     QgsMapCanvas *m_canvas;
     QTimer m_timer;
     QMenu *m_contextMenu;
+    QAction *m_historyAction;  // Store reference to history action for dynamic updates
 
     // Tooltip support members
     int m_hoveredTrackId;      //!< Currently hovered track ID (-1 if none)
@@ -75,6 +76,11 @@ private:
      * @brief Creates the context menu for tracks
      */
     void createContextMenu();
+    
+    /**
+     * @brief Updates context menu items based on current track state
+     */
+    void updateContextMenuItems();
 
     /**
      * @brief Detects if a track is at the given position
@@ -90,6 +96,14 @@ private:
      * @param screenPos Screen position for tooltip
      */
     void drawTooltip(QPainter *pPainter, const stTrackDisplayInfo &trackInfo, const QPointF &screenPos);
+    
+    /**
+     * @brief Draws track history trail
+     * @param pPainter QPainter instance
+     * @param trackId Track ID to draw history for
+     * @param mapToPixel Map to pixel transformation
+     */
+    void drawTrackHistory(QPainter *pPainter, int trackId, const QgsMapToPixel &mapToPixel);
 
 private slots:
     void onFocusTrack();
@@ -97,6 +111,7 @@ private slots:
     void onLoadTrackImage();
     void onToggleTrackHistory();
     void onHighlightTrack();
+    void onConfigureHistory();
 };
 
 #endif // CTRACKLAYER_H

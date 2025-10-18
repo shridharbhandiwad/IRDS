@@ -22,6 +22,12 @@ CDataWarehouse* CDataWarehouse::getInstance()
 CDataWarehouse::CDataWarehouse(QObject *parent) : QObject(parent)
 {
     _m_RadarPos = QPointF(77.2946, 13.2716);
+    
+    // Initialize history configuration with defaults
+    _m_historyConfig.maxHistoryPoints = 50;
+    _m_historyConfig.showHistory = true;
+    _m_historyConfig.historyLineWidth = 2;
+    _m_historyConfig.historyAlpha = 0.7;
 
     stTrackRecvInfo info1;
     info1.nTrkId = 1;
@@ -92,8 +98,78 @@ void CDataWarehouse::slotUpdateTrackData(stTrackRecvInfo trackRecvInfo) {
                            trackRecvInfo.x,trackRecvInfo.y,trackRecvInfo.z);
 
     _m_listTrackInfo.insert(info.nTrkId,info);
+    
+    // Update track history if this track has history enabled
+    if (_m_tracksWithHistoryEnabled.contains(info.nTrkId)) {
+        stTrackHistoryPoint historyPoint;
+        historyPoint.lat = info.lat;
+        historyPoint.lon = info.lon;
+        historyPoint.alt = info.alt;
+        historyPoint.heading = info.heading;
+        historyPoint.timestamp = info.nTrackTime;
+        
+        // Add to history
+        _m_trackHistory[info.nTrkId].append(historyPoint);
+        
+        // Limit history points to configured maximum
+        if (_m_trackHistory[info.nTrkId].size() > _m_historyConfig.maxHistoryPoints) {
+            _m_trackHistory[info.nTrkId].removeFirst();
+        }
+    }
 }
 
 const QPointF CDataWarehouse::getRadarPos() {
     return _m_RadarPos;
+}
+
+QList<stTrackHistoryPoint> CDataWarehouse::getTrackHistory(int trackId) {
+    return _m_trackHistory.value(trackId, QList<stTrackHistoryPoint>());
+}
+
+bool CDataWarehouse::toggleTrackHistory(int trackId) {
+    if (_m_tracksWithHistoryEnabled.contains(trackId)) {
+        // Disable history for this track
+        _m_tracksWithHistoryEnabled.remove(trackId);
+        _m_trackHistory.remove(trackId);
+        return false;
+    } else {
+        // Enable history for this track
+        _m_tracksWithHistoryEnabled.insert(trackId);
+        
+        // Add current position as first history point if track exists
+        if (_m_listTrackInfo.contains(trackId)) {
+            stTrackDisplayInfo currentTrack = _m_listTrackInfo.value(trackId);
+            stTrackHistoryPoint historyPoint;
+            historyPoint.lat = currentTrack.lat;
+            historyPoint.lon = currentTrack.lon;
+            historyPoint.alt = currentTrack.alt;
+            historyPoint.heading = currentTrack.heading;
+            historyPoint.timestamp = currentTrack.nTrackTime;
+            
+            _m_trackHistory[trackId].append(historyPoint);
+        }
+        return true;
+    }
+}
+
+bool CDataWarehouse::isTrackHistoryEnabled(int trackId) {
+    return _m_tracksWithHistoryEnabled.contains(trackId);
+}
+
+stTrackHistoryConfig CDataWarehouse::getHistoryConfig() {
+    return _m_historyConfig;
+}
+
+void CDataWarehouse::setMaxHistoryPoints(int maxPoints) {
+    if (maxPoints > 0 && maxPoints <= 1000) { // Reasonable limits
+        _m_historyConfig.maxHistoryPoints = maxPoints;
+        
+        // Trim existing histories to new limit
+        for (auto it = _m_trackHistory.begin(); it != _m_trackHistory.end(); ++it) {
+            QList<stTrackHistoryPoint> &history = it.value();
+            while (history.size() > maxPoints) {
+                history.removeFirst();
+            }
+        }
+    }
 }
