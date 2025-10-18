@@ -152,20 +152,20 @@
 #include <QKeyEvent>
 
 // Forward declarations
-class CTrackTableWidget;
-class CConfigPanelWidget;
-class CChartsWidget;
-class CInterfacesPanelWidget;
-class CAnalyticsWidget;
-class CSimulationWidget;
-class CRecordingWidget;
-class CHealthMonitorWidget;
-class CPredictiveMaintenanceWidget;
+class CPPIWindow;
+class CControlsWindow;
 
 namespace Ui {
 class CMapMainWindow;
 }
 
+/**
+ * @brief Main window managing dual-monitor setup
+ * 
+ * This window orchestrates two separate windows:
+ * - CPPIWindow: PPI display + Track table (Monitor 1)
+ * - CControlsWindow: All controls and tabs (Monitor 2)
+ */
 class CMapMainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -180,64 +180,15 @@ protected:
      * @param event Key event
      *
      * Shortcuts:
-     * - T: Toggle track table visibility
-     * - C: Toggle control panel visibility
-     * - I: Toggle interfaces panel visibility
-     * - A: Toggle analytics widget visibility
-     * - S: Toggle simulation widget visibility
-     * - R: Toggle recording widget visibility
-     * - M: Toggle health monitor visibility
-     * - P: Toggle predictive maintenance visibility
+     * - F1: Show/Hide PPI Window
+     * - F2: Show/Hide Controls Window
      * - H: Map home view
-     * - F: Toggle old controls (deprecated)
+     * - Esc: Exit application
      */
     void keyPressEvent(QKeyEvent *event) override;
 
 private slots:
-    /**
-     * @brief Update status bar with mouse position
-     * @param mouseRead Mouse position string
-     */
-    void slotMouseRead(QString mouseRead);
-
-    /**
-     * @brief Reset map to home view
-     */
-    void on_pushButton_MapHome_clicked();
-
-    /**
-     * @brief Open raster map file dialog
-     */
-    void on_pushButton_OpenMaps_clicked();
-
-    /**
-     * @brief Flush/clear operation
-     */
-    void on_pushButton_FLUSH_clicked();
-
-    /**
-     * @brief Exit application
-     */
-    void on_pushButton_EXIT_clicked();
-
-    /**
-     * @brief Update track table with current data
-     */
-    void updateTrackTable();
-
-    /**
-     * @brief Handle track selection from table
-     * @param trackId Selected track ID
-     */
-    void onTrackSelected(int trackId);
-
-    /**
-     * @brief Handle track double-click from table
-     * @param trackId Double-clicked track ID
-     */
-    void onTrackDoubleClicked(int trackId);
-
-    // Config panel slots
+    // Control window signal handlers
     void onMapHomeRequested();
     void onOpenMapsRequested();
     void onFlushRequested();
@@ -252,102 +203,31 @@ private slots:
 
 private:
     Ui::CMapMainWindow *ui;
-    QTimer _m_updateTimer;
 
     /**
-     * @brief Rich dockable track table widget
+     * @brief PPI display window (Monitor 1)
      */
-    CTrackTableWidget *m_trackTable;
+    CPPIWindow *m_ppiWindow;
 
     /**
-     * @brief Rich dockable configuration panel
+     * @brief Controls window (Monitor 2)
      */
-    CConfigPanelWidget *m_configPanel;
+    CControlsWindow *m_controlsWindow;
 
     /**
-     * @brief Rich dockable interfaces panel for controllers
+     * @brief Initialize and setup dual-monitor windows
      */
-    CInterfacesPanelWidget *m_interfacesPanel;
+    void setupDualMonitorWindows();
 
     /**
-     * @brief Rich dockable analytics panel for track statistics
+     * @brief Apply light theme to the application
      */
-    CAnalyticsWidget *m_analyticsWidget;
+    void applyLightTheme();
 
     /**
-     * @brief Simulation control widget for track generation
+     * @brief Position windows for dual-monitor setup
      */
-    CSimulationWidget *m_simulationWidget;
-
-    /**
-     * @brief Recording and replay widget
-     */
-    CRecordingWidget *m_recordingWidget;
-
-    /**
-     * @brief System health monitoring widget
-     */
-    CHealthMonitorWidget *m_healthMonitorWidget;
-
-    /**
-     * @brief Predictive maintenance widget
-     */
-    CPredictiveMaintenanceWidget *m_predictiveMaintenanceWidget;
-
-    /**
-     * @brief Initialize and setup the dockable track table
-     */
-    void setupTrackTable();
-
-    /**
-     * @brief Initialize and setup the dockable config panel
-     */
-    void setupConfigPanel();
-
-    /**
-     * @brief Initialize and setup the dockable interfaces panel
-     */
-    void setupInterfacesPanel();
-
-    /**
-     * @brief Initialize and setup the dockable analytics panel
-     */
-    void setupAnalyticsWidget();
-
-    /**
-     * @brief Initialize and setup the simulation widget
-     */
-    void setupSimulationWidget();
-
-    /**
-     * @brief Initialize and setup the recording widget
-     */
-    void setupRecordingWidget();
-
-    /**
-     * @brief Initialize and setup the health monitor widget
-     */
-    void setupHealthMonitorWidget();
-
-    /**
-     * @brief Initialize and setup the predictive maintenance widget
-     */
-    void setupPredictiveMaintenanceWidget();
-
-    /**
-     * @brief Apply modern dark theme to the application
-     */
-    void applyModernTheme();
-
-    /**
-     * @brief Setup better dock widget layout to prevent overlapping
-     */
-    void setupDockWidgetLayout();
-
-    CChartsWidget *m_chartsWidget;
-
-    void setupChartsWidget();
-    void onChartsRequested();
+    void positionWindowsForDualMonitor();
 };
 
 #endif // CMAPMAINWINDOW_H

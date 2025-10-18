@@ -42,8 +42,10 @@ SOURCES += \
         MapDisplay/canalyticswidget.cpp \
         MapDisplay/cchartswidget.cpp \
         MapDisplay/cconfigpanelwidget.cpp \
+        MapDisplay/ccontrolswindow.cpp \
         MapDisplay/chealthmonitorwidget.cpp \
         MapDisplay/cinterfacespanelwidget.cpp \
+        MapDisplay/cppiwindow.cpp \
         MapDisplay/cpredictivemaintenancewidget.cpp \
         MapDisplay/cppilayer.cpp \
         MapDisplay/crecordingwidget.cpp \
@@ -64,8 +66,10 @@ HEADERS += \
         MapDisplay/canalyticswidget.h \
         MapDisplay/cchartswidget.h \
         MapDisplay/cconfigpanelwidget.h \
+        MapDisplay/ccontrolswindow.h \
         MapDisplay/chealthmonitorwidget.h \
         MapDisplay/cinterfacespanelwidget.h \
+        MapDisplay/cppiwindow.h \
         MapDisplay/cpredictivemaintenancewidget.h \
         MapDisplay/cppilayer.h \
         MapDisplay/crecordingwidget.h \
