@@ -53,6 +53,7 @@ SOURCES += \
         MapDisplay/ctracktablewidget.cpp \
         MapDisplay/customgradiantfillsymbollayer.cpp \
         cdatawarehouse.cpp \
+        cdrone.cpp \
         cudpreceiver.cpp \
         main.cpp \
         cmapmainwindow.cpp \
@@ -77,6 +78,7 @@ HEADERS += \
         MapDisplay/ctracktablewidget.h \
         MapDisplay/customgradiantfillsymbollayer.h \
         cdatawarehouse.h \
+        cdrone.h \
         cmapmainwindow.h \
         cppiwindow.h \
         ccontrolswindow.h \

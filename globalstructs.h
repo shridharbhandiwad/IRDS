@@ -4,6 +4,9 @@
 #include <QList>
 #include <QPointF>
 
+// Forward declaration
+class CDrone;
+
 enum eTrackIdentity {
     TRACK_IDENTITY_DEFAULT = 0,
     TRACK_IDENTITY_UNKNOWN = 1,
@@ -51,6 +54,7 @@ struct stTrackDisplayInfo {
     QString tooltip;  // ADD THIS LINE
     QList<stTrackHistoryPoint> historyPoints;  //!< Track history points
     bool showHistory;           //!< Flag to show/hide history trail
+    CDrone* pDrone;             //!< Pointer to associated drone object (nullptr if not a drone)
 };
 
 #pragma pack()

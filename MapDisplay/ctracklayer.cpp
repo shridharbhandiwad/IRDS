@@ -117,6 +117,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <cmath>
+#include "../cdrone.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -719,6 +720,202 @@ void CTrackLayer::drawFocusedTrackDatatip(QPainter *pPainter, const stTrackDispl
 }
 
 /**
+ * @brief Draws drone internal details panel next to track
+ * @param pPainter QPainter instance
+ * @param trackInfo Track information with drone pointer
+ * @param screenPos Screen position of track
+ */
+void CTrackLayer::drawDroneInternalDetails(QPainter *pPainter, const stTrackDisplayInfo &trackInfo, 
+                                          const QPointF &screenPos)
+{
+    if (!trackInfo.pDrone) return;
+    
+    stDroneInternalState droneState = trackInfo.pDrone->getInternalState();
+    
+    // Determine health color
+    QColor healthColor = trackInfo.pDrone->getHealthStatusColor();
+    
+    // Build info lines for display
+    QStringList lines;
+    lines << QString("🚁 DRONE #%1").arg(trackInfo.nTrkId);
+    lines << QString("━━━━━━━━━━━━━━");
+    lines << QString("MODE: %1").arg(trackInfo.pDrone->getFlightModeString());
+    lines << QString("STATUS: %1").arg(droneState.statusMessage);
+    lines << "";
+    lines << QString("⚡ POWER");
+    lines << QString("  Battery: %1%").arg(droneState.batteryLevel, 0, 'f', 1);
+    lines << QString("  Voltage: %1V").arg(droneState.batteryVoltage, 0, 'f', 2);
+    lines << QString("  Flight Time: %1m").arg(droneState.estimatedFlightTime, 0, 'f', 1);
+    lines << "";
+    lines << QString("🎯 DYNAMICS");
+    lines << QString("  Speed: %1 m/s").arg(droneState.groundSpeed, 0, 'f', 1);
+    lines << QString("  V-Speed: %1 m/s").arg(droneState.verticalSpeed, 0, 'f', 1);
+    lines << QString("  Accel: %1 m/s²").arg(droneState.acceleration, 0, 'f', 2);
+    lines << QString("  Heading: %1°").arg(droneState.yaw, 0, 'f', 1);
+    lines << "";
+    lines << QString("🎚️ ATTITUDE");
+    lines << QString("  Pitch: %1°").arg(droneState.pitch, 0, 'f', 1);
+    lines << QString("  Roll: %1°").arg(droneState.roll, 0, 'f', 1);
+    lines << QString("  Yaw: %1°").arg(droneState.yaw, 0, 'f', 1);
+    lines << "";
+    lines << QString("📡 SENSORS");
+    lines << QString("  GPS: %1%2").arg(droneState.sensors.gpsActive ? "✓" : "✗").arg(QString(" %1%").arg(droneState.sensors.gpsQuality));
+    lines << QString("  Link: %1%").arg(droneState.sensors.linkQuality);
+    lines << QString("  IMU: %1").arg(droneState.sensors.imuActive ? "✓" : "✗");
+    lines << "";
+    lines << QString("📍 MISSION");
+    lines << QString("  ID: %1").arg(droneState.missionId);
+    lines << QString("  WP: %1/%2").arg(droneState.waypointIndex).arg(droneState.totalWaypoints);
+    lines << QString("  Progress: %1%").arg(droneState.missionProgress, 0, 'f', 0);
+    
+    // Calculate dimensions
+    QFont detailFont("Consolas", 8);
+    pPainter->setFont(detailFont);
+    QFontMetrics fm(detailFont);
+    
+    int maxWidth = 0;
+    for (const QString &line : lines) {
+        int lineWidth = fm.horizontalAdvance(line);
+        if (lineWidth > maxWidth) {
+            maxWidth = lineWidth;
+        }
+    }
+    
+    int padding = 12;
+    int panelWidth = maxWidth + padding * 2;
+    int lineHeight = fm.height() + 1;
+    int panelHeight = lines.count() * lineHeight + padding * 2;
+    
+    // Position panel to the right of track
+    QPointF panelPos = screenPos + QPointF(40, -panelHeight / 2);
+    
+    // Keep within bounds
+    if (panelPos.x() + panelWidth > m_canvas->width() - 10) {
+        panelPos.setX(screenPos.x() - panelWidth - 40);
+    }
+    if (panelPos.y() < 10) {
+        panelPos.setY(10);
+    }
+    if (panelPos.y() + panelHeight > m_canvas->height() - 10) {
+        panelPos.setY(m_canvas->height() - panelHeight - 10);
+    }
+    
+    QRectF panelRect(panelPos, QSizeF(panelWidth, panelHeight));
+    
+    // Draw panel shadow
+    pPainter->setPen(Qt::NoPen);
+    pPainter->setBrush(QColor(0, 0, 0, 60));
+    pPainter->drawRoundedRect(panelRect.adjusted(-3, -3, 3, 3), 12, 12);
+    
+    // Main background - dark semi-transparent
+    QLinearGradient bgGradient(panelRect.topLeft(), panelRect.bottomLeft());
+    bgGradient.setColorAt(0, QColor(20, 25, 35, 240));
+    bgGradient.setColorAt(1, QColor(15, 20, 30, 250));
+    
+    pPainter->setBrush(bgGradient);
+    pPainter->setPen(QPen(healthColor, 2));
+    pPainter->drawRoundedRect(panelRect, 10, 10);
+    
+    // Health status indicator bar on left
+    QRectF healthBar(panelPos.x() + 5, panelPos.y() + 5, 4, panelHeight - 10);
+    pPainter->setPen(Qt::NoPen);
+    pPainter->setBrush(healthColor);
+    pPainter->drawRoundedRect(healthBar, 2, 2);
+    
+    // Battery level indicator (visual bar)
+    if (droneState.batteryLevel > 0) {
+        QRectF batteryBg(panelPos.x() + padding, panelPos.y() + panelHeight - padding - 8, 
+                         panelWidth - padding * 2, 6);
+        pPainter->setPen(Qt::NoPen);
+        pPainter->setBrush(QColor(60, 60, 70));
+        pPainter->drawRoundedRect(batteryBg, 3, 3);
+        
+        // Battery fill color based on level
+        QColor batteryColor;
+        if (droneState.batteryLevel > 50) {
+            batteryColor = QColor(46, 204, 113); // Green
+        } else if (droneState.batteryLevel > 25) {
+            batteryColor = QColor(241, 196, 15); // Yellow
+        } else {
+            batteryColor = QColor(231, 76, 60); // Red
+        }
+        
+        QRectF batteryFill(batteryBg.x(), batteryBg.y(), 
+                          batteryBg.width() * (droneState.batteryLevel / 100.0), batteryBg.height());
+        pPainter->setBrush(batteryColor);
+        pPainter->drawRoundedRect(batteryFill, 3, 3);
+    }
+    
+    // Draw text lines
+    int yOffset = padding + fm.ascent();
+    
+    for (int i = 0; i < lines.count(); i++) {
+        const QString &line = lines[i];
+        
+        if (line.isEmpty() || line.startsWith("━")) {
+            yOffset += lineHeight / 2;
+            
+            // Draw separator line
+            if (line.startsWith("━")) {
+                pPainter->setPen(QPen(QColor(100, 100, 120, 100), 1));
+                pPainter->drawLine(panelPos.x() + padding + 15, panelPos.y() + yOffset - fm.ascent()/2,
+                                  panelPos.x() + panelWidth - padding - 15, panelPos.y() + yOffset - fm.ascent()/2);
+            }
+            continue;
+        }
+        
+        // Color coding for different line types
+        if (line.startsWith("🚁")) {
+            // Title - bright cyan
+            pPainter->setFont(QFont("Consolas", 9, QFont::Bold));
+            pPainter->setPen(QColor(100, 200, 255));
+        } else if (line.startsWith("MODE:") || line.startsWith("STATUS:")) {
+            // Status lines
+            pPainter->setFont(QFont("Consolas", 8, QFont::Bold));
+            if (line.contains("EMERGENCY") || line.contains("CRITICAL")) {
+                pPainter->setPen(QColor(231, 76, 60)); // Red
+            } else if (line.contains("WARNING") || line.contains("RTB")) {
+                pPainter->setPen(QColor(241, 196, 15)); // Yellow
+            } else {
+                pPainter->setPen(healthColor);
+            }
+        } else if (line.startsWith("⚡") || line.startsWith("🎯") || 
+                   line.startsWith("🎚️") || line.startsWith("📡") || line.startsWith("📍")) {
+            // Section headers
+            pPainter->setFont(QFont("Consolas", 8, QFont::Bold));
+            pPainter->setPen(QColor(150, 180, 255));
+        } else if (line.startsWith("  ")) {
+            // Data lines (indented)
+            pPainter->setFont(QFont("Consolas", 8));
+            pPainter->setPen(QColor(220, 220, 230));
+        } else {
+            // Default
+            pPainter->setFont(detailFont);
+            pPainter->setPen(QColor(200, 200, 210));
+        }
+        
+        pPainter->drawText(QPointF(panelPos.x() + padding + 15, panelPos.y() + yOffset), line);
+        yOffset += lineHeight;
+    }
+    
+    // Draw connection line from panel to track
+    QPainterPath connectorPath;
+    if (panelPos.x() > screenPos.x()) {
+        // Panel on right
+        connectorPath.moveTo(panelPos.x(), panelPos.y() + panelHeight / 2);
+        connectorPath.lineTo(screenPos.x() + 15, screenPos.y());
+    } else {
+        // Panel on left
+        connectorPath.moveTo(panelPos.x() + panelWidth, panelPos.y() + panelHeight / 2);
+        connectorPath.lineTo(screenPos.x() - 15, screenPos.y());
+    }
+    
+    pPainter->setPen(QPen(healthColor, 2, Qt::DotLine));
+    pPainter->setBrush(Qt::NoBrush);
+    pPainter->drawPath(connectorPath);
+}
+
+/**
  * @brief Paints the tracks on the canvas
  * @param pPainter QPainter instance used for drawing
  */
@@ -876,7 +1073,14 @@ void CTrackLayer::paint(QPainter *pPainter)
         for (const stTrackDisplayInfo &track : listTracks) {
             if (track.nTrkId == m_focusedTrackId) {
                 QPointF focusedScreen = mapToPixel.transform(QgsPointXY(track.lon, track.lat)).toQPointF();
-                drawFocusedTrackDatatip(pPainter, track, focusedScreen);
+                
+                // Draw drone internal details if this track has an associated drone
+                if (track.pDrone) {
+                    drawDroneInternalDetails(pPainter, track, focusedScreen);
+                } else {
+                    // Otherwise draw regular datatip
+                    drawFocusedTrackDatatip(pPainter, track, focusedScreen);
+                }
                 break;
             }
         }

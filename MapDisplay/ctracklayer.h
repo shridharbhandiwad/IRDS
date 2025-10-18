@@ -114,6 +114,15 @@ private:
      */
     void drawFocusedTrackDatatip(QPainter *pPainter, const stTrackDisplayInfo &trackInfo, 
                                 const QPointF &screenPos);
+    
+    /**
+     * @brief Draws drone internal details panel
+     * @param pPainter QPainter instance
+     * @param trackInfo Track information with drone pointer
+     * @param screenPos Screen position of track
+     */
+    void drawDroneInternalDetails(QPainter *pPainter, const stTrackDisplayInfo &trackInfo, 
+                                  const QPointF &screenPos);
 
 private slots:
     void onFocusTrack();
