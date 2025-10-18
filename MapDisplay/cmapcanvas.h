@@ -31,6 +31,13 @@ public:
 
     void loadRasterFile(QString rasterPath);
     void importRasterMap(QString inputPath);
+    
+    // Getter for track layer
+    CTrackLayer* getTrackLayer() const { return _m_trackLayer; }
+    
+    // Map enable/disable functionality
+    void enableMap(bool enabled);
+    bool isMapEnabled() const { return m_mapEnabled; }
 private:
 
     QProcess* m_translateProcess = nullptr;
@@ -55,6 +62,10 @@ private:
     void _loadLayers();
     void convertAndCacheRaster(const QString inputPath);
     void _loadRasterMaps();
+    
+    // Map state
+    bool m_mapEnabled;
+    QList<QgsMapLayer*> m_mapLayers;  // Store map layers for enable/disable
 signals:
     void signalMouseRead(QString);
 public slots:

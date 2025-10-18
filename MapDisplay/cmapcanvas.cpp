@@ -21,7 +21,7 @@
 #include  <QProcess>
 
 CMapCanvas::CMapCanvas(QWidget *parent) : QgsMapCanvas(parent),
-    _m_ppiLayer(nullptr),_m_trackLayer(nullptr)
+    _m_ppiLayer(nullptr),_m_trackLayer(nullptr), m_mapEnabled(true)
 {
     QgsRectangle fixedWorldExtent(-180.0, -90.0, 180.0, 90.0);
 
@@ -35,7 +35,7 @@ CMapCanvas::CMapCanvas(QWidget *parent) : QgsMapCanvas(parent),
         fixedWorldExtent.xMaximum() + padX,
         fixedWorldExtent.yMaximum() + padY);
 
-    setCanvasColor(QColor("#050D1A"));
+    setCanvasColor(QColor("#f8fafc")); // Light background
     enableAntiAliasing(true);
     setRenderFlag(true);
     freeze(false);
@@ -185,11 +185,16 @@ void CMapCanvas::loadRasterFile( QString rasterPath) {
     // Add to QGIS project and canvas
 
     QgsProject::instance()->addMapLayer(rasterLayer);
-    QList<QgsMapLayer*> alllayers = layers();
-    alllayers.insert(0, rasterLayer);  // Background (lowest)
-    setLayers({ alllayers });
-    //setDestinationCrs(wgs84); // Important for canvas reprojectionsetDestinationCrs(wgs84); // Important for canvas reprojection
-    //setExtent(rasterLayer->extent());
+    
+    // Store map layers for enable/disable functionality
+    m_mapLayers.append(rasterLayer);
+    
+    if (m_mapEnabled) {
+        QList<QgsMapLayer*> alllayers = layers();
+        alllayers.insert(0, rasterLayer);  // Background (lowest)
+        setLayers(alllayers);
+    }
+    
     refresh();
 
     //qDebug() << "Loaded raster with world file:" << rasterPath<<rasterLayer->extent();
@@ -321,11 +326,16 @@ void CMapCanvas::loadShapeFile(const QString &shpPath)
         layer->triggerRepaint();
 
     QgsProject::instance()->addMapLayer(layer);
+    
+    // Store map layers for enable/disable functionality
+    m_mapLayers.append(layer);
 
-    // Keep existing layers and add the new one
-    QList<QgsMapLayer *> currentLayers = layers();
-    currentLayers.append(layer);
-    setLayers(currentLayers);
+    if (m_mapEnabled) {
+        // Keep existing layers and add the new one
+        QList<QgsMapLayer *> currentLayers = layers();
+        currentLayers.append(layer);
+        setLayers(currentLayers);
+    }
 
     // Optional: Zoom to the extent of the first layer loaded
 //    if (currentLayers.size() == 1) {
@@ -486,4 +496,28 @@ void CMapCanvas::keyPressEvent(QKeyEvent *event)
         QgsMapCanvas::keyPressEvent(event); // Default handling
         break;
     }
+}
+
+void CMapCanvas::enableMap(bool enabled)
+{
+    m_mapEnabled = enabled;
+    
+    if (enabled) {
+        // Re-enable map layers - show both PPI and map layers
+        QList<QgsMapLayer*> allLayers;
+        
+        // Add map layers first (background)
+        for (QgsMapLayer* layer : m_mapLayers) {
+            allLayers.append(layer);
+        }
+        
+        setLayers(allLayers);
+        setCanvasColor(QColor("#f8fafc")); // Light background for map mode
+    } else {
+        // Disable map layers - show only PPI
+        setLayers(QList<QgsMapLayer*>()); // Clear all map layers
+        setCanvasColor(QColor("#0a0d1a")); // Dark background for PPI-only mode
+    }
+    
+    refresh();
 }

@@ -184,6 +184,16 @@ bool CTrackLayer::eventFilter(QObject *obj, QEvent *event)
                 m_canvas->unsetCursor();
                 update();
             }
+        } else if (event->type() == QEvent::MouseButtonPress) {
+            QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+            if (mouseEvent->button() == Qt::RightButton) {
+                int trackId = getTrackAtPosition(mouseEvent->pos());
+                if (trackId != -1) {
+                    QPoint globalPos = m_canvas->viewport()->mapToGlobal(mouseEvent->pos());
+                    emit trackRightClicked(trackId, globalPos);
+                    return true; // Consume the event
+                }
+            }
         }
     }
 

@@ -54,6 +54,9 @@ protected:
 private slots:
     void _UpdateAnimation(); //!< Timer-based animation tick
 
+signals:
+    void trackRightClicked(int trackId, const QPoint& globalPos);
+
 private:
     QgsMapCanvas *m_canvas;
     QTimer m_timer;
