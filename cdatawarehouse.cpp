@@ -3,6 +3,7 @@
 #include "cudpreceiver.h"
 #include <QDateTime>
 #include <QDebug>
+#include "cdrone.h"
 
 // Initialize static member variables
 CDataWarehouse* CDataWarehouse::_m_pInstance = nullptr;
@@ -92,6 +93,7 @@ void CDataWarehouse::slotUpdateTrackData(stTrackRecvInfo trackRecvInfo) {
     
     info.nTrkId = trackRecvInfo.nTrkId;
     info.heading = trackRecvInfo.heading;
+    info.velocity = trackRecvInfo.velocity;
     info.nTrackIden = trackRecvInfo.nTrackIden;
     info.nTrackTime = QDateTime::currentDateTime().toSecsSinceEpoch();
 
@@ -100,6 +102,20 @@ void CDataWarehouse::slotUpdateTrackData(stTrackRecvInfo trackRecvInfo) {
 
     _m_CoordConv.env2polar(&info.range,&info.azimuth,&info.elevation,
                            trackRecvInfo.x,trackRecvInfo.y,trackRecvInfo.z);
+    
+    // Create or get drone for this track
+    if (!_m_mapDrones.contains(trackRecvInfo.nTrkId)) {
+        CDrone* pDrone = new CDrone(trackRecvInfo.nTrkId, this);
+        _m_mapDrones.insert(trackRecvInfo.nTrkId, pDrone);
+        info.pDrone = pDrone;
+    } else {
+        info.pDrone = _m_mapDrones.value(trackRecvInfo.nTrkId);
+    }
+    
+    // Update drone dynamics with new track information
+    if (info.pDrone) {
+        info.pDrone->updateDynamics(info);
+    }
     
     // Add current position to history if history is enabled
     if (trackExists && info.showHistory) {
@@ -173,5 +189,44 @@ void CDataWarehouse::deleteTrack(int trackId) {
     if (_m_listTrackInfo.contains(trackId)) {
         _m_listTrackInfo.remove(trackId);
         qDebug() << "Track" << trackId << "deleted from data warehouse";
+    }
+    
+    // Also delete associated drone
+    if (_m_mapDrones.contains(trackId)) {
+        CDrone* pDrone = _m_mapDrones.value(trackId);
+        _m_mapDrones.remove(trackId);
+        delete pDrone;
+        qDebug() << "Drone" << trackId << "deleted";
+    }
+}
+
+CDrone* CDataWarehouse::getDrone(int trackId) {
+    if (_m_mapDrones.contains(trackId)) {
+        return _m_mapDrones.value(trackId);
+    }
+    return nullptr;
+}
+
+void CDataWarehouse::createDroneForTrack(int trackId) {
+    if (!_m_mapDrones.contains(trackId)) {
+        CDrone* pDrone = new CDrone(trackId, this);
+        _m_mapDrones.insert(trackId, pDrone);
+        
+        // Update track info with drone pointer
+        if (_m_listTrackInfo.contains(trackId)) {
+            stTrackDisplayInfo info = _m_listTrackInfo.value(trackId);
+            info.pDrone = pDrone;
+            _m_listTrackInfo.insert(trackId, info);
+        }
+        
+        qDebug() << "Created drone for track" << trackId;
+    }
+}
+
+void CDataWarehouse::updateDroneForTrack(int trackId) {
+    if (_m_mapDrones.contains(trackId) && _m_listTrackInfo.contains(trackId)) {
+        CDrone* pDrone = _m_mapDrones.value(trackId);
+        stTrackDisplayInfo trackInfo = _m_listTrackInfo.value(trackId);
+        pDrone->updateDynamics(trackInfo);
     }
 }

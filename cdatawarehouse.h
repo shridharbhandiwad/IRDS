@@ -8,6 +8,7 @@
 #include "CoordinateConverter.h"
 #include <QPointF>
 #include <QTimer>
+#include "cdrone.h"
 
 class CDataWarehouse : public QObject
 {
@@ -28,6 +29,11 @@ public :
     void setHistoryLimit(int limit);
     int getHistoryLimit() const;
     void deleteTrack(int trackId);
+    
+    // Drone management functions
+    CDrone* getDrone(int trackId);
+    void createDroneForTrack(int trackId);
+    void updateDroneForTrack(int trackId);
 private slots:
     void slotUpdateTrackData(stTrackRecvInfo trackRecvInfo);
     void slotClearTracksOnTimeOut();
@@ -53,6 +59,8 @@ private:
     QPointF _m_RadarPos;
     
     int _m_nHistoryLimit;  //!< Maximum number of history points to maintain
+    
+    QHash<int, CDrone*> _m_mapDrones;  //!< Map of track ID to drone object
 
 };
 
