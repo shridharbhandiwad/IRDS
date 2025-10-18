@@ -23,6 +23,10 @@ public :
     QList<stTrackDisplayInfo> getTrackList();
 
     const QPointF getRadarPos();
+    
+    void toggleTrackHistory(int trackId);
+    void setHistoryLimit(int limit);
+    int getHistoryLimit() const;
 private slots:
     void slotUpdateTrackData(stTrackRecvInfo trackRecvInfo);
     void slotClearTracksOnTimeOut();
@@ -46,6 +50,8 @@ private:
     CoordinateConverter _m_CoordConv;
 
     QPointF _m_RadarPos;
+    
+    int _m_nHistoryLimit;  //!< Maximum number of history points to maintain
 
 };
 

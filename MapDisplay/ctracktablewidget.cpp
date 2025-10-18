@@ -415,8 +415,10 @@ void CTrackTableWidget::createContextMenu()
 {
     m_contextMenu = new QMenu(this);
     
+    int historyLimit = CDataWarehouse::getInstance()->getHistoryLimit();
+    
     QAction *focusAction = m_contextMenu->addAction("🎯 Focus Track");
-    QAction *historyAction = m_contextMenu->addAction("📍 Toggle History (Max 50)");
+    QAction *historyAction = m_contextMenu->addAction(QString("📍 Toggle History (Max %1)").arg(historyLimit));
     QAction *highlightAction = m_contextMenu->addAction("✨ Highlight & Follow");
     m_contextMenu->addSeparator();
     QAction *imageAction = m_contextMenu->addAction("🖼️ Load Track Image");
@@ -461,6 +463,7 @@ void CTrackTableWidget::createContextMenu()
     
     connect(historyAction, &QAction::triggered, [this]() {
         if (m_rightClickedTrackId != -1) {
+            CDataWarehouse::getInstance()->toggleTrackHistory(m_rightClickedTrackId);
             qDebug() << "Toggle history for track" << m_rightClickedTrackId;
         }
     });

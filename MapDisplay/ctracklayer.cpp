@@ -220,7 +220,8 @@ void CTrackLayer::createContextMenu()
     
     m_contextMenu->addSeparator();
     
-    QAction *historyAction = m_contextMenu->addAction("📍 Toggle History (Max 50)");
+    int historyLimit = CDataWarehouse::getInstance()->getHistoryLimit();
+    QAction *historyAction = m_contextMenu->addAction(QString("📍 Toggle History (Max %1)").arg(historyLimit));
     connect(historyAction, &QAction::triggered, this, &CTrackLayer::onToggleTrackHistory);
     
     QAction *highlightAction = m_contextMenu->addAction("✨ Highlight & Follow");
@@ -311,8 +312,11 @@ void CTrackLayer::onToggleTrackHistory()
 {
     if (m_rightClickedTrackId == -1) return;
     
+    CDataWarehouse::getInstance()->toggleTrackHistory(m_rightClickedTrackId);
     qDebug() << "Toggle history for track" << m_rightClickedTrackId;
-    // TODO: Implement track history with max 50 points
+    
+    // Force redraw to show/hide history
+    update();
 }
 
 void CTrackLayer::onHighlightTrack()
@@ -604,6 +608,55 @@ void CTrackLayer::paint(QPainter *pPainter)
         pPainter->setPen(Qt::NoPen);
         pPainter->setBrush(gradient);
         pPainter->drawEllipse(ptScreen, nCurrentRadius, nCurrentRadius);
+        
+        // Draw history trail if enabled
+        if (track.showHistory && !track.historyPoints.isEmpty()) {
+            QPainterPath historyPath;
+            bool firstPoint = true;
+            
+            // Calculate fade effect based on history point age
+            int totalPoints = track.historyPoints.size();
+            
+            for (int i = 0; i < totalPoints; ++i) {
+                const stTrackHistoryPoint &histPoint = track.historyPoints[i];
+                QPointF histScreen = mapToPixel.transform(QgsPointXY(histPoint.lon, histPoint.lat)).toQPointF();
+                
+                if (firstPoint) {
+                    historyPath.moveTo(histScreen);
+                    firstPoint = false;
+                } else {
+                    historyPath.lineTo(histScreen);
+                }
+                
+                // Draw small dot for each history point with fading effect
+                // Older points are more transparent
+                int alpha = 50 + (i * 150 / totalPoints);  // Fade from 50 to 200
+                QColor dotColor = clr;
+                dotColor.setAlpha(alpha);
+                
+                pPainter->setPen(Qt::NoPen);
+                pPainter->setBrush(dotColor);
+                pPainter->drawEllipse(histScreen, 2, 2);
+            }
+            
+            // Draw the history trail line
+            QColor trailColor = clr;
+            trailColor.setAlpha(120);
+            pPainter->setPen(QPen(trailColor, 2, Qt::DashLine));
+            pPainter->setBrush(Qt::NoBrush);
+            pPainter->drawPath(historyPath);
+            
+            // Draw line from last history point to current position
+            if (!track.historyPoints.isEmpty()) {
+                const stTrackHistoryPoint &lastPoint = track.historyPoints.last();
+                QPointF lastScreen = mapToPixel.transform(QgsPointXY(lastPoint.lon, lastPoint.lat)).toQPointF();
+                
+                QColor connectColor = clr;
+                connectColor.setAlpha(180);
+                pPainter->setPen(QPen(connectColor, 2, Qt::SolidLine));
+                pPainter->drawLine(lastScreen, ptScreen);
+            }
+        }
     }
 
     // Draw tooltip for hovered track (draw last so it's on top)

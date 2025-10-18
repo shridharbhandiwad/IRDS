@@ -75,6 +75,7 @@ signals:
     void gridVisibilityChanged(bool visible);
     void compassVisibilityChanged(bool visible);
     void chartsRequested();
+    void historyLimitChanged(int limit);
 
 private:
     void setupUI();

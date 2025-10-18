@@ -339,6 +339,41 @@ void CConfigPanelWidget::createTrackTab()
 
     layout->addWidget(animGroup);
 
+    // Track History Group
+    QGroupBox *historyGroup = createStyledGroup("Track History");
+    QGridLayout *historyLayout = new QGridLayout(historyGroup);
+    historyLayout->setSpacing(10);
+
+    QLabel *lblHistoryLimit = new QLabel("Max History Points:");
+    lblHistoryLimit->setStyleSheet("color: #e2e8f0; font-size: 12px;");
+    historyLayout->addWidget(lblHistoryLimit, 0, 0);
+
+    m_sliderHistoryLimit = new QSlider(Qt::Horizontal);
+    m_sliderHistoryLimit->setRange(10, 200);
+    m_sliderHistoryLimit->setValue(50);
+    m_sliderHistoryLimit->setTickPosition(QSlider::TicksBelow);
+    m_sliderHistoryLimit->setTickInterval(50);
+    m_sliderHistoryLimit->setStyleSheet(m_sliderTrackSize->styleSheet());
+    historyLayout->addWidget(m_sliderHistoryLimit, 0, 1);
+
+    m_spinHistoryLimit = new QSpinBox();
+    m_spinHistoryLimit->setRange(10, 200);
+    m_spinHistoryLimit->setValue(50);
+    m_spinHistoryLimit->setMaximumWidth(70);
+    m_spinHistoryLimit->setStyleSheet(m_spinTrackSize->styleSheet());
+    historyLayout->addWidget(m_spinHistoryLimit, 0, 2);
+
+    connect(m_sliderHistoryLimit, &QSlider::valueChanged, m_spinHistoryLimit, &QSpinBox::setValue);
+    connect(m_spinHistoryLimit, QOverload<int>::of(&QSpinBox::valueChanged), m_sliderHistoryLimit, &QSlider::setValue);
+    connect(m_sliderHistoryLimit, &QSlider::valueChanged, this, &CConfigPanelWidget::historyLimitChanged);
+
+    QLabel *lblHistoryDesc = new QLabel("📍 Right-click a track to toggle history trail");
+    lblHistoryDesc->setStyleSheet("color: #a0aec0; font-size: 11px; font-style: italic;");
+    lblHistoryDesc->setWordWrap(true);
+    historyLayout->addWidget(lblHistoryDesc, 1, 0, 1, 3);
+
+    layout->addWidget(historyGroup);
+
     // Additional Options
     QGroupBox *optionsGroup = createStyledGroup("Options");
     QVBoxLayout *optionsLayout = new QVBoxLayout(optionsGroup);
