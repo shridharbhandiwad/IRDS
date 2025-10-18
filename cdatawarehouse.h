@@ -27,6 +27,12 @@ public :
     void toggleTrackHistory(int trackId);
     void setHistoryLimit(int limit);
     int getHistoryLimit() const;
+    
+    void deleteTrack(int trackId);
+    void highlightTrack(int trackId, bool highlight);
+    void focusTrack(int trackId);
+    void unfocusAllTracks();
+    int getFocusedTrackId() const;
 private slots:
     void slotUpdateTrackData(stTrackRecvInfo trackRecvInfo);
     void slotClearTracksOnTimeOut();
@@ -52,6 +58,7 @@ private:
     QPointF _m_RadarPos;
     
     int _m_nHistoryLimit;  //!< Maximum number of history points to maintain
+    int _m_nFocusedTrackId; //!< ID of the currently focused track (-1 if none)
 
 };
 

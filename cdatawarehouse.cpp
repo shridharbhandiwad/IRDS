@@ -19,7 +19,7 @@ CDataWarehouse* CDataWarehouse::getInstance()
     return _m_pInstance;
 }
 
-CDataWarehouse::CDataWarehouse(QObject *parent) : QObject(parent), _m_nHistoryLimit(50)
+CDataWarehouse::CDataWarehouse(QObject *parent) : QObject(parent), _m_nHistoryLimit(50), _m_nFocusedTrackId(-1)
 {
     _m_RadarPos = QPointF(77.2946, 13.2716);
 
@@ -87,10 +87,13 @@ void CDataWarehouse::slotUpdateTrackData(stTrackRecvInfo trackRecvInfo) {
         info = _m_listTrackInfo.value(trackRecvInfo.nTrkId);
     } else {
         info.showHistory = false;  // Default to history off for new tracks
+        info.isHighlighted = false;
+        info.isFocused = false;
     }
     
     info.nTrkId = trackRecvInfo.nTrkId;
     info.heading = trackRecvInfo.heading;
+    info.velocity = trackRecvInfo.velocity;
     info.nTrackIden = trackRecvInfo.nTrackIden;
     info.nTrackTime = QDateTime::currentDateTime().toSecsSinceEpoch();
 
@@ -165,4 +168,54 @@ void CDataWarehouse::setHistoryLimit(int limit) {
 
 int CDataWarehouse::getHistoryLimit() const {
     return _m_nHistoryLimit;
+}
+
+void CDataWarehouse::deleteTrack(int trackId) {
+    if (_m_listTrackInfo.contains(trackId)) {
+        _m_listTrackInfo.remove(trackId);
+        
+        // If this was the focused track, unfocus it
+        if (_m_nFocusedTrackId == trackId) {
+            _m_nFocusedTrackId = -1;
+        }
+        
+        qDebug() << "Track deleted:" << trackId;
+    }
+}
+
+void CDataWarehouse::highlightTrack(int trackId, bool highlight) {
+    if (_m_listTrackInfo.contains(trackId)) {
+        stTrackDisplayInfo info = _m_listTrackInfo.value(trackId);
+        info.isHighlighted = highlight;
+        _m_listTrackInfo.insert(trackId, info);
+    }
+}
+
+void CDataWarehouse::focusTrack(int trackId) {
+    // First, unfocus all tracks
+    unfocusAllTracks();
+    
+    // Then focus the selected track
+    if (_m_listTrackInfo.contains(trackId)) {
+        stTrackDisplayInfo info = _m_listTrackInfo.value(trackId);
+        info.isFocused = true;
+        _m_listTrackInfo.insert(trackId, info);
+        _m_nFocusedTrackId = trackId;
+    }
+}
+
+void CDataWarehouse::unfocusAllTracks() {
+    QList<int> trackIds = _m_listTrackInfo.keys();
+    for (int trackId : trackIds) {
+        stTrackDisplayInfo info = _m_listTrackInfo.value(trackId);
+        if (info.isFocused) {
+            info.isFocused = false;
+            _m_listTrackInfo.insert(trackId, info);
+        }
+    }
+    _m_nFocusedTrackId = -1;
+}
+
+int CDataWarehouse::getFocusedTrackId() const {
+    return _m_nFocusedTrackId;
 }

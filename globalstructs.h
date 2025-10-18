@@ -51,6 +51,8 @@ struct stTrackDisplayInfo {
     QString tooltip;  // ADD THIS LINE
     QList<stTrackHistoryPoint> historyPoints;  //!< Track history points
     bool showHistory;           //!< Flag to show/hide history trail
+    bool isHighlighted;         //!< Flag for highlighting track
+    bool isFocused;             //!< Flag for focused track (always show tooltip)
 };
 
 #pragma pack()
