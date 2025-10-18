@@ -146,6 +146,14 @@ CTrackLayer::CTrackLayer(QgsMapCanvas *canvas)
     
     // Create context menu
     createContextMenu();
+    
+    // Load default drone icon
+    m_droneIcon = QPixmap(":/images/resources/drone_icon.png");
+    if (m_droneIcon.isNull()) {
+        qWarning() << "Failed to load default drone icon from resources";
+    } else {
+        qDebug() << "Loaded drone icon:" << m_droneIcon.size();
+    }
 }
 
 CTrackLayer::~CTrackLayer()
@@ -324,7 +332,7 @@ void CTrackLayer::onLoadTrackImage()
 {
     if (m_rightClickedTrackId == -1) return;
     
-    QString filter = "Image Files (*.png *.jpg *.jpeg *.bmp *.gif)";
+    QString filter = "Image Files (*.png *.jpg *.jpeg *.bmp *.gif *.svg)";
     QString imagePath = QFileDialog::getOpenFileName(
         nullptr,
         QString("Load Image for Track #%1").arg(m_rightClickedTrackId),
@@ -343,6 +351,26 @@ void CTrackLayer::onLoadTrackImage()
             update();
         } else {
             QMessageBox::warning(nullptr, "Invalid Image", "Failed to load the selected image.");
+        QPixmap customImage(imagePath);
+        
+        if (customImage.isNull()) {
+            QMessageBox::warning(nullptr, "Load Image", 
+                QString("Failed to load image from: %1").arg(imagePath));
+            qWarning() << "Failed to load image for track" << m_rightClickedTrackId << ":" << imagePath;
+        } else {
+            // Store the custom image for this track
+            m_trackImages[m_rightClickedTrackId] = customImage;
+            qDebug() << "Loaded custom image for track" << m_rightClickedTrackId 
+                    << "Size:" << customImage.size() << "Path:" << imagePath;
+            
+            QMessageBox::information(nullptr, "Load Image", 
+                QString("Successfully loaded image for Track #%1\nSize: %2x%3")
+                .arg(m_rightClickedTrackId)
+                .arg(customImage.width())
+                .arg(customImage.height()));
+            
+            // Force redraw to show the new image
+            update();
         }
     }
 }
@@ -928,6 +956,46 @@ void CTrackLayer::drawDroneInternalDetails(QPainter *pPainter, const stTrackDisp
 }
 
 /**
+ * @brief Draws a rotated drone image based on heading
+ * @param pPainter QPainter instance
+ * @param image Drone image to draw
+ * @param screenPos Screen position of track
+ * @param heading Heading angle in degrees (0 = North, clockwise)
+ * @param scale Scale factor for the image
+ */
+void CTrackLayer::drawRotatedDroneImage(QPainter *pPainter, const QPixmap &image, 
+                                       const QPointF &screenPos, double heading, double scale)
+{
+    if (image.isNull()) return;
+    
+    // Save the current painter state
+    pPainter->save();
+    
+    // Move to the track position
+    pPainter->translate(screenPos);
+    
+    // Rotate based on heading
+    // Note: Heading is in degrees (0 = North, clockwise)
+    // Qt rotation is counter-clockwise from the positive x-axis
+    // So we need to adjust: Qt angle = 90 - heading
+    pPainter->rotate(90 - heading);
+    
+    // Apply scale
+    if (scale != 1.0) {
+        pPainter->scale(scale, scale);
+    }
+    
+    // Calculate the center point to draw from
+    QPointF imageCenter(-image.width() / 2.0, -image.height() / 2.0);
+    
+    // Draw the image centered at the origin (which is now at screenPos)
+    pPainter->drawPixmap(imageCenter, image);
+    
+    // Restore the painter state
+    pPainter->restore();
+}
+
+/**
  * @brief Paints the tracks on the canvas
  * @param pPainter QPainter instance used for drawing
  */
@@ -1049,6 +1117,39 @@ void CTrackLayer::paint(QPainter *pPainter)
                 QPointF topLeft(ptScreen.x() - rotated.width() / 2.0,
                                 ptScreen.y() - rotated.height() / 2.0);
                 pPainter->drawPixmap(topLeft, rotated);
+            // Draw drone image if available and track has a drone, otherwise draw core dot
+            bool useDroneImage = false;
+            QPixmap imageToUse;
+            
+            // Check if this track has a custom image
+            if (m_trackImages.contains(track.nTrkId)) {
+                imageToUse = m_trackImages[track.nTrkId];
+                useDroneImage = true;
+            }
+            // Otherwise use default drone icon if track has an associated drone
+            else if (track.pDrone && !m_droneIcon.isNull()) {
+                imageToUse = m_droneIcon;
+                useDroneImage = true;
+            }
+            
+            if (useDroneImage && !imageToUse.isNull()) {
+                // Calculate scale based on zoom level and track state
+                double baseScale = 0.4; // Base scale for the drone image
+                double zoomScale = qMin(1.5, pixelPerDegree / 1000000.0); // Scale with zoom
+                double stateScale = 1.0;
+                
+                if (isFocused) stateScale = 1.5;
+                else if (isHighlighted) stateScale = 1.2;
+                
+                double finalScale = baseScale * zoomScale * stateScale;
+                
+                // Draw the rotated drone image
+                drawRotatedDroneImage(pPainter, imageToUse, ptScreen, track.heading, finalScale);
+            } else {
+                // Fallback to drawing core dot if no image available
+                pPainter->setPen(clr);
+                pPainter->setBrush(clr);
+                pPainter->drawEllipse(ptScreen, trackSize, trackSize);
             }
 
             // Draw speed vector instead of simple heading line
