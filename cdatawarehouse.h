@@ -34,6 +34,7 @@ public :
     CDrone* getDrone(int trackId);
     void createDroneForTrack(int trackId);
     void updateDroneForTrack(int trackId);
+    void removeDroneFromTrack(int trackId);
 private slots:
     void slotUpdateTrackData(stTrackRecvInfo trackRecvInfo);
     void slotClearTracksOnTimeOut();

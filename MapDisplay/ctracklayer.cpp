@@ -118,6 +118,8 @@
 #include <QMessageBox>
 #include <cmath>
 #include "../cdrone.h"
+#include <QTransform>
+#include <QPainterPath>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -131,7 +133,7 @@ int nAnimFrame = 0;
  */
 CTrackLayer::CTrackLayer(QgsMapCanvas *canvas)
     : QgsMapCanvasItem(canvas), m_canvas(canvas), m_hoveredTrackId(-1), m_rightClickedTrackId(-1), 
-      m_contextMenu(nullptr), m_focusedTrackId(-1)
+      m_contextMenu(nullptr), m_focusedTrackId(-1), m_animationProgress(0.0)
 {
     setZValue(101); // Ensure drawing order: above base map, below UI overlays
     QObject::connect(&m_timer, &QTimer::timeout, this, &CTrackLayer::_UpdateAnimation);
@@ -143,6 +145,9 @@ CTrackLayer::CTrackLayer(QgsMapCanvas *canvas)
     
     // Create context menu
     createContextMenu();
+    
+    // Create default drone image
+    m_defaultDroneImage = createDefaultDroneImage();
 }
 
 CTrackLayer::~CTrackLayer()
@@ -164,6 +169,30 @@ QRectF CTrackLayer::boundingRect() const
 void CTrackLayer::_UpdateAnimation()
 {
     nAnimFrame = (nAnimFrame + 2) % 20; // Loop from 0–19
+    
+    // Update animation progress for smooth movement
+    m_animationProgress += 0.1; // Increment by 10% each frame
+    if (m_animationProgress > 1.0) {
+        m_animationProgress = 0.0;
+        
+        // Update previous positions for next animation cycle
+        const QgsMapToPixel &mapToPixel = m_canvas->mapSettings().mapToPixel();
+        QList<stTrackDisplayInfo> listTracks = CDataWarehouse::getInstance()->getTrackList();
+        
+        for (const stTrackDisplayInfo &track : listTracks) {
+            QPointF currentScreen = mapToPixel.transform(QgsPointXY(track.lon, track.lat)).toQPointF();
+            
+            // Store previous position if this is a new track or update existing
+            if (!m_trackAnimatedPositions.contains(track.nTrkId)) {
+                m_trackPreviousPositions[track.nTrkId] = currentScreen;
+                m_trackAnimatedPositions[track.nTrkId] = currentScreen;
+            } else {
+                m_trackPreviousPositions[track.nTrkId] = m_trackAnimatedPositions[track.nTrkId];
+                m_trackAnimatedPositions[track.nTrkId] = currentScreen;
+            }
+        }
+    }
+    
     update(); // Redraw
 }
 
@@ -238,6 +267,12 @@ void CTrackLayer::createContextMenu()
     
     QAction *imageAction = m_contextMenu->addAction("🖼️ Load Track Image");
     connect(imageAction, &QAction::triggered, this, &CTrackLayer::onLoadTrackImage);
+    
+    QAction *droneAction = m_contextMenu->addAction("🚁 Create Drone for Track");
+    connect(droneAction, &QAction::triggered, this, &CTrackLayer::onCreateDroneForTrack);
+    
+    QAction *removeDroneAction = m_contextMenu->addAction("❌ Remove Drone from Track");
+    connect(removeDroneAction, &QAction::triggered, this, &CTrackLayer::onRemoveDroneFromTrack);
     
     m_contextMenu->addSeparator();
     
@@ -330,8 +365,15 @@ void CTrackLayer::onLoadTrackImage()
     );
     
     if (!imagePath.isEmpty()) {
-        qDebug() << "Load image for track" << m_rightClickedTrackId << ":" << imagePath;
-        // TODO: Implement track image display
+        QPixmap image(imagePath);
+        if (!image.isNull()) {
+            // Scale image to appropriate size (32x32 pixels)
+            m_trackImages[m_rightClickedTrackId] = image.scaled(32, 32, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            qDebug() << "Loaded image for track" << m_rightClickedTrackId << ":" << imagePath;
+            update(); // Redraw to show the new image
+        } else {
+            qDebug() << "Failed to load image:" << imagePath;
+        }
     }
 }
 
@@ -359,6 +401,33 @@ void CTrackLayer::onHighlightTrack()
     }
     
     update(); // Redraw to show highlight changes
+}
+
+void CTrackLayer::onCreateDroneForTrack()
+{
+    if (m_rightClickedTrackId == -1) return;
+    
+    // Create a drone for this track through the data warehouse
+    CDataWarehouse::getInstance()->createDroneForTrack(m_rightClickedTrackId);
+    qDebug() << "Created drone for track" << m_rightClickedTrackId;
+    
+    update(); // Redraw to show the new drone image
+}
+
+void CTrackLayer::onRemoveDroneFromTrack()
+{
+    if (m_rightClickedTrackId == -1) return;
+    
+    // Remove custom image if exists
+    if (m_trackImages.contains(m_rightClickedTrackId)) {
+        m_trackImages.remove(m_rightClickedTrackId);
+    }
+    
+    // Remove drone from data warehouse
+    CDataWarehouse::getInstance()->removeDroneFromTrack(m_rightClickedTrackId);
+    qDebug() << "Removed drone from track" << m_rightClickedTrackId;
+    
+    update(); // Redraw to show changes
 }
 
 /**
@@ -916,6 +985,162 @@ void CTrackLayer::drawDroneInternalDetails(QPainter *pPainter, const stTrackDisp
 }
 
 /**
+ * @brief Creates a default drone image programmatically
+ * @return QPixmap containing the drone image
+ */
+QPixmap CTrackLayer::createDefaultDroneImage()
+{
+    int size = 40; // Increased size for better detail
+    QPixmap droneImage(size, size);
+    droneImage.fill(Qt::transparent);
+    
+    QPainter painter(&droneImage);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    
+    // Center point
+    QPointF center(size / 2.0, size / 2.0);
+    
+    // Draw shadow/glow effect
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(QColor(0, 0, 0, 30));
+    painter.drawEllipse(center, 18, 18);
+    
+    // Draw drone arms (4 arms extending from center) - thicker and more detailed
+    painter.setPen(QPen(QColor(70, 70, 70), 3));
+    painter.setBrush(Qt::NoBrush);
+    
+    // Front-left arm
+    painter.drawLine(center.x() - 3, center.y() - 3, center.x() - 14, center.y() - 14);
+    // Front-right arm  
+    painter.drawLine(center.x() + 3, center.y() - 3, center.x() + 14, center.y() - 14);
+    // Rear-left arm
+    painter.drawLine(center.x() - 3, center.y() + 3, center.x() - 14, center.y() + 14);
+    // Rear-right arm
+    painter.drawLine(center.x() + 3, center.y() + 3, center.x() + 14, center.y() + 14);
+    
+    // Draw propellers with spinning effect (blur)
+    painter.setPen(QPen(QColor(100, 100, 100, 150), 1));
+    painter.setBrush(QColor(220, 220, 220, 120));
+    
+    // Propeller positions
+    QPointF props[] = {
+        QPointF(center.x() - 14, center.y() - 14), // Front-left
+        QPointF(center.x() + 14, center.y() - 14), // Front-right
+        QPointF(center.x() - 14, center.y() + 14), // Rear-left
+        QPointF(center.x() + 14, center.y() + 14)  // Rear-right
+    };
+    
+    for (const QPointF &prop : props) {
+        // Draw spinning propeller effect
+        painter.drawEllipse(prop, 6, 6);
+        painter.setPen(QPen(QColor(150, 150, 150, 100), 1));
+        painter.drawEllipse(prop, 8, 8);
+    }
+    
+    // Draw drone body (main fuselage) with gradient
+    QLinearGradient bodyGradient(center.x() - 8, center.y() - 4, center.x() + 8, center.y() + 4);
+    bodyGradient.setColorAt(0, QColor(140, 140, 140));
+    bodyGradient.setColorAt(0.5, QColor(100, 100, 100));
+    bodyGradient.setColorAt(1, QColor(80, 80, 80));
+    
+    QRectF body(center.x() - 8, center.y() - 4, 16, 8);
+    painter.setPen(QPen(QColor(50, 50, 50), 1));
+    painter.setBrush(bodyGradient);
+    painter.drawRoundedRect(body, 3, 3);
+    
+    // Draw camera/gimbal underneath
+    painter.setPen(QPen(QColor(40, 40, 40), 1));
+    painter.setBrush(QColor(60, 60, 60));
+    QRectF camera(center.x() - 3, center.y() + 2, 6, 4);
+    painter.drawRoundedRect(camera, 1, 1);
+    
+    // Draw LED lights on arms
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(QColor(0, 255, 0, 200)); // Green LED
+    painter.drawEllipse(center.x() - 14, center.y() - 14, 2, 2);
+    painter.drawEllipse(center.x() + 14, center.y() - 14, 2, 2);
+    
+    painter.setBrush(QColor(255, 0, 0, 200)); // Red LED
+    painter.drawEllipse(center.x() - 14, center.y() + 14, 2, 2);
+    painter.drawEllipse(center.x() + 14, center.y() + 14, 2, 2);
+    
+    // Draw direction indicator (enhanced arrow pointing forward)
+    painter.setPen(QPen(QColor(255, 120, 120), 2));
+    painter.setBrush(QColor(255, 120, 120));
+    
+    // Arrow pointing up (forward direction when heading = 0)
+    QPainterPath arrow;
+    arrow.moveTo(center.x(), center.y() - 12);
+    arrow.lineTo(center.x() - 4, center.y() - 7);
+    arrow.lineTo(center.x() - 2, center.y() - 7);
+    arrow.lineTo(center.x() - 2, center.y() - 2);
+    arrow.lineTo(center.x() + 2, center.y() - 2);
+    arrow.lineTo(center.x() + 2, center.y() - 7);
+    arrow.lineTo(center.x() + 4, center.y() - 7);
+    arrow.closeSubpath();
+    painter.drawPath(arrow);
+    
+    return droneImage;
+}
+
+/**
+ * @brief Draws a drone image rotated according to heading
+ * @param pPainter QPainter instance
+ * @param trackInfo Track information
+ * @param screenPos Screen position of track
+ * @param image Drone image to draw
+ */
+void CTrackLayer::drawDroneImage(QPainter *pPainter, const stTrackDisplayInfo &trackInfo, 
+                                const QPointF &screenPos, const QPixmap &image)
+{
+    if (image.isNull()) return;
+    
+    pPainter->save();
+    
+    // Move to track position
+    pPainter->translate(screenPos);
+    
+    // Rotate according to heading (convert from geographical heading to screen rotation)
+    // Geographical: 0° = North, 90° = East
+    // Screen: 0° = Right, 90° = Down
+    // So we need to rotate by (90 - heading) to align properly
+    double rotationAngle = 90.0 - trackInfo.heading;
+    pPainter->rotate(rotationAngle);
+    
+    // Draw the image centered at the origin
+    QRectF imageRect(-image.width() / 2.0, -image.height() / 2.0, image.width(), image.height());
+    pPainter->drawPixmap(imageRect, image, image.rect());
+    
+    pPainter->restore();
+}
+
+/**
+ * @brief Gets interpolated position for smooth movement animation
+ * @param trackId Track ID
+ * @param currentPos Current screen position
+ * @return Interpolated position between previous and current
+ */
+QPointF CTrackLayer::getAnimatedPosition(int trackId, const QPointF &currentPos)
+{
+    if (!m_trackPreviousPositions.contains(trackId)) {
+        // First time seeing this track, no animation
+        m_trackPreviousPositions[trackId] = currentPos;
+        m_trackAnimatedPositions[trackId] = currentPos;
+        return currentPos;
+    }
+    
+    QPointF prevPos = m_trackPreviousPositions[trackId];
+    
+    // Use easing function for smoother animation (ease-out)
+    double easedProgress = 1.0 - (1.0 - m_animationProgress) * (1.0 - m_animationProgress);
+    
+    // Interpolate between previous and current position
+    QPointF animatedPos = prevPos + (currentPos - prevPos) * easedProgress;
+    
+    return animatedPos;
+}
+
+/**
  * @brief Paints the tracks on the canvas
  * @param pPainter QPainter instance used for drawing
  */
@@ -934,7 +1159,8 @@ void CTrackLayer::paint(QPainter *pPainter)
     bool hasHoveredTrack = false;
 
     for (const stTrackDisplayInfo &track : listTracks) {
-        QPointF ptScreen = mapToPixel.transform(QgsPointXY(track.lon, track.lat)).toQPointF();
+        QPointF ptScreenActual = mapToPixel.transform(QgsPointXY(track.lon, track.lat)).toQPointF();
+        QPointF ptScreen = getAnimatedPosition(track.nTrkId, ptScreenActual);
         double pixelPerDegree = 1.0 / m_canvas->mapUnitsPerPixel();
         QColor clr = Qt::cyan;
 
@@ -985,12 +1211,24 @@ void CTrackLayer::paint(QPainter *pPainter)
                 pPainter->drawEllipse(ptScreen, trackSize + 8, trackSize + 8);
             }
 
-            // Core dot
-            pPainter->setPen(clr);
-            pPainter->setBrush(clr);
-            pPainter->drawEllipse(ptScreen, trackSize, trackSize);
+            // Check if this track has a drone or custom image
+            bool hasCustomImage = m_trackImages.contains(track.nTrkId);
+            bool hasDrone = (track.pDrone != nullptr);
+            
+            if (hasCustomImage) {
+                // Draw custom loaded image
+                drawDroneImage(pPainter, track, ptScreen, m_trackImages[track.nTrkId]);
+            } else if (hasDrone) {
+                // Draw default drone image for drone tracks
+                drawDroneImage(pPainter, track, ptScreen, m_defaultDroneImage);
+            } else {
+                // Draw traditional dot for non-drone tracks
+                pPainter->setPen(clr);
+                pPainter->setBrush(clr);
+                pPainter->drawEllipse(ptScreen, trackSize, trackSize);
+            }
 
-            // Draw speed vector instead of simple heading line
+            // Draw speed vector for all tracks
             drawSpeedVector(pPainter, track, ptScreen, clr);
 
             if (pixelPerDegree > TEXT_VISIBLE_THRESHOLD) {
@@ -1001,22 +1239,43 @@ void CTrackLayer::paint(QPainter *pPainter)
             }
         }
 
-        // Glowing blip animation
-        int nMaxRadius = 20;
-        int nCurrentRadius = 4 + (nAnimFrame * (nMaxRadius - 4) / 20);
-        int nAlpha = 255 - (nAnimFrame * 255 / 20); // Fades out
+        // Different animation for drone vs regular tracks
+        if (hasDrone) {
+            // Drone-specific animation: pulsing glow
+            int nMaxRadius = 25;
+            int nCurrentRadius = 8 + (nAnimFrame * (nMaxRadius - 8) / 20);
+            int nAlpha = 120 - (nAnimFrame * 80 / 20); // Less intense fade
+            
+            // Drone glow: blue-cyan gradient
+            QRadialGradient droneGradient(ptScreen, nCurrentRadius);
+            QColor droneGlow(100, 200, 255, nAlpha);
+            QColor droneCenter(150, 220, 255, nAlpha / 3);
+            
+            droneGradient.setColorAt(0, droneCenter);
+            droneGradient.setColorAt(0.7, droneGlow);
+            droneGradient.setColorAt(1.0, QColor(droneGlow.red(), droneGlow.green(), droneGlow.blue(), 0));
+            
+            pPainter->setPen(Qt::NoPen);
+            pPainter->setBrush(droneGradient);
+            pPainter->drawEllipse(ptScreen, nCurrentRadius, nCurrentRadius);
+        } else {
+            // Regular track animation
+            int nMaxRadius = 20;
+            int nCurrentRadius = 4 + (nAnimFrame * (nMaxRadius - 4) / 20);
+            int nAlpha = 255 - (nAnimFrame * 255 / 20); // Fades out
 
-        // Gradient blip: transparent center → bright edge
-        QRadialGradient gradient(ptScreen, nCurrentRadius);
-        QColor clrEdge(clr.red(), clr.green(), clr.blue(), nAlpha);
+            // Gradient blip: transparent center → bright edge
+            QRadialGradient gradient(ptScreen, nCurrentRadius);
+            QColor clrEdge(clr.red(), clr.green(), clr.blue(), nAlpha);
 
-        gradient.setColorAt(0, Qt::cyan);
-        gradient.setColorAt(0.5, clr);
-        gradient.setColorAt(1.0, clrEdge);
+            gradient.setColorAt(0, Qt::cyan);
+            gradient.setColorAt(0.5, clr);
+            gradient.setColorAt(1.0, clrEdge);
 
-        pPainter->setPen(Qt::NoPen);
-        pPainter->setBrush(gradient);
-        pPainter->drawEllipse(ptScreen, nCurrentRadius, nCurrentRadius);
+            pPainter->setPen(Qt::NoPen);
+            pPainter->setBrush(gradient);
+            pPainter->drawEllipse(ptScreen, nCurrentRadius, nCurrentRadius);
+        }
         
         // Draw history trail if enabled
         if (track.showHistory && !track.historyPoints.isEmpty()) {
