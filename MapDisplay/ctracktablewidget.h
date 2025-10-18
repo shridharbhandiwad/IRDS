@@ -30,6 +30,7 @@ signals:
     void trackSelected(int trackId);
     void trackDoubleClicked(int trackId);
     void trackRightClicked(int trackId, const QPoint &globalPos);
+    void trackImageLoaded(int trackId, const QString &imagePath);
 
 private:
     void setupUI();

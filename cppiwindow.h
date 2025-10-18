@@ -79,6 +79,7 @@ private slots:
     void onTrackSelected(int trackId);
     void onTrackDoubleClicked(int trackId);
     void onTrackRightClicked(int trackId, const QPoint& globalPos);
+    void onTrackImageLoaded(int trackId, const QString &imagePath);
     
     // Status updates
     void updateStatusBar();

@@ -200,6 +200,15 @@ void CDataWarehouse::deleteTrack(int trackId) {
     }
 }
 
+void CDataWarehouse::setTrackImagePath(int trackId, const QString &imagePath) {
+    if (_m_listTrackInfo.contains(trackId)) {
+        stTrackDisplayInfo info = _m_listTrackInfo.value(trackId);
+        info.imagePath = imagePath;
+        _m_listTrackInfo.insert(trackId, info);
+        qDebug() << "Image path set for track" << trackId << ":" << imagePath;
+    }
+}
+
 CDrone* CDataWarehouse::getDrone(int trackId) {
     if (_m_mapDrones.contains(trackId)) {
         return _m_mapDrones.value(trackId);
