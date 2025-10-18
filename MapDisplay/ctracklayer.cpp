@@ -114,6 +114,8 @@
 #include "globalmacros.h"
 #include <QDateTime>
 #include <QMouseEvent>
+#include <QFileDialog>
+#include <QMessageBox>
 
 int nAnimFrame = 0;
 
@@ -122,7 +124,7 @@ int nAnimFrame = 0;
  * @param pCanvas Pointer to the QgsMapCanvas
  */
 CTrackLayer::CTrackLayer(QgsMapCanvas *canvas)
-    : QgsMapCanvasItem(canvas), m_canvas(canvas), m_hoveredTrackId(-1)
+    : QgsMapCanvasItem(canvas), m_canvas(canvas), m_hoveredTrackId(-1), m_rightClickedTrackId(-1), m_contextMenu(nullptr)
 {
     setZValue(101); // Ensure drawing order: above base map, below UI overlays
     QObject::connect(&m_timer, &QTimer::timeout, this, &CTrackLayer::_UpdateAnimation);
@@ -131,6 +133,9 @@ CTrackLayer::CTrackLayer(QgsMapCanvas *canvas)
     // Enable mouse tracking on the canvas
     m_canvas->viewport()->setMouseTracking(true);
     m_canvas->viewport()->installEventFilter(this);
+    
+    // Create context menu
+    createContextMenu();
 }
 
 CTrackLayer::~CTrackLayer()
@@ -184,10 +189,138 @@ bool CTrackLayer::eventFilter(QObject *obj, QEvent *event)
                 m_canvas->unsetCursor();
                 update();
             }
+        } else if (event->type() == QEvent::MouseButtonPress) {
+            QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+            if (mouseEvent->button() == Qt::RightButton) {
+                m_mousePos = mouseEvent->pos();
+                int trackId = getTrackAtPosition(m_mousePos);
+                
+                if (trackId != -1) {
+                    m_rightClickedTrackId = trackId;
+                    QPoint globalPos = m_canvas->viewport()->mapToGlobal(mouseEvent->pos());
+                    m_contextMenu->exec(globalPos);
+                    return true; // Consume the event
+                }
+            }
         }
     }
 
     return QObject::eventFilter(obj, event);
+}
+
+/**
+ * @brief Creates the context menu for tracks
+ */
+void CTrackLayer::createContextMenu()
+{
+    m_contextMenu = new QMenu();
+    
+    QAction *focusAction = m_contextMenu->addAction("🎯 Focus Track");
+    connect(focusAction, &QAction::triggered, this, &CTrackLayer::onFocusTrack);
+    
+    m_contextMenu->addSeparator();
+    
+    QAction *historyAction = m_contextMenu->addAction("📍 Toggle History (Max 50)");
+    connect(historyAction, &QAction::triggered, this, &CTrackLayer::onToggleTrackHistory);
+    
+    QAction *highlightAction = m_contextMenu->addAction("✨ Highlight & Follow");
+    connect(highlightAction, &QAction::triggered, this, &CTrackLayer::onHighlightTrack);
+    
+    m_contextMenu->addSeparator();
+    
+    QAction *imageAction = m_contextMenu->addAction("🖼️ Load Track Image");
+    connect(imageAction, &QAction::triggered, this, &CTrackLayer::onLoadTrackImage);
+    
+    m_contextMenu->addSeparator();
+    
+    QAction *deleteAction = m_contextMenu->addAction("🗑️ Delete Track");
+    connect(deleteAction, &QAction::triggered, this, &CTrackLayer::onDeleteTrack);
+    
+    // Style the context menu
+    m_contextMenu->setStyleSheet(
+        "QMenu {"
+        "   background-color: #ffffff;"
+        "   color: #1e293b;"
+        "   border: 2px solid #e2e8f0;"
+        "   border-radius: 8px;"
+        "   padding: 6px;"
+        "}"
+        "QMenu::item {"
+        "   padding: 8px 24px;"
+        "   border-radius: 4px;"
+        "   font-weight: 500;"
+        "}"
+        "QMenu::item:selected {"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3b82f6, stop:1 #2563eb);"
+        "   color: white;"
+        "}"
+        "QMenu::separator {"
+        "   height: 1px;"
+        "   background-color: #e2e8f0;"
+        "   margin: 4px 16px;"
+        "}"
+    );
+}
+
+/**
+ * @brief Context menu action slots
+ */
+void CTrackLayer::onFocusTrack()
+{
+    if (m_rightClickedTrackId == -1) return;
+    
+    QList<stTrackDisplayInfo> tracks = CDataWarehouse::getInstance()->getTrackList();
+    for (const stTrackDisplayInfo &track : tracks) {
+        if (track.nTrkId == m_rightClickedTrackId) {
+            QgsPointXY centerPoint(track.lon, track.lat);
+            m_canvas->setCenter(centerPoint);
+            m_canvas->refresh();
+            qDebug() << "Focused on track" << m_rightClickedTrackId;
+            break;
+        }
+    }
+}
+
+void CTrackLayer::onDeleteTrack()
+{
+    if (m_rightClickedTrackId == -1) return;
+    
+    // TODO: Implement track deletion in data warehouse
+    qDebug() << "Delete track requested:" << m_rightClickedTrackId;
+}
+
+void CTrackLayer::onLoadTrackImage()
+{
+    if (m_rightClickedTrackId == -1) return;
+    
+    QString filter = "Image Files (*.png *.jpg *.jpeg *.bmp *.gif)";
+    QString imagePath = QFileDialog::getOpenFileName(
+        nullptr,
+        QString("Load Image for Track #%1").arg(m_rightClickedTrackId),
+        QString(),
+        filter
+    );
+    
+    if (!imagePath.isEmpty()) {
+        qDebug() << "Load image for track" << m_rightClickedTrackId << ":" << imagePath;
+        // TODO: Implement track image display
+    }
+}
+
+void CTrackLayer::onToggleTrackHistory()
+{
+    if (m_rightClickedTrackId == -1) return;
+    
+    qDebug() << "Toggle history for track" << m_rightClickedTrackId;
+    // TODO: Implement track history with max 50 points
+}
+
+void CTrackLayer::onHighlightTrack()
+{
+    if (m_rightClickedTrackId == -1) return;
+    
+    qDebug() << "Highlight and follow track" << m_rightClickedTrackId;
+    // TODO: Implement track highlighting and following
 }
 
 /**

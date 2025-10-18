@@ -62,6 +62,7 @@ private slots:
     void onMapHome();
     void onToggleGrid();
     void onToggleCompass();
+    void onToggleTrackTable();
     void onSettings();
     
     // Track context menu actions
@@ -107,10 +108,12 @@ private:
     QPushButton *m_homeBtn;
     QPushButton *m_gridBtn;
     QPushButton *m_compassBtn;
+    QPushButton *m_toggleTableBtn;
     QPushButton *m_settingsBtn;
     QLabel *m_statusLabel;
     
     // Main components
+    QSplitter *m_splitter;
     CMapCanvas *m_mapCanvas;
     CTrackTableWidget *m_trackTable;
     

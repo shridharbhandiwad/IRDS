@@ -31,7 +31,8 @@ CControlsWindow::CControlsWindow(QWidget *parent)
     , m_settings(new QSettings("RadarDisplay", "ControlsWindow", this))
 {
     setWindowTitle("🎛️ Control Center - System Management");
-    setMinimumSize(1000, 700);
+    setMinimumSize(900, 650);
+    resize(950, 700); // Set initial size
     
     setupUI();
     applyLightTheme();
@@ -55,8 +56,8 @@ void CControlsWindow::setupUI()
     setCentralWidget(m_centralWidget);
     
     m_mainLayout = new QVBoxLayout(m_centralWidget);
-    m_mainLayout->setContentsMargins(8, 8, 8, 8);
-    m_mainLayout->setSpacing(8);
+    m_mainLayout->setContentsMargins(6, 6, 6, 6);
+    m_mainLayout->setSpacing(6);
     
     setupTabs();
     
@@ -148,13 +149,13 @@ void CControlsWindow::applyLightTheme()
         "   color: #475569;"
         "   border: 2px solid #e2e8f0;"
         "   border-bottom: none;"
-        "   border-top-left-radius: 8px;"
-        "   border-top-right-radius: 8px;"
-        "   padding: 10px 20px;"
+        "   border-top-left-radius: 6px;"
+        "   border-top-right-radius: 6px;"
+        "   padding: 8px 16px;"
         "   margin-right: 2px;"
         "   font-weight: 600;"
-        "   font-size: 13px;"
-        "   min-width: 120px;"
+        "   font-size: 12px;"
+        "   min-width: 100px;"
         "}"
         "QTabBar::tab:selected {"
         "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3b82f6, stop:1 #2563eb);"
@@ -169,11 +170,11 @@ void CControlsWindow::applyLightTheme()
         "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3b82f6, stop:1 #2563eb);"
         "   color: white;"
         "   border: none;"
-        "   border-radius: 8px;"
-        "   padding: 8px 16px;"
+        "   border-radius: 6px;"
+        "   padding: 6px 14px;"
         "   font-weight: 600;"
-        "   font-size: 12px;"
-        "   min-height: 28px;"
+        "   font-size: 11px;"
+        "   min-height: 24px;"
         "}"
         "QPushButton:hover {"
         "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #2563eb, stop:1 #1d4ed8);"
@@ -192,20 +193,22 @@ void CControlsWindow::applyLightTheme()
         "QGroupBox {"
         "   background-color: #ffffff;"
         "   border: 2px solid #e2e8f0;"
-        "   border-radius: 8px;"
-        "   margin-top: 12px;"
-        "   padding-top: 12px;"
+        "   border-radius: 6px;"
+        "   margin-top: 10px;"
+        "   padding-top: 10px;"
         "   font-weight: 600;"
         "   color: #1e293b;"
+        "   font-size: 11px;"
         "}"
         "QGroupBox::title {"
         "   subcontrol-origin: margin;"
         "   subcontrol-position: top left;"
-        "   padding: 4px 12px;"
+        "   padding: 3px 10px;"
         "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3b82f6, stop:1 #2563eb);"
-        "   border-radius: 4px;"
+        "   border-radius: 3px;"
         "   color: white;"
         "   font-weight: 600;"
+        "   font-size: 11px;"
         "}"
         "QLabel {"
         "   color: #334155;"
@@ -214,9 +217,9 @@ void CControlsWindow::applyLightTheme()
         "QLineEdit {"
         "   background-color: #ffffff;"
         "   border: 2px solid #e2e8f0;"
-        "   border-radius: 6px;"
-        "   padding: 8px 12px;"
-        "   font-size: 12px;"
+        "   border-radius: 4px;"
+        "   padding: 6px 10px;"
+        "   font-size: 11px;"
         "   color: #1e293b;"
         "}"
         "QLineEdit:focus {"
@@ -225,9 +228,9 @@ void CControlsWindow::applyLightTheme()
         "QComboBox {"
         "   background-color: #ffffff;"
         "   border: 2px solid #e2e8f0;"
-        "   border-radius: 6px;"
-        "   padding: 8px 12px;"
-        "   font-size: 12px;"
+        "   border-radius: 4px;"
+        "   padding: 6px 10px;"
+        "   font-size: 11px;"
         "   color: #1e293b;"
         "}"
         "QComboBox:focus {"

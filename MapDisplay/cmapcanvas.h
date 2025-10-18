@@ -31,6 +31,8 @@ public:
 
     void loadRasterFile(QString rasterPath);
     void importRasterMap(QString inputPath);
+    void setMapLayersVisible(bool visible);
+    bool areMapLayersVisible() const { return m_mapLayersVisible; }
 private:
 
     QProcess* m_translateProcess = nullptr;
@@ -52,6 +54,8 @@ private:
 
     CPPILayer *_m_ppiLayer;
     CTrackLayer *_m_trackLayer;
+    bool m_mapLayersVisible;
+    QList<QgsMapLayer*> m_mapLayers; // Store map layers separately from PPI/track layers
     void _loadLayers();
     void convertAndCacheRaster(const QString inputPath);
     void _loadRasterMaps();

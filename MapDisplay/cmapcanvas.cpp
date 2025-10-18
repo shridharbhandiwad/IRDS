@@ -21,7 +21,7 @@
 #include  <QProcess>
 
 CMapCanvas::CMapCanvas(QWidget *parent) : QgsMapCanvas(parent),
-    _m_ppiLayer(nullptr),_m_trackLayer(nullptr)
+    _m_ppiLayer(nullptr),_m_trackLayer(nullptr), m_mapLayersVisible(true)
 {
     QgsRectangle fixedWorldExtent(-180.0, -90.0, 180.0, 90.0);
 
@@ -35,7 +35,7 @@ CMapCanvas::CMapCanvas(QWidget *parent) : QgsMapCanvas(parent),
         fixedWorldExtent.xMaximum() + padX,
         fixedWorldExtent.yMaximum() + padY);
 
-    setCanvasColor(QColor("#050D1A"));
+    setCanvasColor(QColor("#e0e7ff")); // Light blue-gray background
     enableAntiAliasing(true);
     setRenderFlag(true);
     freeze(false);
@@ -261,6 +261,37 @@ void CMapCanvas::_loadLayers() {
 
     _m_trackLayer = new CTrackLayer(this);
     _m_trackLayer->show();
+}
+
+void CMapCanvas::setMapLayersVisible(bool visible)
+{
+    m_mapLayersVisible = visible;
+    
+    // Get all layers from the project
+    QList<QgsMapLayer*> projectLayers = QgsProject::instance()->mapLayers().values();
+    
+    if (visible) {
+        // Show all layers
+        for (QgsMapLayer* layer : projectLayers) {
+            layer->setCustomProperty("userHidden", false);
+        }
+        setLayers(projectLayers);
+        setCanvasColor(QColor("#e0e7ff")); // Light blue-gray background
+    } else {
+        // Hide map layers, keep only PPI and track layers
+        for (QgsMapLayer* layer : projectLayers) {
+            layer->setCustomProperty("userHidden", true);
+        }
+        setLayers(QList<QgsMapLayer*>()); // Clear all layers
+        setCanvasColor(QColor("#1a1a2e")); // Dark background for PPI-only mode
+    }
+    
+    // Ensure PPI and track layers are always visible
+    if (_m_ppiLayer) _m_ppiLayer->show();
+    if (_m_trackLayer) _m_trackLayer->show();
+    
+    refresh();
+    qDebug() << "Map layers visibility set to:" << visible;
 }
 
 void CMapCanvas::loadShapeFile(const QString &shpPath)
