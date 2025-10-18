@@ -1078,8 +1078,8 @@ void CTrackLayer::paint(QPainter *pPainter)
 
                 if (m_trackPixmaps.contains(track.nTrkId)) {
                     const QPixmap &pix = m_trackPixmaps.value(track.nTrkId);
-                    // Scale to a reasonable on-screen size based on focus/highlight
-                    int baseSize = isFocused ? 40 : (isHighlighted ? 32 : 24);
+                    // Scale to a much larger on-screen size based on focus/highlight
+                    int baseSize = isFocused ? 120 : (isHighlighted ? 96 : 72);
                     QPixmap scaled = pix.scaled(baseSize, baseSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
                     // Rotate so that image points along heading (assume up=0°, clockwise)
@@ -1098,8 +1098,8 @@ void CTrackLayer::paint(QPainter *pPainter)
             }
 
             if (!drawnCustomImage) {
-                // Fallback: draw a small default drone-like marker oriented by heading
-                int baseSize = isFocused ? 28 : (isHighlighted ? 22 : 16);
+                // Fallback: draw a much larger default drone-like marker oriented by heading
+                int baseSize = isFocused ? 84 : (isHighlighted ? 66 : 48);
                 // Generate default icon tinted by identity color (cache by color+size)
                 QString cacheKey = QString("%1x%2_%3").arg(baseSize).arg(baseSize).arg(clr.name());
                 QPixmap defaultIcon;
@@ -1134,7 +1134,7 @@ void CTrackLayer::paint(QPainter *pPainter)
             
             if (useDroneImage && !imageToUse.isNull()) {
                 // Calculate scale based on zoom level and track state
-                double baseScale = 0.4; // Base scale for the drone image
+                double baseScale = 1.2; // Much larger base scale for the drone image
                 double zoomScale = qMin(1.5, pixelPerDegree / 1000000.0); // Scale with zoom
                 double stateScale = 1.0;
                 
