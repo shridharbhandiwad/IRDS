@@ -2,6 +2,7 @@
 #include <QMutexLocker>
 #include "cudpreceiver.h"
 #include <QDateTime>
+#include <QDebug>
 
 // Initialize static member variables
 CDataWarehouse* CDataWarehouse::_m_pInstance = nullptr;
@@ -165,4 +166,12 @@ void CDataWarehouse::setHistoryLimit(int limit) {
 
 int CDataWarehouse::getHistoryLimit() const {
     return _m_nHistoryLimit;
+}
+
+void CDataWarehouse::deleteTrack(int trackId) {
+    QMutexLocker locker(&_m_mutex);
+    if (_m_listTrackInfo.contains(trackId)) {
+        _m_listTrackInfo.remove(trackId);
+        qDebug() << "Track" << trackId << "deleted from data warehouse";
+    }
 }

@@ -32,6 +32,7 @@
 #include <qgsmapcanvas.h>
 #include <QTimer>
 #include <QMenu>
+#include <QSet>
 
 // Forward declaration
 struct stTrackDisplayInfo;
@@ -70,6 +71,10 @@ private:
     int m_hoveredTrackId;      //!< Currently hovered track ID (-1 if none)
     QPointF m_mousePos;        //!< Current mouse position for tooltip placement
     int m_rightClickedTrackId; //!< Track ID for context menu
+    
+    // Track state members
+    QSet<int> m_highlightedTracks; //!< Set of highlighted track IDs
+    int m_focusedTrackId;          //!< Currently focused track ID (-1 if none)
 
     /**
      * @brief Creates the context menu for tracks
@@ -90,6 +95,25 @@ private:
      * @param screenPos Screen position for tooltip
      */
     void drawTooltip(QPainter *pPainter, const stTrackDisplayInfo &trackInfo, const QPointF &screenPos);
+    
+    /**
+     * @brief Draws speed vector for a track
+     * @param pPainter QPainter instance
+     * @param trackInfo Track information
+     * @param screenPos Screen position of track
+     * @param trackColor Color of the track
+     */
+    void drawSpeedVector(QPainter *pPainter, const stTrackDisplayInfo &trackInfo, 
+                        const QPointF &screenPos, const QColor &trackColor);
+    
+    /**
+     * @brief Draws focused track datatip that follows the track
+     * @param pPainter QPainter instance
+     * @param trackInfo Track information
+     * @param screenPos Screen position of track
+     */
+    void drawFocusedTrackDatatip(QPainter *pPainter, const stTrackDisplayInfo &trackInfo, 
+                                const QPointF &screenPos);
 
 private slots:
     void onFocusTrack();
