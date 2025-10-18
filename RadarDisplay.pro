@@ -56,6 +56,8 @@ SOURCES += \
         cudpreceiver.cpp \
         main.cpp \
         cmapmainwindow.cpp \
+        cppiwindow.cpp \
+        ccontrolswindow.cpp \
         MapDisplay/cmapcanvas.cpp \
         matrix.cpp
 
@@ -76,6 +78,8 @@ HEADERS += \
         MapDisplay/customgradiantfillsymbollayer.h \
         cdatawarehouse.h \
         cmapmainwindow.h \
+        cppiwindow.h \
+        ccontrolswindow.h \
         MapDisplay/cmapcanvas.h \
         cudpreceiver.h \
         globalmacros.h \
