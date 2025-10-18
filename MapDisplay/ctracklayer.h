@@ -33,6 +33,8 @@
 #include <QTimer>
 #include <QMenu>
 #include <QSet>
+#include <QPixmap>
+#include <QMap>
 
 // Forward declaration
 struct stTrackDisplayInfo;
@@ -75,11 +77,44 @@ private:
     // Track state members
     QSet<int> m_highlightedTracks; //!< Set of highlighted track IDs
     int m_focusedTrackId;          //!< Currently focused track ID (-1 if none)
+    
+    // Drone image members
+    QMap<int, QPixmap> m_trackImages;  //!< Custom images for tracks (trackId -> image)
+    QPixmap m_defaultDroneImage;       //!< Default drone image
+    
+    // Animation members
+    QMap<int, QPointF> m_trackPreviousPositions; //!< Previous positions for smooth movement
+    QMap<int, QPointF> m_trackAnimatedPositions; //!< Current animated positions
+    double m_animationProgress;                   //!< Animation progress (0.0 to 1.0)
 
     /**
      * @brief Creates the context menu for tracks
      */
     void createContextMenu();
+    
+    /**
+     * @brief Creates a default drone image programmatically
+     * @return QPixmap containing the drone image
+     */
+    QPixmap createDefaultDroneImage();
+    
+    /**
+     * @brief Draws a drone image rotated according to heading
+     * @param pPainter QPainter instance
+     * @param trackInfo Track information
+     * @param screenPos Screen position of track
+     * @param image Drone image to draw
+     */
+    void drawDroneImage(QPainter *pPainter, const stTrackDisplayInfo &trackInfo, 
+                       const QPointF &screenPos, const QPixmap &image);
+    
+    /**
+     * @brief Gets interpolated position for smooth movement animation
+     * @param trackId Track ID
+     * @param currentPos Current screen position
+     * @return Interpolated position between previous and current
+     */
+    QPointF getAnimatedPosition(int trackId, const QPointF &currentPos);
 
     /**
      * @brief Detects if a track is at the given position
@@ -130,6 +165,8 @@ private slots:
     void onLoadTrackImage();
     void onToggleTrackHistory();
     void onHighlightTrack();
+    void onCreateDroneForTrack();
+    void onRemoveDroneFromTrack();
 };
 
 #endif // CTRACKLAYER_H

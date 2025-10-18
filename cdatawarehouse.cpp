@@ -230,3 +230,20 @@ void CDataWarehouse::updateDroneForTrack(int trackId) {
         pDrone->updateDynamics(trackInfo);
     }
 }
+
+void CDataWarehouse::removeDroneFromTrack(int trackId) {
+    if (_m_mapDrones.contains(trackId)) {
+        CDrone* pDrone = _m_mapDrones.value(trackId);
+        _m_mapDrones.remove(trackId);
+        delete pDrone;
+        
+        // Update track info to remove drone pointer
+        if (_m_listTrackInfo.contains(trackId)) {
+            stTrackDisplayInfo info = _m_listTrackInfo.value(trackId);
+            info.pDrone = nullptr;
+            _m_listTrackInfo.insert(trackId, info);
+        }
+        
+        qDebug() << "Removed drone from track" << trackId;
+    }
+}
