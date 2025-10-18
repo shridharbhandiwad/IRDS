@@ -19,7 +19,7 @@ CDataWarehouse* CDataWarehouse::getInstance()
     return _m_pInstance;
 }
 
-CDataWarehouse::CDataWarehouse(QObject *parent) : QObject(parent)
+CDataWarehouse::CDataWarehouse(QObject *parent) : QObject(parent), _m_nHistoryLimit(50)
 {
     _m_RadarPos = QPointF(77.2946, 13.2716);
 
@@ -80,6 +80,15 @@ void CDataWarehouse::slotClearTracksOnTimeOut() {
 void CDataWarehouse::slotUpdateTrackData(stTrackRecvInfo trackRecvInfo) {
 
     stTrackDisplayInfo info;
+    
+    // Check if track already exists to preserve history settings
+    bool trackExists = _m_listTrackInfo.contains(trackRecvInfo.nTrkId);
+    if (trackExists) {
+        info = _m_listTrackInfo.value(trackRecvInfo.nTrkId);
+    } else {
+        info.showHistory = false;  // Default to history off for new tracks
+    }
+    
     info.nTrkId = trackRecvInfo.nTrkId;
     info.heading = trackRecvInfo.heading;
     info.nTrackIden = trackRecvInfo.nTrackIden;
@@ -90,10 +99,70 @@ void CDataWarehouse::slotUpdateTrackData(stTrackRecvInfo trackRecvInfo) {
 
     _m_CoordConv.env2polar(&info.range,&info.azimuth,&info.elevation,
                            trackRecvInfo.x,trackRecvInfo.y,trackRecvInfo.z);
+    
+    // Add current position to history if history is enabled
+    if (trackExists && info.showHistory) {
+        stTrackHistoryPoint historyPoint;
+        historyPoint.lat = info.lat;
+        historyPoint.lon = info.lon;
+        historyPoint.alt = info.alt;
+        historyPoint.timestamp = info.nTrackTime;
+        
+        // Add to history list
+        info.historyPoints.append(historyPoint);
+        
+        // Limit history to configured maximum
+        while (info.historyPoints.size() > _m_nHistoryLimit) {
+            info.historyPoints.removeFirst();
+        }
+    }
 
     _m_listTrackInfo.insert(info.nTrkId,info);
 }
 
 const QPointF CDataWarehouse::getRadarPos() {
     return _m_RadarPos;
+}
+
+void CDataWarehouse::toggleTrackHistory(int trackId) {
+    if (_m_listTrackInfo.contains(trackId)) {
+        stTrackDisplayInfo info = _m_listTrackInfo.value(trackId);
+        info.showHistory = !info.showHistory;
+        
+        // If enabling history, add current position as first point
+        if (info.showHistory && info.historyPoints.isEmpty()) {
+            stTrackHistoryPoint historyPoint;
+            historyPoint.lat = info.lat;
+            historyPoint.lon = info.lon;
+            historyPoint.alt = info.alt;
+            historyPoint.timestamp = info.nTrackTime;
+            info.historyPoints.append(historyPoint);
+        }
+        // If disabling history, clear the history
+        else if (!info.showHistory) {
+            info.historyPoints.clear();
+        }
+        
+        _m_listTrackInfo.insert(trackId, info);
+    }
+}
+
+void CDataWarehouse::setHistoryLimit(int limit) {
+    if (limit > 0 && limit <= 1000) {  // Sanity check
+        _m_nHistoryLimit = limit;
+        
+        // Trim existing histories to new limit
+        QList<int> trackIds = _m_listTrackInfo.keys();
+        for (int trackId : trackIds) {
+            stTrackDisplayInfo info = _m_listTrackInfo.value(trackId);
+            while (info.historyPoints.size() > _m_nHistoryLimit) {
+                info.historyPoints.removeFirst();
+            }
+            _m_listTrackInfo.insert(trackId, info);
+        }
+    }
+}
+
+int CDataWarehouse::getHistoryLimit() const {
+    return _m_nHistoryLimit;
 }

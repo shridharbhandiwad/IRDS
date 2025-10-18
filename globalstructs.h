@@ -1,12 +1,22 @@
 #ifndef GLOBALSTRUCTS_H
 #define GLOBALSTRUCTS_H
 #include <QString>
+#include <QList>
+#include <QPointF>
 
 enum eTrackIdentity {
     TRACK_IDENTITY_DEFAULT = 0,
     TRACK_IDENTITY_UNKNOWN = 1,
     TRACK_IDENTITY_FRIEND = 2,
     TRACK_IDENTITY_HOSTILE = 3,
+};
+
+// Structure to store a single history point
+struct stTrackHistoryPoint {
+    double lat;
+    double lon;
+    double alt;
+    long long timestamp;
 };
 
 #pragma pack(1)
@@ -39,6 +49,8 @@ struct stTrackDisplayInfo {
     int nTrackIden;
     long long nTrackTime;
     QString tooltip;  // ADD THIS LINE
+    QList<stTrackHistoryPoint> historyPoints;  //!< Track history points
+    bool showHistory;           //!< Flag to show/hide history trail
 };
 
 #pragma pack()

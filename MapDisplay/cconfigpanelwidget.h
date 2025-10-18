@@ -32,6 +32,7 @@ signals:
     void gridVisibilityChanged(bool visible);
     void compassVisibilityChanged(bool visible);
     void chartsRequested();
+    void historyLimitChanged(int limit);
 
 private:
     void setupUI();
@@ -65,6 +66,8 @@ private:
     QSpinBox *m_spinAnimSpeed;
     QCheckBox *m_chkShowLabels;
     QCheckBox *m_chkShowTrails;
+    QSlider *m_sliderHistoryLimit;
+    QSpinBox *m_spinHistoryLimit;
 
     // Display tab widgets
     QSlider *m_sliderOpacity;

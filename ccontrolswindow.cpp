@@ -282,6 +282,12 @@ void CControlsWindow::connectSignals()
             this, &CControlsWindow::compassVisibilityChanged);
     connect(m_configPanel, &CConfigPanelWidget::chartsRequested,
             this, &CControlsWindow::chartsRequested);
+    connect(m_configPanel, &CConfigPanelWidget::historyLimitChanged,
+            this, &CControlsWindow::historyLimitChanged);
+    
+    // Connect history limit changes directly to data warehouse
+    connect(m_configPanel, &CConfigPanelWidget::historyLimitChanged,
+            CDataWarehouse::getInstance(), &CDataWarehouse::setHistoryLimit);
     
     // Connect simulation widget to data warehouse
     connect(m_simulationWidget, &CSimulationWidget::simulatedTrackData,
