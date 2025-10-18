@@ -12,10 +12,13 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSettings>
+#include <QSplitter>
+#include "MapDisplay/canalyticswidget.h"
 
 // Forward declarations
 class CMapCanvas;
 class CTrackTableWidget;
+class CAnalyticsWidget;
 
 namespace Ui {
 class CPPIWindow;
@@ -140,3 +143,4 @@ private:
 };
 
 #endif // CPPIWINDOW_H
+

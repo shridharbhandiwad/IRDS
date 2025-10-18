@@ -59,7 +59,7 @@ private slots:
     void _UpdateAnimation(); //!< Timer-based animation tick
 
 private slots:
-    void showContextMenu(const QPoint& pos);
+    //void showContextMenu(const QPoint& pos);
 
 private:
     QgsMapCanvas *m_canvas;
@@ -100,3 +100,4 @@ private slots:
 };
 
 #endif // CTRACKLAYER_H
+
