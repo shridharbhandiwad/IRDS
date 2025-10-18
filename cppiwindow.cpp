@@ -60,7 +60,8 @@ void CPPIWindow::setupUI()
     
     // Create horizontal splitter for map and track table
     QSplitter *splitter = new QSplitter(Qt::Horizontal, this);
-    splitter->setChildrenCollapsible(false);
+    splitter->setChildrenCollapsible(true); // Allow collapsing
+    splitter->setHandleWidth(6); // Make handle more visible
     
     setupMapCanvas();
     setupTrackTable();
@@ -73,6 +74,9 @@ void CPPIWindow::setupUI()
     splitter->setSizes({700, 300});
     splitter->setStretchFactor(0, 7);
     splitter->setStretchFactor(1, 3);
+    
+    // Store splitter reference for later use
+    m_splitter = splitter;
     
     m_mainLayout->addWidget(splitter);
     
@@ -102,6 +106,7 @@ void CPPIWindow::setupSettingsToolbar()
     m_homeBtn = new QPushButton("🏠 Home", this);
     m_gridBtn = new QPushButton("📐 Grid", this);
     m_compassBtn = new QPushButton("🧭 Compass", this);
+    m_toggleTableBtn = new QPushButton("📊 Table", this);
     m_settingsBtn = new QPushButton("⚙️ Settings", this);
     
     // Make toggle buttons checkable
@@ -111,6 +116,8 @@ void CPPIWindow::setupSettingsToolbar()
     m_compassBtn->setChecked(m_compassVisible);
     m_disableMapBtn->setCheckable(true);
     m_disableMapBtn->setChecked(!m_mapEnabled);
+    m_toggleTableBtn->setCheckable(true);
+    m_toggleTableBtn->setChecked(true);
     
     // Status label
     m_statusLabel = new QLabel("Ready", this);
@@ -129,6 +136,7 @@ void CPPIWindow::setupSettingsToolbar()
     m_settingsLayout->addWidget(m_homeBtn);
     m_settingsLayout->addWidget(m_gridBtn);
     m_settingsLayout->addWidget(m_compassBtn);
+    m_settingsLayout->addWidget(m_toggleTableBtn);
     m_settingsLayout->addStretch();
     m_settingsLayout->addWidget(m_statusLabel);
     m_settingsLayout->addWidget(m_settingsBtn);
@@ -140,6 +148,7 @@ void CPPIWindow::setupSettingsToolbar()
     connect(m_homeBtn, &QPushButton::clicked, this, &CPPIWindow::onMapHome);
     connect(m_gridBtn, &QPushButton::clicked, this, &CPPIWindow::onToggleGrid);
     connect(m_compassBtn, &QPushButton::clicked, this, &CPPIWindow::onToggleCompass);
+    connect(m_toggleTableBtn, &QPushButton::clicked, this, &CPPIWindow::onToggleTrackTable);
     connect(m_settingsBtn, &QPushButton::clicked, this, &CPPIWindow::onSettings);
     
     m_mainLayout->addLayout(m_settingsLayout);
@@ -331,14 +340,15 @@ void CPPIWindow::onDisableMap()
     m_disableMapBtn->setChecked(!m_mapEnabled);
     
     if (m_mapEnabled) {
-        m_statusLabel->setText("Map enabled");
+        m_statusLabel->setText("Map enabled - Showing PPI with map layers");
         m_disableMapBtn->setText("🚫 Disable Map");
+        m_mapCanvas->setMapLayersVisible(true);
     } else {
-        m_statusLabel->setText("Map disabled");
+        m_statusLabel->setText("Map disabled - Showing PPI only");
         m_disableMapBtn->setText("✅ Enable Map");
+        m_mapCanvas->setMapLayersVisible(false);
     }
     
-    // TODO: Implement actual map disable/enable functionality
     qDebug() << "Map enabled:" << m_mapEnabled;
 }
 
@@ -374,6 +384,15 @@ void CPPIWindow::onToggleCompass()
     
     // TODO: Implement actual compass toggle
     qDebug() << "Compass visibility:" << m_compassVisible;
+}
+
+void CPPIWindow::onToggleTrackTable()
+{
+    bool isVisible = m_trackTable->isVisible();
+    m_trackTable->setVisible(!isVisible);
+    m_toggleTableBtn->setChecked(!isVisible);
+    m_statusLabel->setText(!isVisible ? "Track table shown" : "Track table hidden");
+    qDebug() << "Track table visibility:" << !isVisible;
 }
 
 void CPPIWindow::onSettings()

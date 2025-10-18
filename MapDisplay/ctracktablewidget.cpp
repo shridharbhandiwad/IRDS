@@ -13,9 +13,12 @@
 CTrackTableWidget::CTrackTableWidget(QWidget *parent)
     : QDockWidget("Track Table", parent),
       m_currentFilter(""),
-      m_currentIdentityFilter(-1)
+      m_currentIdentityFilter(-1),
+      m_contextMenu(nullptr),
+      m_rightClickedTrackId(-1)
 {
     setupUI();
+    createContextMenu();
 
     m_updateTimer = new QTimer(this);
     connect(m_updateTimer, &QTimer::timeout, this, &CTrackTableWidget::updateTrackTable);
@@ -40,22 +43,22 @@ void CTrackTableWidget::setupUI()
 
     // Filter by ID/text
     QLabel *filterLabel = new QLabel("Filter:");
-    filterLabel->setStyleSheet("color: #ffffff; font-weight: bold;");
+    filterLabel->setStyleSheet("color: #1e293b; font-weight: bold;");
     toolbarLayout->addWidget(filterLabel);
 
     m_filterEdit = new QLineEdit();
     m_filterEdit->setPlaceholderText("Search by Track ID...");
     m_filterEdit->setStyleSheet(
         "QLineEdit {"
-        "   background-color: #2d3748;"
-        "   color: #ffffff;"
-        "   border: 2px solid #4a5568;"
+        "   background-color: #ffffff;"
+        "   color: #1e293b;"
+        "   border: 2px solid #e2e8f0;"
         "   border-radius: 6px;"
         "   padding: 6px;"
         "   font-size: 11px;"
         "}"
         "QLineEdit:focus {"
-        "   border: 2px solid #667eea;"
+        "   border: 2px solid #3b82f6;"
         "}"
     );
     connect(m_filterEdit, &QLineEdit::textChanged, this, &CTrackTableWidget::onFilterChanged);
@@ -69,24 +72,24 @@ void CTrackTableWidget::setupUI()
     m_identityFilter->addItem("? Unknown", TRACK_IDENTITY_UNKNOWN);
     m_identityFilter->setStyleSheet(
         "QComboBox {"
-        "   background-color: #2d3748;"
-        "   color: #ffffff;"
-        "   border: 2px solid #4a5568;"
+        "   background-color: #ffffff;"
+        "   color: #1e293b;"
+        "   border: 2px solid #e2e8f0;"
         "   border-radius: 6px;"
         "   padding: 6px;"
         "   font-size: 11px;"
         "   min-width: 120px;"
         "}"
         "QComboBox:hover {"
-        "   border: 2px solid #667eea;"
+        "   border: 2px solid #3b82f6;"
         "}"
         "QComboBox::drop-down {"
         "   border: none;"
         "}"
         "QComboBox QAbstractItemView {"
-        "   background-color: #2d3748;"
-        "   color: #ffffff;"
-        "   selection-background-color: #667eea;"
+        "   background-color: #ffffff;"
+        "   color: #1e293b;"
+        "   selection-background-color: #3b82f6;"
         "}"
     );
     connect(m_identityFilter, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -99,7 +102,7 @@ void CTrackTableWidget::setupUI()
     m_exportButton = new QPushButton("Export CSV");
     m_exportButton->setStyleSheet(
         "QPushButton {"
-        "   background-color: #667eea;"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3b82f6, stop:1 #2563eb);"
         "   color: white;"
         "   border: none;"
         "   border-radius: 6px;"
@@ -108,10 +111,10 @@ void CTrackTableWidget::setupUI()
         "   font-size: 11px;"
         "}"
         "QPushButton:hover {"
-        "   background-color: #5568d3;"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #2563eb, stop:1 #1d4ed8);"
         "}"
         "QPushButton:pressed {"
-        "   background-color: #4c51bf;"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #1d4ed8, stop:1 #1e40af);"
         "}"
     );
     connect(m_exportButton, &QPushButton::clicked, this, &CTrackTableWidget::onExportTracks);
@@ -134,56 +137,57 @@ void CTrackTableWidget::setupUI()
 
     m_tableWidget->setStyleSheet(
         "QTableWidget {"
-        "   background-color: #1a202c;"
-        "   alternate-background-color: #2d3748;"
-        "   color: #ffffff;"
-        "   gridline-color: #4a5568;"
-        "   border: 2px solid #4a5568;"
+        "   background-color: #ffffff;"
+        "   alternate-background-color: #f8fafc;"
+        "   color: #1e293b;"
+        "   gridline-color: #e2e8f0;"
+        "   border: 2px solid #e2e8f0;"
         "   border-radius: 8px;"
         "   font-size: 11px;"
         "}"
         "QTableWidget::item {"
         "   padding: 8px;"
+        "   color: #334155;"
         "}"
         "QTableWidget::item:selected {"
-        "   background-color: #667eea;"
+        "   background-color: #3b82f6;"
         "   color: white;"
         "}"
         "QTableWidget::item:hover {"
-        "   background-color: #4a5568;"
+        "   background-color: #e0e7ff;"
         "}"
         "QHeaderView::section {"
-        "   background-color: #2d3748;"
-        "   color: #ffffff;"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #f1f5f9, stop:1 #e2e8f0);"
+        "   color: #1e293b;"
         "   padding: 8px;"
         "   border: none;"
-        "   border-bottom: 2px solid #667eea;"
+        "   border-bottom: 2px solid #3b82f6;"
         "   font-weight: bold;"
         "   font-size: 11px;"
         "}"
         "QHeaderView::section:hover {"
-        "   background-color: #4a5568;"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #e2e8f0, stop:1 #cbd5e1);"
         "}"
         "QScrollBar:vertical {"
-        "   background-color: #2d3748;"
+        "   background-color: #f1f5f9;"
         "   width: 12px;"
         "   border-radius: 6px;"
         "}"
         "QScrollBar::handle:vertical {"
-        "   background-color: #667eea;"
+        "   background-color: #3b82f6;"
         "   border-radius: 6px;"
         "   min-height: 20px;"
         "}"
         "QScrollBar::handle:vertical:hover {"
-        "   background-color: #5568d3;"
+        "   background-color: #2563eb;"
         "}"
         "QScrollBar:horizontal {"
-        "   background-color: #2d3748;"
+        "   background-color: #f1f5f9;"
         "   height: 12px;"
         "   border-radius: 6px;"
         "}"
         "QScrollBar::handle:horizontal {"
-        "   background-color: #667eea;"
+        "   background-color: #3b82f6;"
         "   border-radius: 6px;"
         "   min-width: 20px;"
         "}"
@@ -201,6 +205,11 @@ void CTrackTableWidget::setupUI()
         int trackId = m_tableWidget->item(row, 0)->text().toInt();
         emit trackDoubleClicked(trackId);
     });
+    
+    // Enable context menu
+    m_tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_tableWidget, &QTableWidget::customContextMenuRequested,
+            this, &CTrackTableWidget::onTableContextMenu);
 
     mainLayout->addWidget(m_tableWidget);
 
@@ -209,23 +218,23 @@ void CTrackTableWidget::setupUI()
     // Dock widget styling
     setStyleSheet(
         "QDockWidget {"
-        "   background-color: #1a202c;"
-        "   color: #ffffff;"
+        "   background-color: #f8fafc;"
+        "   color: #1e293b;"
         "   font-size: 12px;"
         "   font-weight: bold;"
         "}"
         "QDockWidget::title {"
-        "   background-color: #2d3748;"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #f1f5f9, stop:1 #e2e8f0);"
         "   padding: 8px;"
-        "   border-bottom: 2px solid #667eea;"
+        "   border-bottom: 2px solid #3b82f6;"
         "}"
         "QDockWidget::close-button, QDockWidget::float-button {"
-        "   background-color: #4a5568;"
+        "   background-color: #e2e8f0;"
         "   border-radius: 4px;"
         "   padding: 2px;"
         "}"
         "QDockWidget::close-button:hover, QDockWidget::float-button:hover {"
-        "   background-color: #667eea;"
+        "   background-color: #3b82f6;"
         "}"
     );
 }
@@ -400,4 +409,102 @@ void CTrackTableWidget::onExportTracks()
 void CTrackTableWidget::applyFilters()
 {
     updateTrackTable();
+}
+
+void CTrackTableWidget::createContextMenu()
+{
+    m_contextMenu = new QMenu(this);
+    
+    QAction *focusAction = m_contextMenu->addAction("🎯 Focus Track");
+    QAction *historyAction = m_contextMenu->addAction("📍 Toggle History (Max 50)");
+    QAction *highlightAction = m_contextMenu->addAction("✨ Highlight & Follow");
+    m_contextMenu->addSeparator();
+    QAction *imageAction = m_contextMenu->addAction("🖼️ Load Track Image");
+    m_contextMenu->addSeparator();
+    QAction *deleteAction = m_contextMenu->addAction("🗑️ Delete Track");
+    
+    // Connect actions
+    connect(focusAction, &QAction::triggered, [this]() {
+        if (m_rightClickedTrackId != -1) {
+            emit trackDoubleClicked(m_rightClickedTrackId);
+        }
+    });
+    
+    connect(deleteAction, &QAction::triggered, [this]() {
+        if (m_rightClickedTrackId != -1) {
+            int ret = QMessageBox::question(this, "Delete Track",
+                QString("Are you sure you want to delete Track #%1?").arg(m_rightClickedTrackId),
+                QMessageBox::Yes | QMessageBox::No);
+            
+            if (ret == QMessageBox::Yes) {
+                qDebug() << "Delete track requested:" << m_rightClickedTrackId;
+                // TODO: Implement track deletion
+            }
+        }
+    });
+    
+    connect(imageAction, &QAction::triggered, [this]() {
+        if (m_rightClickedTrackId != -1) {
+            QString filter = "Image Files (*.png *.jpg *.jpeg *.bmp *.gif)";
+            QString imagePath = QFileDialog::getOpenFileName(
+                this,
+                QString("Load Image for Track #%1").arg(m_rightClickedTrackId),
+                QString(),
+                filter
+            );
+            
+            if (!imagePath.isEmpty()) {
+                qDebug() << "Load image for track" << m_rightClickedTrackId << ":" << imagePath;
+            }
+        }
+    });
+    
+    connect(historyAction, &QAction::triggered, [this]() {
+        if (m_rightClickedTrackId != -1) {
+            qDebug() << "Toggle history for track" << m_rightClickedTrackId;
+        }
+    });
+    
+    connect(highlightAction, &QAction::triggered, [this]() {
+        if (m_rightClickedTrackId != -1) {
+            qDebug() << "Highlight and follow track" << m_rightClickedTrackId;
+        }
+    });
+    
+    // Style the context menu
+    m_contextMenu->setStyleSheet(
+        "QMenu {"
+        "   background-color: #ffffff;"
+        "   color: #1e293b;"
+        "   border: 2px solid #e2e8f0;"
+        "   border-radius: 8px;"
+        "   padding: 6px;"
+        "}"
+        "QMenu::item {"
+        "   padding: 8px 24px;"
+        "   border-radius: 4px;"
+        "   font-weight: 500;"
+        "}"
+        "QMenu::item:selected {"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3b82f6, stop:1 #2563eb);"
+        "   color: white;"
+        "}"
+        "QMenu::separator {"
+        "   height: 1px;"
+        "   background-color: #e2e8f0;"
+        "   margin: 4px 16px;"
+        "}"
+    );
+}
+
+void CTrackTableWidget::onTableContextMenu(const QPoint &pos)
+{
+    QTableWidgetItem *item = m_tableWidget->itemAt(pos);
+    if (item) {
+        int row = item->row();
+        m_rightClickedTrackId = m_tableWidget->item(row, 0)->text().toInt();
+        QPoint globalPos = m_tableWidget->mapToGlobal(pos);
+        emit trackRightClicked(m_rightClickedTrackId, globalPos);
+        m_contextMenu->exec(globalPos);
+    }
 }

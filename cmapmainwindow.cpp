@@ -399,6 +399,7 @@ CMapMainWindow::CMapMainWindow(QWidget *parent) :
     
     setupMonitors();
     setupDualWindows();
+    applyLightTheme();
     connectWindowSignals();
     connectManagerButtons();
     
@@ -497,7 +498,7 @@ void CMapMainWindow::applyLightTheme()
         "   color: #1e293b;"
         "}"
         "QWidget {"
-        "   background-color: #f8fafc;"
+        "   background-color: #ffffff;"
         "   color: #1e293b;"
         "   font-family: 'Segoe UI', Arial, sans-serif;"
         "}"
@@ -517,6 +518,14 @@ void CMapMainWindow::applyLightTheme()
         "QLabel {"
         "   color: #334155;"
         "   font-weight: 500;"
+        "}"
+        "QStatusBar {"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #f8fafc, stop:1 #e2e8f0);"
+        "   color: #334155;"
+        "   border-top: 2px solid #3b82f6;"
+        "   font-size: 12px;"
+        "   font-weight: 500;"
+        "   padding: 6px;"
         "}"
     );
 }

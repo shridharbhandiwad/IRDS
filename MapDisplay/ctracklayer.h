@@ -31,6 +31,7 @@
 #include <qgsmapcanvasitem.h>
 #include <qgsmapcanvas.h>
 #include <QTimer>
+#include <QMenu>
 
 // Forward declaration
 struct stTrackDisplayInfo;
@@ -45,6 +46,9 @@ public:
     void paint(QPainter *painter) override;
     QRectF boundingRect() const override;
 
+signals:
+    void trackRightClicked(int trackId, const QPoint& globalPos);
+
 protected:
     /**
      * @brief Event filter to capture mouse events from canvas
@@ -54,13 +58,23 @@ protected:
 private slots:
     void _UpdateAnimation(); //!< Timer-based animation tick
 
+private slots:
+    void showContextMenu(const QPoint& pos);
+
 private:
     QgsMapCanvas *m_canvas;
     QTimer m_timer;
+    QMenu *m_contextMenu;
 
     // Tooltip support members
     int m_hoveredTrackId;      //!< Currently hovered track ID (-1 if none)
     QPointF m_mousePos;        //!< Current mouse position for tooltip placement
+    int m_rightClickedTrackId; //!< Track ID for context menu
+
+    /**
+     * @brief Creates the context menu for tracks
+     */
+    void createContextMenu();
 
     /**
      * @brief Detects if a track is at the given position
@@ -76,6 +90,13 @@ private:
      * @param screenPos Screen position for tooltip
      */
     void drawTooltip(QPainter *pPainter, const stTrackDisplayInfo &trackInfo, const QPointF &screenPos);
+
+private slots:
+    void onFocusTrack();
+    void onDeleteTrack();
+    void onLoadTrackImage();
+    void onToggleTrackHistory();
+    void onHighlightTrack();
 };
 
 #endif // CTRACKLAYER_H
