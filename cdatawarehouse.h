@@ -27,6 +27,7 @@ public :
     void toggleTrackHistory(int trackId);
     void setHistoryLimit(int limit);
     int getHistoryLimit() const;
+    void deleteTrack(int trackId);
 private slots:
     void slotUpdateTrackData(stTrackRecvInfo trackRecvInfo);
     void slotClearTracksOnTimeOut();

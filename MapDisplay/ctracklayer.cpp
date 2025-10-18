@@ -116,6 +116,11 @@
 #include <QMouseEvent>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <cmath>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 int nAnimFrame = 0;
 
@@ -124,7 +129,8 @@ int nAnimFrame = 0;
  * @param pCanvas Pointer to the QgsMapCanvas
  */
 CTrackLayer::CTrackLayer(QgsMapCanvas *canvas)
-    : QgsMapCanvasItem(canvas), m_canvas(canvas), m_hoveredTrackId(-1), m_rightClickedTrackId(-1), m_contextMenu(nullptr)
+    : QgsMapCanvasItem(canvas), m_canvas(canvas), m_hoveredTrackId(-1), m_rightClickedTrackId(-1), 
+      m_contextMenu(nullptr), m_focusedTrackId(-1)
 {
     setZValue(101); // Ensure drawing order: above base map, below UI overlays
     QObject::connect(&m_timer, &QTimer::timeout, this, &CTrackLayer::_UpdateAnimation);
@@ -224,7 +230,7 @@ void CTrackLayer::createContextMenu()
     QAction *historyAction = m_contextMenu->addAction(QString("📍 Toggle History (Max %1)").arg(historyLimit));
     connect(historyAction, &QAction::triggered, this, &CTrackLayer::onToggleTrackHistory);
     
-    QAction *highlightAction = m_contextMenu->addAction("✨ Highlight & Follow");
+    QAction *highlightAction = m_contextMenu->addAction("✨ Toggle Highlight");
     connect(highlightAction, &QAction::triggered, this, &CTrackLayer::onHighlightTrack);
     
     m_contextMenu->addSeparator();
@@ -270,24 +276,44 @@ void CTrackLayer::onFocusTrack()
 {
     if (m_rightClickedTrackId == -1) return;
     
-    QList<stTrackDisplayInfo> tracks = CDataWarehouse::getInstance()->getTrackList();
-    for (const stTrackDisplayInfo &track : tracks) {
-        if (track.nTrkId == m_rightClickedTrackId) {
-            QgsPointXY centerPoint(track.lon, track.lat);
-            m_canvas->setCenter(centerPoint);
-            m_canvas->refresh();
-            qDebug() << "Focused on track" << m_rightClickedTrackId;
-            break;
+    // Toggle focus state
+    if (m_focusedTrackId == m_rightClickedTrackId) {
+        m_focusedTrackId = -1;
+        qDebug() << "Unfocused track" << m_rightClickedTrackId;
+    } else {
+        m_focusedTrackId = m_rightClickedTrackId;
+        qDebug() << "Focused on track" << m_rightClickedTrackId;
+        
+        // Center the canvas on the focused track
+        QList<stTrackDisplayInfo> tracks = CDataWarehouse::getInstance()->getTrackList();
+        for (const stTrackDisplayInfo &track : tracks) {
+            if (track.nTrkId == m_rightClickedTrackId) {
+                QgsPointXY centerPoint(track.lon, track.lat);
+                m_canvas->setCenter(centerPoint);
+                m_canvas->refresh();
+                break;
+            }
         }
     }
+    
+    update(); // Redraw to show focus changes
 }
 
 void CTrackLayer::onDeleteTrack()
 {
     if (m_rightClickedTrackId == -1) return;
     
-    // TODO: Implement track deletion in data warehouse
-    qDebug() << "Delete track requested:" << m_rightClickedTrackId;
+    // Remove from highlight and focus sets if present
+    m_highlightedTracks.remove(m_rightClickedTrackId);
+    if (m_focusedTrackId == m_rightClickedTrackId) {
+        m_focusedTrackId = -1;
+    }
+    
+    // Delete track from data warehouse
+    CDataWarehouse::getInstance()->deleteTrack(m_rightClickedTrackId);
+    qDebug() << "Track" << m_rightClickedTrackId << "deleted";
+    
+    update(); // Redraw to reflect changes
 }
 
 void CTrackLayer::onLoadTrackImage()
@@ -323,8 +349,15 @@ void CTrackLayer::onHighlightTrack()
 {
     if (m_rightClickedTrackId == -1) return;
     
-    qDebug() << "Highlight and follow track" << m_rightClickedTrackId;
-    // TODO: Implement track highlighting and following
+    if (m_highlightedTracks.contains(m_rightClickedTrackId)) {
+        m_highlightedTracks.remove(m_rightClickedTrackId);
+        qDebug() << "Removed highlight from track" << m_rightClickedTrackId;
+    } else {
+        m_highlightedTracks.insert(m_rightClickedTrackId);
+        qDebug() << "Highlighted track" << m_rightClickedTrackId;
+    }
+    
+    update(); // Redraw to show highlight changes
 }
 
 /**
@@ -517,6 +550,174 @@ void CTrackLayer::drawTooltip(QPainter *pPainter, const stTrackDisplayInfo &trac
     pPainter->setBrush(Qt::NoBrush);
     pPainter->drawPath(connectorPath);
 }
+
+/**
+ * @brief Draws speed vector for a track
+ * @param pPainter QPainter instance
+ * @param trackInfo Track information
+ * @param screenPos Screen position of track
+ * @param trackColor Color of the track
+ */
+void CTrackLayer::drawSpeedVector(QPainter *pPainter, const stTrackDisplayInfo &trackInfo, 
+                                 const QPointF &screenPos, const QColor &trackColor)
+{
+    if (trackInfo.velocity <= 0) return; // No vector for stationary targets
+    
+    // Calculate speed vector length (proportional to speed)
+    // Scale factor: 1 m/s = 2 pixels, max length = 50 pixels
+    double speedScale = 2.0;
+    double maxVectorLength = 50.0;
+    double vectorLength = qMin(trackInfo.velocity * speedScale, maxVectorLength);
+    
+    // Calculate speed vector direction (same as heading)
+    double speedHeadingRad = qDegreesToRadians(trackInfo.heading);
+    QPointF vectorEnd(
+        screenPos.x() + std::cos(speedHeadingRad) * vectorLength,
+        screenPos.y() - std::sin(speedHeadingRad) * vectorLength
+    );
+    
+    // Draw speed vector line
+    QColor vectorColor = trackColor;
+    vectorColor.setAlpha(200);
+    pPainter->setPen(QPen(vectorColor, 2, Qt::SolidLine));
+    pPainter->drawLine(screenPos, vectorEnd);
+    
+    // Draw arrowhead at the end
+    double arrowSize = 6.0;
+    double arrowAngle = M_PI / 6; // 30 degrees
+    
+    QPointF arrowP1(
+        vectorEnd.x() - arrowSize * std::cos(speedHeadingRad - arrowAngle),
+        vectorEnd.y() + arrowSize * std::sin(speedHeadingRad - arrowAngle)
+    );
+    QPointF arrowP2(
+        vectorEnd.x() - arrowSize * std::cos(speedHeadingRad + arrowAngle),
+        vectorEnd.y() + arrowSize * std::sin(speedHeadingRad + arrowAngle)
+    );
+    
+    pPainter->setPen(QPen(vectorColor, 2, Qt::SolidLine));
+    pPainter->drawLine(vectorEnd, arrowP1);
+    pPainter->drawLine(vectorEnd, arrowP2);
+    
+    // Optional: Draw speed text near the vector
+    if (vectorLength > 20) { // Only show text if vector is long enough
+        pPainter->setFont(QFont("Arial", 8));
+        pPainter->setPen(Qt::white);
+        QString speedText = QString("%1 m/s").arg(trackInfo.velocity, 0, 'f', 1);
+        QPointF textPos = screenPos + QPointF(vectorLength * 0.6 * std::cos(speedHeadingRad), 
+                                             -vectorLength * 0.6 * std::sin(speedHeadingRad));
+        pPainter->drawText(textPos, speedText);
+    }
+}
+
+/**
+ * @brief Draws focused track datatip that follows the track
+ * @param pPainter QPainter instance
+ * @param trackInfo Track information
+ * @param screenPos Screen position of track
+ */
+void CTrackLayer::drawFocusedTrackDatatip(QPainter *pPainter, const stTrackDisplayInfo &trackInfo, 
+                                         const QPointF &screenPos)
+{
+    // Use a modified version of the tooltip for focused tracks
+    // This will always be visible and follow the track
+    
+    // Determine identity display
+    QString identityStr;
+    QString identityIcon;
+    QColor identityColor;
+
+    switch(trackInfo.nTrackIden) {
+        case TRACK_IDENTITY_FRIEND:
+            identityStr = "FRIENDLY";
+            identityIcon = "✓";
+            identityColor = QColor(46, 204, 113);
+            break;
+        case TRACK_IDENTITY_HOSTILE:
+            identityStr = "HOSTILE";
+            identityIcon = "✖";
+            identityColor = QColor(231, 76, 60);
+            break;
+        case TRACK_IDENTITY_UNKNOWN:
+            identityStr = "UNKNOWN";
+            identityIcon = "?";
+            identityColor = QColor(241, 196, 15);
+            break;
+        default:
+            identityStr = "UNDEFINED";
+            identityIcon = "•";
+            identityColor = QColor(149, 165, 166);
+            break;
+    }
+
+    // Focused track tooltip content (more compact)
+    QStringList lines;
+    lines << QString("🎯 FOCUSED: ID %1").arg(trackInfo.nTrkId);
+    lines << QString("%1 %2").arg(identityIcon).arg(identityStr);
+    lines << QString("🚀 %1 m/s").arg(trackInfo.velocity, 0, 'f', 1);
+    lines << QString("🧭 %1°").arg(trackInfo.heading, 0, 'f', 0);
+
+    // Calculate dimensions
+    QFont tooltipFont("Segoe UI", 9, QFont::Bold);
+    pPainter->setFont(tooltipFont);
+    QFontMetrics fm(tooltipFont);
+
+    int maxWidth = 0;
+    for (const QString &line : lines) {
+        int lineWidth = fm.horizontalAdvance(line);
+        if (lineWidth > maxWidth) {
+            maxWidth = lineWidth;
+        }
+    }
+
+    int padding = 10;
+    int tooltipWidth = maxWidth + padding * 2;
+    int lineHeight = fm.height() + 2;
+    int tooltipHeight = lines.count() * lineHeight + padding * 2;
+
+    // Position tooltip above and to the right of track
+    QPointF tooltipPos = screenPos + QPointF(15, -tooltipHeight - 15);
+
+    // Keep within bounds
+    if (tooltipPos.x() + tooltipWidth > m_canvas->width()) {
+        tooltipPos.setX(screenPos.x() - tooltipWidth - 15);
+    }
+    if (tooltipPos.y() < 5) {
+        tooltipPos.setY(screenPos.y() + 15);
+    }
+
+    QRectF tooltipRect(tooltipPos, QSizeF(tooltipWidth, tooltipHeight));
+
+    // Draw focused tooltip with stronger background
+    QLinearGradient bgGradient(tooltipRect.topLeft(), tooltipRect.bottomLeft());
+    bgGradient.setColorAt(0, QColor(30, 30, 40, 200));
+    bgGradient.setColorAt(1, QColor(20, 20, 30, 220));
+
+    pPainter->setBrush(bgGradient);
+    pPainter->setPen(QPen(identityColor, 2));
+    pPainter->drawRoundedRect(tooltipRect, 8, 8);
+
+    // Draw text
+    int yOffset = padding + fm.ascent();
+    for (int i = 0; i < lines.count(); i++) {
+        const QString &line = lines[i];
+
+        if (i == 0) {
+            // Focused header - bright cyan
+            pPainter->setPen(QColor(100, 200, 255));
+        } else if (i == 1) {
+            // Identity - use identity color
+            pPainter->setPen(identityColor);
+        } else {
+            // Regular info - bright white
+            pPainter->setPen(QColor(255, 255, 255));
+        }
+
+        pPainter->drawText(QPointF(tooltipPos.x() + padding, tooltipPos.y() + yOffset), line);
+        yOffset += lineHeight;
+    }
+}
+
 /**
  * @brief Paints the tracks on the canvas
  * @param pPainter QPainter instance used for drawing
@@ -540,8 +741,11 @@ void CTrackLayer::paint(QPainter *pPainter)
         double pixelPerDegree = 1.0 / m_canvas->mapUnitsPerPixel();
         QColor clr = Qt::cyan;
 
-        // Check if this is the hovered track
+        // Check track states
         bool isHovered = (track.nTrkId == m_hoveredTrackId);
+        bool isHighlighted = m_highlightedTracks.contains(track.nTrkId);
+        bool isFocused = (track.nTrkId == m_focusedTrackId);
+        
         if (isHovered) {
             hoveredTrack = track;
             hasHoveredTrack = true;
@@ -560,29 +764,37 @@ void CTrackLayer::paint(QPainter *pPainter)
         }
 
         if (pixelPerDegree > PPI_VISIBLE_THRESHOLD) {
-            // Highlight hovered track with pulsing circle
-            if (isHovered) {
+            // Determine track size based on state
+            double trackSize = 4;
+            if (isHighlighted) trackSize = 8;  // Larger for highlighted tracks
+            if (isFocused) trackSize = 10;     // Even larger for focused tracks
+            
+            // Highlight effects
+            if (isHighlighted || isFocused) {
+                // Outer highlight ring
                 pPainter->setPen(QPen(Qt::white, 3));
                 pPainter->setBrush(Qt::NoBrush);
-                pPainter->drawEllipse(ptScreen, 10, 10);
+                pPainter->drawEllipse(ptScreen, trackSize + 6, trackSize + 6);
 
-                // Add an extra glow effect
+                // Inner glow effect
                 pPainter->setPen(QPen(clr, 2));
-                pPainter->drawEllipse(ptScreen, 12, 12);
+                pPainter->drawEllipse(ptScreen, trackSize + 3, trackSize + 3);
+            }
+            
+            // Hover effect (additional to highlight/focus)
+            if (isHovered) {
+                pPainter->setPen(QPen(Qt::cyan, 2));
+                pPainter->setBrush(Qt::NoBrush);
+                pPainter->drawEllipse(ptScreen, trackSize + 8, trackSize + 8);
             }
 
             // Core dot
             pPainter->setPen(clr);
             pPainter->setBrush(clr);
-            pPainter->drawEllipse(ptScreen, 4, 4);
+            pPainter->drawEllipse(ptScreen, trackSize, trackSize);
 
-            // Heading line
-            double dHeadingRad = qDegreesToRadians(track.heading);
-            QPointF ptTip(
-                ptScreen.x() + std::cos(dHeadingRad) * 10,
-                ptScreen.y() - std::sin(dHeadingRad) * 10
-            );
-            pPainter->drawLine(ptScreen, ptTip);
+            // Draw speed vector instead of simple heading line
+            drawSpeedVector(pPainter, track, ptScreen, clr);
 
             if (pixelPerDegree > TEXT_VISIBLE_THRESHOLD) {
                 pPainter->setFont(QFont("century", 11, 80, true));
@@ -659,8 +871,19 @@ void CTrackLayer::paint(QPainter *pPainter)
         }
     }
 
-    // Draw tooltip for hovered track (draw last so it's on top)
-    if (hasHoveredTrack && m_hoveredTrackId != -1) {
+    // Draw focused track datatip (always visible, follows track)
+    if (m_focusedTrackId != -1) {
+        for (const stTrackDisplayInfo &track : listTracks) {
+            if (track.nTrkId == m_focusedTrackId) {
+                QPointF focusedScreen = mapToPixel.transform(QgsPointXY(track.lon, track.lat)).toQPointF();
+                drawFocusedTrackDatatip(pPainter, track, focusedScreen);
+                break;
+            }
+        }
+    }
+    
+    // Draw tooltip for hovered track (draw last so it's on top, but not for focused tracks)
+    if (hasHoveredTrack && m_hoveredTrackId != -1 && m_hoveredTrackId != m_focusedTrackId) {
         drawTooltip(pPainter, hoveredTrack, m_mousePos);
     }
 }
