@@ -217,6 +217,9 @@ private slots:
     void onTrackFilterChanged(bool showFriend, bool showHostile, bool showUnknown);
     void onAnimationSpeedChanged(int speed);
     void onGridVisibilityChanged(bool visible);
+    
+    // Drone scenario management
+    void createTestDroneScenario();
     void onCompassVisibilityChanged(bool visible);
     void onChartsRequested();
 

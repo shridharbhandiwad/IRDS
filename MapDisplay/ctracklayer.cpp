@@ -886,4 +886,251 @@ void CTrackLayer::paint(QPainter *pPainter)
     if (hasHoveredTrack && m_hoveredTrackId != -1 && m_hoveredTrackId != m_focusedTrackId) {
         drawTooltip(pPainter, hoveredTrack, m_mousePos);
     }
+    
+    // Draw drone internal details for all drone tracks
+    for (const stTrackDisplayInfo &track : listTracks) {
+        if (track.isDrone) {
+            QPointF droneScreen = mapToPixel.transform(QgsPointXY(track.lon, track.lat)).toQPointF();
+            drawDroneInternalDetails(pPainter, track, droneScreen);
+        }
+    }
+}
+
+/**
+ * @brief Draws drone-specific internal details
+ */
+void CTrackLayer::drawDroneInternalDetails(QPainter *pPainter, const stTrackDisplayInfo &trackInfo, 
+                                          const QPointF &screenPos)
+{
+    if (!trackInfo.isDrone) return;
+    
+    double pixelPerDegree = 1.0 / m_canvas->mapUnitsPerPixel();
+    
+    // Only draw details at appropriate zoom levels
+    if (pixelPerDegree < PPI_VISIBLE_THRESHOLD * 2) return;
+    
+    // Draw attitude indicator
+    drawDroneAttitudeIndicator(pPainter, trackInfo, screenPos, 25.0);
+    
+    // Draw health status indicators
+    drawDroneHealthStatus(pPainter, trackInfo, screenPos);
+    
+    // Draw battery level indicator
+    QRectF batteryRect(screenPos.x() + 35, screenPos.y() - 15, 20, 8);
+    
+    // Battery outline
+    pPainter->setPen(QPen(Qt::white, 1));
+    pPainter->setBrush(Qt::NoBrush);
+    pPainter->drawRect(batteryRect);
+    
+    // Battery terminal
+    QRectF terminalRect(batteryRect.right(), batteryRect.y() + 2, 2, 4);
+    pPainter->setBrush(Qt::white);
+    pPainter->drawRect(terminalRect);
+    
+    // Battery level fill
+    double fillWidth = batteryRect.width() * (trackInfo.batteryLevel / 100.0);
+    QRectF fillRect(batteryRect.x(), batteryRect.y(), fillWidth, batteryRect.height());
+    
+    QColor batteryColor;
+    if (trackInfo.batteryLevel > 50) {
+        batteryColor = Qt::green;
+    } else if (trackInfo.batteryLevel > 20) {
+        batteryColor = Qt::yellow;
+    } else {
+        batteryColor = Qt::red;
+    }
+    
+    pPainter->setBrush(batteryColor);
+    pPainter->setPen(Qt::NoPen);
+    pPainter->drawRect(fillRect);
+    
+    // Battery percentage text
+    pPainter->setFont(QFont("Arial", 7));
+    pPainter->setPen(Qt::white);
+    pPainter->drawText(batteryRect.adjusted(0, -12, 0, 0), Qt::AlignCenter, 
+                      QString("%1%").arg(trackInfo.batteryLevel, 0, 'f', 0));
+    
+    // Signal strength indicator
+    QPointF signalPos(screenPos.x() + 35, screenPos.y() + 25);
+    int signalBars = qRound(trackInfo.signalStrength / 25.0); // 0-4 bars
+    
+    for (int i = 0; i < 4; i++) {
+        QRectF barRect(signalPos.x() + i * 4, signalPos.y() - (i + 1) * 2, 3, (i + 1) * 2);
+        
+        if (i < signalBars) {
+            if (trackInfo.signalStrength > 75) {
+                pPainter->setBrush(Qt::green);
+            } else if (trackInfo.signalStrength > 50) {
+                pPainter->setBrush(Qt::yellow);
+            } else {
+                pPainter->setBrush(Qt::red);
+            }
+        } else {
+            pPainter->setBrush(QColor(100, 100, 100, 100));
+        }
+        
+        pPainter->setPen(Qt::NoPen);
+        pPainter->drawRect(barRect);
+    }
+    
+    // Flight mode indicator
+    pPainter->setFont(QFont("Arial", 8, QFont::Bold));
+    pPainter->setPen(Qt::cyan);
+    pPainter->drawText(screenPos + QPointF(-30, 35), trackInfo.flightMode);
+    
+    // System status indicator
+    QColor statusColor;
+    if (trackInfo.systemStatus == "ACTIVE") {
+        statusColor = Qt::green;
+    } else if (trackInfo.systemStatus == "CRITICAL") {
+        statusColor = Qt::red;
+    } else if (trackInfo.systemStatus == "STANDBY") {
+        statusColor = Qt::yellow;
+    } else {
+        statusColor = Qt::gray;
+    }
+    
+    pPainter->setPen(statusColor);
+    pPainter->drawText(screenPos + QPointF(-30, 45), trackInfo.systemStatus);
+    
+    // Waypoint progress indicator
+    if (trackInfo.waypointIndex >= 0 && trackInfo.totalWaypoints > 0) {
+        pPainter->setFont(QFont("Arial", 7));
+        pPainter->setPen(Qt::white);
+        QString waypointText = QString("WP %1/%2").arg(trackInfo.waypointIndex + 1).arg(trackInfo.totalWaypoints);
+        pPainter->drawText(screenPos + QPointF(35, 45), waypointText);
+        
+        // Progress bar
+        QRectF progressRect(screenPos.x() + 35, screenPos.y() + 50, 30, 4);
+        pPainter->setPen(QPen(Qt::white, 1));
+        pPainter->setBrush(Qt::NoBrush);
+        pPainter->drawRect(progressRect);
+        
+        double progress = (double)(trackInfo.waypointIndex + 1) / trackInfo.totalWaypoints;
+        QRectF progressFill(progressRect.x(), progressRect.y(), 
+                           progressRect.width() * progress, progressRect.height());
+        pPainter->setBrush(Qt::cyan);
+        pPainter->setPen(Qt::NoPen);
+        pPainter->drawRect(progressFill);
+    }
+}
+
+/**
+ * @brief Draws drone attitude indicator (pitch/roll visualization)
+ */
+void CTrackLayer::drawDroneAttitudeIndicator(QPainter *pPainter, const stTrackDisplayInfo &trackInfo, 
+                                            const QPointF &screenPos, double size)
+{
+    if (!trackInfo.isDrone) return;
+    
+    pPainter->save();
+    
+    // Translate to drone position
+    pPainter->translate(screenPos);
+    
+    // Draw attitude indicator circle
+    pPainter->setPen(QPen(Qt::white, 2));
+    pPainter->setBrush(QColor(0, 0, 0, 100));
+    pPainter->drawEllipse(QRectF(-size/2, -size/2, size, size));
+    
+    // Draw horizon line (affected by roll)
+    pPainter->rotate(trackInfo.roll);
+    
+    // Horizon line
+    double horizonOffset = (trackInfo.pitch / 90.0) * (size / 4); // Scale pitch to indicator
+    pPainter->setPen(QPen(Qt::green, 2));
+    pPainter->drawLine(QPointF(-size/3, horizonOffset), QPointF(size/3, horizonOffset));
+    
+    // Sky/ground representation
+    if (std::abs(trackInfo.pitch) < 45) {
+        QRectF skyRect(-size/2, -size/2, size, size/2 + horizonOffset);
+        QRectF groundRect(-size/2, horizonOffset, size, size/2 - horizonOffset);
+        
+        pPainter->setPen(Qt::NoPen);
+        pPainter->setBrush(QColor(135, 206, 235, 100)); // Sky blue
+        pPainter->drawRect(skyRect);
+        
+        pPainter->setBrush(QColor(139, 69, 19, 100)); // Brown ground
+        pPainter->drawRect(groundRect);
+    }
+    
+    pPainter->restore();
+    
+    // Draw aircraft symbol (fixed, not rotated)
+    pPainter->setPen(QPen(Qt::yellow, 3));
+    pPainter->drawLine(screenPos + QPointF(-8, 0), screenPos + QPointF(8, 0));
+    pPainter->drawLine(screenPos + QPointF(0, -3), screenPos + QPointF(0, 3));
+    
+    // Pitch and roll text
+    pPainter->setFont(QFont("Arial", 7));
+    pPainter->setPen(Qt::white);
+    pPainter->drawText(screenPos + QPointF(-35, -25), 
+                      QString("P:%1°").arg(trackInfo.pitch, 0, 'f', 1));
+    pPainter->drawText(screenPos + QPointF(-35, -15), 
+                      QString("R:%1°").arg(trackInfo.roll, 0, 'f', 1));
+}
+
+/**
+ * @brief Draws drone health status indicators
+ */
+void CTrackLayer::drawDroneHealthStatus(QPainter *pPainter, const stTrackDisplayInfo &trackInfo, 
+                                       const QPointF &screenPos)
+{
+    if (!trackInfo.isDrone) return;
+    
+    // Health status color coding
+    QColor healthColor;
+    if (trackInfo.healthSummary == "ALL SYSTEMS OK") {
+        healthColor = Qt::green;
+    } else if (trackInfo.healthSummary == "MOSTLY HEALTHY") {
+        healthColor = Qt::yellow;
+    } else if (trackInfo.healthSummary == "DEGRADED") {
+        healthColor = QColor(255, 165, 0); // Orange
+    } else {
+        healthColor = Qt::red;
+    }
+    
+    // Draw health status circle
+    pPainter->setPen(QPen(healthColor, 2));
+    pPainter->setBrush(QColor(healthColor.red(), healthColor.green(), healthColor.blue(), 50));
+    pPainter->drawEllipse(screenPos + QPointF(-45, -10), 8, 8);
+    
+    // Health status text
+    pPainter->setFont(QFont("Arial", 6));
+    pPainter->setPen(healthColor);
+    pPainter->drawText(screenPos + QPointF(-70, -20), "HEALTH");
+    pPainter->drawText(screenPos + QPointF(-70, -12), trackInfo.healthSummary);
+    
+    // Vertical speed indicator (simple arrow)
+    if (std::abs(trackInfo.verticalSpeed) > 0.5) {
+        QPointF arrowBase = screenPos + QPointF(50, 0);
+        double arrowLength = qMin(std::abs(trackInfo.verticalSpeed) * 3, 20.0);
+        
+        if (trackInfo.verticalSpeed > 0) {
+            // Climbing
+            pPainter->setPen(QPen(Qt::green, 2));
+            pPainter->drawLine(arrowBase, arrowBase + QPointF(0, -arrowLength));
+            // Arrow head
+            pPainter->drawLine(arrowBase + QPointF(0, -arrowLength), 
+                              arrowBase + QPointF(-3, -arrowLength + 3));
+            pPainter->drawLine(arrowBase + QPointF(0, -arrowLength), 
+                              arrowBase + QPointF(3, -arrowLength + 3));
+        } else {
+            // Descending
+            pPainter->setPen(QPen(Qt::red, 2));
+            pPainter->drawLine(arrowBase, arrowBase + QPointF(0, arrowLength));
+            // Arrow head
+            pPainter->drawLine(arrowBase + QPointF(0, arrowLength), 
+                              arrowBase + QPointF(-3, arrowLength - 3));
+            pPainter->drawLine(arrowBase + QPointF(0, arrowLength), 
+                              arrowBase + QPointF(3, arrowLength - 3));
+        }
+        
+        // Vertical speed text
+        pPainter->setFont(QFont("Arial", 7));
+        pPainter->setPen(Qt::white);
+        pPainter->drawText(arrowBase + QPointF(8, 5), 
+                          QString("%1 m/s").arg(trackInfo.verticalSpeed, 0, 'f', 1));
+    }
 }

@@ -64,7 +64,13 @@ CDataWarehouse::CDataWarehouse(QObject *parent) : QObject(parent), _m_nHistoryLi
 }
 
 QList<stTrackDisplayInfo> CDataWarehouse::getTrackList() {
-    return _m_listTrackInfo.values();
+    QList<stTrackDisplayInfo> allTracks = _m_listTrackInfo.values();
+    
+    // Add drone tracks from drone manager
+    QList<stTrackDisplayInfo> droneTracks = CDroneManager::getInstance()->getDroneTrackList();
+    allTracks.append(droneTracks);
+    
+    return allTracks;
 }
 
 void CDataWarehouse::slotClearTracksOnTimeOut() {
@@ -170,8 +176,32 @@ int CDataWarehouse::getHistoryLimit() const {
 
 void CDataWarehouse::deleteTrack(int trackId) {
     QMutexLocker locker(&_m_mutex);
+    
+    // Try to delete from regular tracks first
     if (_m_listTrackInfo.contains(trackId)) {
         _m_listTrackInfo.remove(trackId);
         qDebug() << "Track" << trackId << "deleted from data warehouse";
+        return;
     }
+    
+    // Try to delete from drone manager
+    CDroneManager* droneManager = CDroneManager::getInstance();
+    if (droneManager->getDrone(trackId)) {
+        droneManager->removeDrone(trackId);
+        qDebug() << "Drone" << trackId << "deleted from drone manager";
+    }
+}
+
+void CDataWarehouse::createTestDroneScenario() {
+    CDroneManager::getInstance()->createTestScenario();
+    qDebug() << "Test drone scenario created";
+}
+
+void CDataWarehouse::clearAllDrones() {
+    CDroneManager::getInstance()->clearAllDrones();
+    qDebug() << "All drones cleared";
+}
+
+CDroneManager* CDataWarehouse::getDroneManager() {
+    return CDroneManager::getInstance();
 }

@@ -410,6 +410,9 @@ CMapMainWindow::CMapMainWindow(QWidget *parent) :
                               .arg(m_screens.count())
                               .arg(m_isDualMonitor ? "Available" : "Not Available"));
     
+    // Create test drone scenario
+    createTestDroneScenario();
+    
     // Auto-arrange for dual monitor if available
     if (m_isDualMonitor) {
         QTimer::singleShot(500, this, &CMapMainWindow::onArrangeDualMonitor);
@@ -785,4 +788,11 @@ void CMapMainWindow::loadWindowSettings()
         m_controlsWindow->restoreGeometry(m_settings->value("controlsGeometry").toByteArray());
         m_controlsWindow->restoreState(m_settings->value("controlsState").toByteArray());
     }
+}
+
+void CMapMainWindow::createTestDroneScenario()
+{
+    // Create test drone scenario through data warehouse
+    CDataWarehouse::getInstance()->createTestDroneScenario();
+    qDebug() << "Test drone scenario created from main window";
 }

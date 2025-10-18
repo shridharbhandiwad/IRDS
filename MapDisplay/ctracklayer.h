@@ -114,6 +114,34 @@ private:
      */
     void drawFocusedTrackDatatip(QPainter *pPainter, const stTrackDisplayInfo &trackInfo, 
                                 const QPointF &screenPos);
+    
+    /**
+     * @brief Draws drone-specific internal details
+     * @param pPainter QPainter instance
+     * @param trackInfo Track information (must be a drone)
+     * @param screenPos Screen position of track
+     */
+    void drawDroneInternalDetails(QPainter *pPainter, const stTrackDisplayInfo &trackInfo, 
+                                 const QPointF &screenPos);
+    
+    /**
+     * @brief Draws drone attitude indicator (pitch/roll visualization)
+     * @param pPainter QPainter instance
+     * @param trackInfo Track information
+     * @param screenPos Screen position of track
+     * @param size Size of the attitude indicator
+     */
+    void drawDroneAttitudeIndicator(QPainter *pPainter, const stTrackDisplayInfo &trackInfo, 
+                                   const QPointF &screenPos, double size);
+    
+    /**
+     * @brief Draws drone health status indicators
+     * @param pPainter QPainter instance
+     * @param trackInfo Track information
+     * @param screenPos Screen position of track
+     */
+    void drawDroneHealthStatus(QPainter *pPainter, const stTrackDisplayInfo &trackInfo, 
+                              const QPointF &screenPos);
 
 private slots:
     void onFocusTrack();
