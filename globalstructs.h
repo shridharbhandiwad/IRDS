@@ -38,7 +38,13 @@ struct stTrackDisplayInfo {
     double snr;                 //!< SNR
     int nTrackIden;
     long long nTrackTime;
-    QString tooltip;  // ADD THIS LINE
+    QString tooltip;
+    int nMaxHistoryPoints;      //!< Maximum number of history points (default: 20, max: 50)
+    bool bHighlighted;          //!< Whether track is highlighted
+    bool bFollowEnabled;        //!< Whether to follow track movement
+    QString customImagePath;    //!< Custom image path for the track
+    
+    stTrackDisplayInfo() : nMaxHistoryPoints(20), bHighlighted(false), bFollowEnabled(false) {}
 };
 
 #pragma pack()
