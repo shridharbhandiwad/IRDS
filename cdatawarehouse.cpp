@@ -89,6 +89,7 @@ void CDataWarehouse::slotUpdateTrackData(stTrackRecvInfo trackRecvInfo) {
         info = _m_listTrackInfo.value(trackRecvInfo.nTrkId);
     } else {
         info.showHistory = false;  // Default to history off for new tracks
+        info.firstSeenTime = QDateTime::currentDateTime().toSecsSinceEpoch();
     }
     
     info.nTrkId = trackRecvInfo.nTrkId;

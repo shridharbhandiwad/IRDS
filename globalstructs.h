@@ -49,6 +49,7 @@ struct stTrackDisplayInfo {
     double heading;             //!< Heading
     double velocity;            //!< Velocity
     double snr;                 //!< SNR
+    long long firstSeenTime;    //!< Epoch seconds when track first seen
     int nTrackIden;
     long long nTrackTime;
     QString tooltip;  // ADD THIS LINE
