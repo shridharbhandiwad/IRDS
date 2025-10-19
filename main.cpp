@@ -28,14 +28,32 @@ int main(int argc, char *argv[])
     qDebug() << "📅 APP BUILT DATE:" << APP_BUILD_DATE;
     qDebug() << "🖥️  DUAL MONITOR SUPPORT: ENABLED";
 
-    // Create splash screen
+    // Create splash screen (neutral grey theme)
+    // Apply a neutral grey application palette first
+    {
+        QPalette palette = app.palette();
+        palette.setColor(QPalette::Window, QColor("#f3f4f6"));      // light grey window
+        palette.setColor(QPalette::WindowText, QColor("#111827"));  // near-black text
+        palette.setColor(QPalette::Base, QColor("#ffffff"));        // inputs background
+        palette.setColor(QPalette::AlternateBase, QColor("#f3f4f6"));
+        palette.setColor(QPalette::ToolTipBase, QColor("#374151"));
+        palette.setColor(QPalette::ToolTipText, QColor("#f9fafb"));
+        palette.setColor(QPalette::Text, QColor("#111827"));
+        palette.setColor(QPalette::Button, QColor("#e5e7eb"));
+        palette.setColor(QPalette::ButtonText, QColor("#111827"));
+        palette.setColor(QPalette::BrightText, QColor("#ffffff"));
+        palette.setColor(QPalette::Highlight, QColor("#6b7280"));   // grey highlight
+        palette.setColor(QPalette::HighlightedText, QColor("#ffffff"));
+        app.setPalette(palette);
+    }
+
     QPixmap splashPixmap(400, 300);
-    splashPixmap.fill(QColor("#f8fafc"));
-    
+    splashPixmap.fill(QColor("#f3f4f6"));
+
     QSplashScreen splash(splashPixmap);
     splash.setStyleSheet(
         "QSplashScreen {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #3b82f6, stop:1 #2563eb);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #9ca3af, stop:1 #6b7280);"
         "   color: white;"
         "   font-family: 'Segoe UI', Arial, sans-serif;"
         "   font-size: 16px;"

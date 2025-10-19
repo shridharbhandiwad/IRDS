@@ -8,13 +8,13 @@ ApplicationWindow {
     height: 400
     visible: true
     title: "Sophisticated Icon Preview"
-    color: "#0a0d1a"
+    color: "#f3f4f6"
     
     Rectangle {
         anchors.fill: parent
         gradient: Gradient {
-            GradientStop { position: 0.0; color: "#1e293b" }
-            GradientStop { position: 1.0; color: "#0f172a" }
+            GradientStop { position: 0.0; color: "#e5e7eb" }
+            GradientStop { position: 1.0; color: "#d1d5db" }
         }
         
         Column {
@@ -33,10 +33,10 @@ ApplicationWindow {
             Rectangle {
                 width: 400
                 height: 60
-                color: Qt.rgba(248/255, 250/255, 252/255, 0.1)
+                color: Qt.rgba(243/255, 244/255, 246/255, 0.7)
                 radius: 12
                 border.width: 1
-                border.color: Qt.rgba(255, 255, 255, 0.2)
+                border.color: Qt.rgba(107, 114, 128, 0.6)
                 
                 Row {
                     anchors.centerIn: parent
@@ -112,7 +112,7 @@ ApplicationWindow {
             
             Text {
                 text: "✨ Features:\n• Transparent backgrounds\n• Smooth hover animations\n• Toggle state indicators\n• Ripple click effects\n• Sophisticated vector graphics"
-                color: "#94a3b8"
+                color: "#6b7280"
                 font.pixelSize: 14
                 lineHeight: 1.5
                 anchors.horizontalCenter: parent.horizontalCenter
