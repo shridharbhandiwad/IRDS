@@ -9,6 +9,7 @@
 #include <QStatusBar>
 #include <QToolBar>
 #include <QDebug>
+#include <QLabel>
 
 CPPIWindow::CPPIWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -96,18 +97,53 @@ void CPPIWindow::setupUI()
 void CPPIWindow::setupSettingsToolbar()
 {
     m_settingsLayout = new QHBoxLayout();
-    m_settingsLayout->setSpacing(8);
-    m_settingsLayout->setContentsMargins(4, 4, 4, 4);
+    m_settingsLayout->setSpacing(6);
+    m_settingsLayout->setContentsMargins(2, 2, 2, 2);
     
     // Create settings buttons with light theme
-    m_loadMapBtn = new QPushButton("📁 Load Map", this);
-    m_disableMapBtn = new QPushButton("🚫 Disable Map", this);
-    m_zoomFitBtn = new QPushButton("🔍 Zoom Fit", this);
-    m_homeBtn = new QPushButton("🏠 Home", this);
-    m_gridBtn = new QPushButton("📐 Grid", this);
-    m_compassBtn = new QPushButton("🧭 Compass", this);
-    m_toggleTableBtn = new QPushButton("📊 Table", this);
-    m_settingsBtn = new QPushButton("⚙️ Settings", this);
+    // Icon-only buttons with tooltips
+    m_loadMapBtn = new QPushButton("📁", this);
+    m_disableMapBtn = new QPushButton(m_mapEnabled ? "🚫" : "✅", this);
+    m_zoomFitBtn = new QPushButton("🔍", this);
+    m_homeBtn = new QPushButton("🏠", this);
+    m_gridBtn = new QPushButton("📐", this);
+    m_compassBtn = new QPushButton("🧭", this);
+    m_toggleTableBtn = new QPushButton("📊", this);
+    m_settingsBtn = new QPushButton("⚙️", this);
+
+    // Tooltips (text appears on hover)
+    m_loadMapBtn->setToolTip("Load Map");
+    m_disableMapBtn->setToolTip(m_mapEnabled ? "Disable Map" : "Enable Map");
+    m_zoomFitBtn->setToolTip("Zoom Fit");
+    m_homeBtn->setToolTip("Home");
+    m_gridBtn->setToolTip("Toggle Grid");
+    m_compassBtn->setToolTip("Toggle Compass");
+    m_toggleTableBtn->setToolTip("Show/Hide Track Table");
+    m_settingsBtn->setToolTip("Settings");
+
+    // Compact icon-only style with hover zoom
+    auto styleIconButton = [](QPushButton *btn) {
+        btn->setCursor(Qt::PointingHandCursor);
+        // Fix size so hover zoom doesn't shift layout
+        btn->setFixedSize(QSize(36, 32));
+        // Only override sizing and font so we keep global colors/backgrounds
+        btn->setStyleSheet(
+            "padding: 2px 6px;"
+            "font-size: 16px;"
+            "min-width: 36px;"
+            "min-height: 32px;"
+        );
+        // Hover zoom effect for the icon
+        btn->setStyleSheet(btn->styleSheet() + "QPushButton:hover { font-size: 20px; }");
+    };
+    styleIconButton(m_loadMapBtn);
+    styleIconButton(m_disableMapBtn);
+    styleIconButton(m_zoomFitBtn);
+    styleIconButton(m_homeBtn);
+    styleIconButton(m_gridBtn);
+    styleIconButton(m_compassBtn);
+    styleIconButton(m_toggleTableBtn);
+    styleIconButton(m_settingsBtn);
     
     // Make toggle buttons checkable
     m_gridBtn->setCheckable(true);
@@ -343,11 +379,13 @@ void CPPIWindow::onDisableMap()
     
     if (m_mapEnabled) {
         m_statusLabel->setText("Map enabled - Showing PPI with map layers");
-        m_disableMapBtn->setText("🚫 Disable Map");
+        m_disableMapBtn->setText("🚫");
+        m_disableMapBtn->setToolTip("Disable Map");
         m_mapCanvas->setMapLayersVisible(true);
     } else {
         m_statusLabel->setText("Map disabled - Showing PPI only");
-        m_disableMapBtn->setText("✅ Enable Map");
+        m_disableMapBtn->setText("✅");
+        m_disableMapBtn->setToolTip("Enable Map");
         m_mapCanvas->setMapLayersVisible(false);
     }
     
@@ -564,5 +602,6 @@ void CPPIWindow::loadSettings()
     m_gridBtn->setChecked(m_gridVisible);
     m_compassBtn->setChecked(m_compassVisible);
     m_disableMapBtn->setChecked(!m_mapEnabled);
-    m_disableMapBtn->setText(m_mapEnabled ? "🚫 Disable Map" : "✅ Enable Map");
+    m_disableMapBtn->setText(m_mapEnabled ? "🚫" : "✅");
+    m_disableMapBtn->setToolTip(m_mapEnabled ? "Disable Map" : "Enable Map");
 }
