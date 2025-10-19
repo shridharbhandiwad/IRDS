@@ -13,6 +13,7 @@
 #include <QQmlEngine>
 #include <QQmlContext>
 #include <QQuickItem>
+#include <QLabel>
 
 CPPIWindow::CPPIWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -119,32 +120,63 @@ QQuickWidget* CPPIWindow::createIconButton(const QString& iconType, const QStrin
 void CPPIWindow::setupSettingsToolbar()
 {
     m_settingsLayout = new QHBoxLayout();
-    m_settingsLayout->setSpacing(8);
-    m_settingsLayout->setContentsMargins(4, 4, 4, 4);
+    m_settingsLayout->setSpacing(6);
+    m_settingsLayout->setContentsMargins(2, 2, 2, 2);
     
-    // Create QML-based icon buttons
-    m_loadMapBtn = createIconButton("loadmap", "Load Map");
-    m_disableMapBtn = createIconButton("disablemap", "Disable Map");
-    m_zoomFitBtn = createIconButton("zoomfit", "Zoom Fit");
-    m_homeBtn = createIconButton("home", "Home");
-    m_gridBtn = createIconButton("grid", "Grid");
-    m_compassBtn = createIconButton("compass", "Compass");
-    m_toggleTableBtn = createIconButton("table", "Table");
-    m_settingsBtn = createIconButton("settings", "Settings");
+    // Create settings buttons with light theme
+    // Icon-only buttons with tooltips
+    m_loadMapBtn = new QPushButton("📁", this);
+    m_disableMapBtn = new QPushButton(m_mapEnabled ? "🚫" : "✅", this);
+    m_zoomFitBtn = new QPushButton("🔍", this);
+    m_homeBtn = new QPushButton("🏠", this);
+    m_gridBtn = new QPushButton("📐", this);
+    m_compassBtn = new QPushButton("🧭", this);
+    m_toggleTableBtn = new QPushButton("📊", this);
+    m_settingsBtn = new QPushButton("⚙️", this);
+
+    // Tooltips (text appears on hover)
+    m_loadMapBtn->setToolTip("Load Map");
+    m_disableMapBtn->setToolTip(m_mapEnabled ? "Disable Map" : "Enable Map");
+    m_zoomFitBtn->setToolTip("Zoom Fit");
+    m_homeBtn->setToolTip("Home");
+    m_gridBtn->setToolTip("Toggle Grid");
+    m_compassBtn->setToolTip("Toggle Compass");
+    m_toggleTableBtn->setToolTip("Show/Hide Track Table");
+    m_settingsBtn->setToolTip("Settings");
+
+    // Compact icon-only style with hover zoom
+    auto styleIconButton = [](QPushButton *btn) {
+        btn->setCursor(Qt::PointingHandCursor);
+        // Fix size so hover zoom doesn't shift layout
+        btn->setFixedSize(QSize(36, 32));
+        // Only override sizing and font so we keep global colors/backgrounds
+        btn->setStyleSheet(
+            "padding: 2px 6px;"
+            "font-size: 16px;"
+            "min-width: 36px;"
+            "min-height: 32px;"
+        );
+        // Hover zoom effect for the icon
+        btn->setStyleSheet(btn->styleSheet() + "QPushButton:hover { font-size: 20px; }");
+    };
+    styleIconButton(m_loadMapBtn);
+    styleIconButton(m_disableMapBtn);
+    styleIconButton(m_zoomFitBtn);
+    styleIconButton(m_homeBtn);
+    styleIconButton(m_gridBtn);
+    styleIconButton(m_compassBtn);
+    styleIconButton(m_toggleTableBtn);
+    styleIconButton(m_settingsBtn);
     
-    // Set initial toggle states
-    if (m_gridBtn->rootObject()) {
-        m_gridBtn->rootObject()->setProperty("isToggled", m_gridVisible);
-    }
-    if (m_compassBtn->rootObject()) {
-        m_compassBtn->rootObject()->setProperty("isToggled", m_compassVisible);
-    }
-    if (m_disableMapBtn->rootObject()) {
-        m_disableMapBtn->rootObject()->setProperty("isToggled", !m_mapEnabled);
-    }
-    if (m_toggleTableBtn->rootObject()) {
-        m_toggleTableBtn->rootObject()->setProperty("isToggled", true);
-    }
+    // Make toggle buttons checkable
+    m_gridBtn->setCheckable(true);
+    m_gridBtn->setChecked(m_gridVisible);
+    m_compassBtn->setCheckable(true);
+    m_compassBtn->setChecked(m_compassVisible);
+    m_disableMapBtn->setCheckable(true);
+    m_disableMapBtn->setChecked(!m_mapEnabled);
+    m_toggleTableBtn->setCheckable(true);
+    m_toggleTableBtn->setChecked(true);
     
     // Status label
     m_statusLabel = new QLabel("Ready", this);
@@ -369,9 +401,13 @@ void CPPIWindow::onDisableMap()
     
     if (m_mapEnabled) {
         m_statusLabel->setText("Map enabled - Showing PPI with map layers");
+        m_disableMapBtn->setText("🚫");
+        m_disableMapBtn->setToolTip("Disable Map");
         m_mapCanvas->setMapLayersVisible(true);
     } else {
         m_statusLabel->setText("Map disabled - Showing PPI only");
+        m_disableMapBtn->setText("✅");
+        m_disableMapBtn->setToolTip("Enable Map");
         m_mapCanvas->setMapLayersVisible(false);
     }
     
@@ -596,15 +632,10 @@ void CPPIWindow::loadSettings()
     m_mapEnabled = m_settings->value("mapEnabled", true).toBool();
     m_maxHistoryPoints = m_settings->value("maxHistoryPoints", 50).toInt();
     
-    // Update UI state for QML buttons
-    if (m_gridBtn->rootObject()) {
-        m_gridBtn->rootObject()->setProperty("isToggled", m_gridVisible);
-    }
-    if (m_compassBtn->rootObject()) {
-        m_compassBtn->rootObject()->setProperty("isToggled", m_compassVisible);
-    }
-    if (m_disableMapBtn->rootObject()) {
-        m_disableMapBtn->rootObject()->setProperty("isToggled", !m_mapEnabled);
-        m_disableMapBtn->rootObject()->setProperty("toolTip", m_mapEnabled ? "Disable Map" : "Enable Map");
-    }
+    // Update UI state
+    m_gridBtn->setChecked(m_gridVisible);
+    m_compassBtn->setChecked(m_compassVisible);
+    m_disableMapBtn->setChecked(!m_mapEnabled);
+    m_disableMapBtn->setText(m_mapEnabled ? "🚫" : "✅");
+    m_disableMapBtn->setToolTip(m_mapEnabled ? "Disable Map" : "Enable Map");
 }
