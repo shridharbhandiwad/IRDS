@@ -5,7 +5,7 @@ Item {
     width: 24
     height: 24
     
-    property color iconColor: "#ffffff"
+    property color iconColor: "#d1d5db"
     property real opacity: 1.0
     property real rotation: 0
     

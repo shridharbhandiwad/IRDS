@@ -6,7 +6,7 @@ import QtCharts 2.15
 Rectangle {
     id: root
     anchors.fill: parent
-    color: "#0a0d1a" // Dark holographic background
+    color: "#1f2937" // Dark grey background
 
     ColumnLayout {
         anchors.fill: parent
@@ -33,7 +33,7 @@ Rectangle {
             ChartView {
                 antialiasing: true
                 theme: ChartView.ChartThemeDark
-                backgroundColor: "#111"
+                backgroundColor: "#374151"
                 LineSeries {
                     name: "Signal"
                    // points: [Qt.point(0,1), Qt.point(1,3), Qt.point(2,1), Qt.point(3,4)]
@@ -49,13 +49,13 @@ Rectangle {
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            color: "#111"
+            color: "#374151"
             radius: 10
-            border.color: "#00ffff"
+            border.color: "#9ca3af"
             Text {
                 anchors.centerIn: parent
                 text: "Radar Placeholder"
-                color: "#00ffff"
+                color: "#d1d5db"
             }
         }
     }
