@@ -75,10 +75,10 @@ void CPPIWindow::setupUI()
     splitter->addWidget(m_mapCanvas);
     splitter->addWidget(m_trackTable);
     
-    // Set splitter proportions (70% map, 30% table)
-    splitter->setSizes({700, 300});
+    // Set splitter proportions and preserve stretch
     splitter->setStretchFactor(0, 7);
-    splitter->setStretchFactor(1, 3);
+    splitter->setStretchFactor(1, 4);
+    splitter->setSizes({840, 480});
     
     // Store splitter reference for later use
     m_splitter = splitter;
@@ -243,8 +243,9 @@ void CPPIWindow::setupMapCanvas()
 void CPPIWindow::setupTrackTable()
 {
     m_trackTable = new CTrackTableWidget(this);
-    m_trackTable->setMinimumWidth(300);
-    m_trackTable->setMaximumWidth(500);
+    // Allow wider table so all header fields are visible while keeping resizable behavior
+    m_trackTable->setMinimumWidth(420);
+    m_trackTable->setMaximumWidth(1200);
     
     // Connect track table signals
     connect(m_trackTable, &CTrackTableWidget::trackSelected,
@@ -260,11 +261,11 @@ void CPPIWindow::applyLightTheme()
     // Light theme with two primary colors: Blue (#3b82f6) and Light Gray (#f8fafc)
     QString lightTheme = 
         "CPPIWindow {"
-        "   background-color: #f8fafc;"
+        "   background-color: rgba(248, 250, 252, 0.85);"
         "   color: #1e293b;"
         "}"
         "QWidget {"
-        "   background-color: #f8fafc;"
+        "   background-color: rgba(248, 250, 252, 0.75);"
         "   color: #1e293b;"
         "   font-family: 'Segoe UI', Arial, sans-serif;"
         "}"
@@ -277,15 +278,15 @@ void CPPIWindow::applyLightTheme()
         "   font-weight: 500;"
         "}"
         "QSplitter {"
-        "   background-color: #e2e8f0;"
+        "   background-color: rgba(226, 232, 240, 0.7);"
         "}"
         "QSplitter::handle {"
-        "   background-color: #cbd5e1;"
+        "   background-color: rgba(203, 213, 225, 0.9);"
         "   width: 3px;"
         "   border-radius: 1px;"
         "}"
         "QSplitter::handle:hover {"
-        "   background-color: #3b82f6;"
+        "   background-color: rgba(59, 130, 246, 0.9);"
         "}";
     
     setStyleSheet(lightTheme);

@@ -128,7 +128,14 @@ void CTrackTableWidget::setupUI()
         "ID", "Identity", "Lat", "Lon", "Alt (m)", "Range (km)", "Heading (°)", "Azimuth (°)", "Updated"
     });
 
-    m_tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    // Ensure header labels and content are fully visible
+    QHeaderView *header = m_tableWidget->horizontalHeader();
+    header->setTextElideMode(Qt::ElideNone);
+    header->setStretchLastSection(true);
+    for (int col = 0; col < m_tableWidget->columnCount(); ++col) {
+        header->setSectionResizeMode(col, QHeaderView::ResizeToContents);
+    }
+    m_tableWidget->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
     m_tableWidget->verticalHeader()->setVisible(false);
     m_tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -137,11 +144,11 @@ void CTrackTableWidget::setupUI()
 
     m_tableWidget->setStyleSheet(
         "QTableWidget {"
-        "   background-color: #ffffff;"
-        "   alternate-background-color: #f8fafc;"
+        "   background-color: rgba(255, 255, 255, 0.88);"
+        "   alternate-background-color: rgba(248, 250, 252, 0.70);"
         "   color: #1e293b;"
-        "   gridline-color: #e2e8f0;"
-        "   border: 2px solid #e2e8f0;"
+        "   gridline-color: rgba(226, 232, 240, 0.9);"
+        "   border: 2px solid rgba(226, 232, 240, 0.85);"
         "   border-radius: 8px;"
         "   font-size: 11px;"
         "}"
@@ -150,44 +157,46 @@ void CTrackTableWidget::setupUI()
         "   color: #334155;"
         "}"
         "QTableWidget::item:selected {"
-        "   background-color: #3b82f6;"
+        "   background-color: rgba(59, 130, 246, 0.9);"
         "   color: white;"
         "}"
         "QTableWidget::item:hover {"
-        "   background-color: #e0e7ff;"
+        "   background-color: rgba(224, 231, 255, 0.8);"
         "}"
         "QHeaderView::section {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #f1f5f9, stop:1 #e2e8f0);"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
+        "       stop:0 rgba(241, 245, 249, 0.9), stop:1 rgba(226, 232, 240, 0.9));"
         "   color: #1e293b;"
         "   padding: 8px;"
         "   border: none;"
-        "   border-bottom: 2px solid #3b82f6;"
+        "   border-bottom: 2px solid rgba(59, 130, 246, 0.9);"
         "   font-weight: bold;"
         "   font-size: 11px;"
         "}"
         "QHeaderView::section:hover {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #e2e8f0, stop:1 #cbd5e1);"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
+        "       stop:0 rgba(226, 232, 240, 0.9), stop:1 rgba(203, 213, 225, 0.9));"
         "}"
         "QScrollBar:vertical {"
-        "   background-color: #f1f5f9;"
+        "   background-color: rgba(241, 245, 249, 0.8);"
         "   width: 12px;"
         "   border-radius: 6px;"
         "}"
         "QScrollBar::handle:vertical {"
-        "   background-color: #3b82f6;"
+        "   background-color: rgba(59, 130, 246, 0.9);"
         "   border-radius: 6px;"
         "   min-height: 20px;"
         "}"
         "QScrollBar::handle:vertical:hover {"
-        "   background-color: #2563eb;"
+        "   background-color: rgba(37, 99, 235, 0.9);"
         "}"
         "QScrollBar:horizontal {"
-        "   background-color: #f1f5f9;"
+        "   background-color: rgba(241, 245, 249, 0.8);"
         "   height: 12px;"
         "   border-radius: 6px;"
         "}"
         "QScrollBar::handle:horizontal {"
-        "   background-color: #3b82f6;"
+        "   background-color: rgba(59, 130, 246, 0.9);"
         "   border-radius: 6px;"
         "   min-width: 20px;"
         "}"
@@ -218,23 +227,24 @@ void CTrackTableWidget::setupUI()
     // Dock widget styling
     setStyleSheet(
         "QDockWidget {"
-        "   background-color: #f8fafc;"
+        "   background-color: rgba(248, 250, 252, 0.75);"
         "   color: #1e293b;"
         "   font-size: 12px;"
         "   font-weight: bold;"
         "}"
         "QDockWidget::title {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #f1f5f9, stop:1 #e2e8f0);"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
+        "       stop:0 rgba(241, 245, 249, 0.9), stop:1 rgba(226, 232, 240, 0.9));"
         "   padding: 8px;"
-        "   border-bottom: 2px solid #3b82f6;"
+        "   border-bottom: 2px solid rgba(59, 130, 246, 0.9);"
         "}"
         "QDockWidget::close-button, QDockWidget::float-button {"
-        "   background-color: #e2e8f0;"
+        "   background-color: rgba(226, 232, 240, 0.9);"
         "   border-radius: 4px;"
         "   padding: 2px;"
         "}"
         "QDockWidget::close-button:hover, QDockWidget::float-button:hover {"
-        "   background-color: #3b82f6;"
+        "   background-color: rgba(59, 130, 246, 0.9);"
         "}"
     );
 }

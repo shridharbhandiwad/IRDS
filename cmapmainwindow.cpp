@@ -70,10 +70,11 @@ void CPPIWindow::setupUI()
     splitter->addWidget(m_mapCanvas);
     splitter->addWidget(m_trackTable);
     
-    // Set splitter proportions (70% map, 30% table)
-    splitter->setSizes({700, 300});
+    // Set splitter proportions and preserve stretch
+    // Favor a slightly wider table by default for full header visibility
     splitter->setStretchFactor(0, 7);
-    splitter->setStretchFactor(1, 3);
+    splitter->setStretchFactor(1, 4);
+    splitter->setSizes({840, 480});
     
     // Store splitter reference for later use
     m_splitter = splitter;
@@ -168,8 +169,9 @@ void CPPIWindow::setupMapCanvas()
 void CPPIWindow::setupTrackTable()
 {
     m_trackTable = new CTrackTableWidget(this);
-    m_trackTable->setMinimumWidth(300);
-    m_trackTable->setMaximumWidth(500);
+    // Allow wider table so all header fields are visible while keeping resizable behavior
+    m_trackTable->setMinimumWidth(420);
+    m_trackTable->setMaximumWidth(1200);
     
     // Connect track table signals
     connect(m_trackTable, &CTrackTableWidget::trackSelected,
