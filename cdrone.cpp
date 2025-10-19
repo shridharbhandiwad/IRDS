@@ -2,6 +2,7 @@
 #include <QtMath>
 #include <QDebug>
 #include <QRandomGenerator>
+#include <QColor>
 
 CDrone::CDrone(int trackId, QObject *parent)
     : QObject(parent)

@@ -153,6 +153,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QScreen>
+#include <QSettings>
 
 // Forward declarations
 class CPPIWindow;

@@ -4,15 +4,15 @@
 #
 #-------------------------------------------------
 
-QT       += core gui widgets xml network concurrent qml quick quickwidgets quickcontrols2 charts
+QT       += core gui widgets xml network concurrent qml quick quickwidgets quickcontrols2 charts multimedia multimediawidgets
 
 
-OBJECTS_DIR = ../obj/OBJ
-MOC_DIR = ../obj/MOC
-UI_DIR = ../obj/UI
-RCC_DIR = ../obj/RCC
+OBJECTS_DIR = obj/OBJ
+MOC_DIR = obj/MOC
+UI_DIR = obj/UI
+RCC_DIR = obj/RCC
 
-TARGET = ../bin/RadarDisplay
+TARGET = bin/RadarDisplay
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use

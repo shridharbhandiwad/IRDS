@@ -35,8 +35,11 @@ public :
     CDrone* getDrone(int trackId);
     void createDroneForTrack(int trackId);
     void updateDroneForTrack(int trackId);
-private slots:
+    
+public slots:
     void slotUpdateTrackData(stTrackRecvInfo trackRecvInfo);
+    
+private slots:
     void slotClearTracksOnTimeOut();
 private:
     /**
