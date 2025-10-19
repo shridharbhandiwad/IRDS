@@ -1,504 +1,193 @@
-//#include "cmapmainwindow.h"
-//#include "ui_cmapmainwindow.h"
-//#include "cdatawarehouse.h"
-//#include <QFileDialog>
-
-//CMapMainWindow::CMapMainWindow(QWidget *parent) :
-//    QMainWindow(parent),
-//    ui(new Ui::CMapMainWindow)
-//{
-//    ui->setupUi(this);
-//    ui->widgetMapCanvas->Initialize();
-//    setWindowTitle("Radar Display");
-
-//    ui->tableWidget->setRowCount(100);
-//    for ( int i = 0; i < ui->tableWidget->rowCount(); i++ ) {
-//        for ( int j = 0; j < ui->tableWidget->columnCount(); j++ ) {
-//            QTableWidgetItem *item = new QTableWidgetItem("");
-//            item->setForeground(QBrush(Qt::white));
-//            item->setFont(QFont("century",12,80,false));
-//            item->setTextAlignment(Qt::AlignCenter);
-//            ui->tableWidget->setItem(i,j,item);
-//        }
-//    }
-
-//    connect(&_m_updateTimer, &QTimer::timeout, this, [this]() {
-//           updateTrackTable();  // Trigger repaint
-//       });
-//    _m_updateTimer.start(1000);
-
-
-//    ui->widget_TextualControl->setVisible(false);
-//    connect(ui->widgetMapCanvas, SIGNAL(signalMouseRead(QString)), this, SLOT(slotMouseRead(QString)));
-//}
-
-//CMapMainWindow::~CMapMainWindow()
-//{
-//    delete ui;
-//}
-
-//void CMapMainWindow::keyPressEvent(QKeyEvent *event)
-//{
-//    switch (event->key()) {
-//    case Qt::Key_F:
-//        ui->widget_TextualControl->setVisible(!ui->widget_TextualControl->isVisible());
-//        break;
-//    case Qt::Key_H:
-//        ui->widgetMapCanvas->mapHome();;;
-//        break;
-
-//   }
-//    QMainWindow::keyPressEvent(event);
-//}
-
-//void CMapMainWindow::slotMouseRead( QString mouseRead ) {
-//    ui->statusBar->showMessage(mouseRead);
-//}
-
-//void CMapMainWindow::on_pushButton_MapHome_clicked()
-//{
-//    ui->widgetMapCanvas->mapHome();
-//}
-
-//void CMapMainWindow::on_pushButton_OpenMaps_clicked()
-//{
-//    QString filter = "Raster Files (*.tif *.tiff *.png *.bmp *.jpg *.TIF *.tiff *.PNG *.BMP *.JPG)";
-
-//    QString rasterPath = QFileDialog::getOpenFileName(
-//                this,
-//                "Select Raster or World-Referenced Image",
-//                QString(),
-//                filter
-//                );
-
-//    if (rasterPath.isEmpty())
-//        return;
-
-//    //ui->widgetMapCanvas->openRasterMap(rasterPath);
-//    ui->widgetMapCanvas->importRasterMap(rasterPath);
-//}
-
-//void CMapMainWindow::on_pushButton_FLUSH_clicked()
-//{
-
-//}
-
-//void CMapMainWindow::on_pushButton_EXIT_clicked()
-//{
-//    exit(0);
-//}
-
-
-//void CMapMainWindow::updateTrackTable() {
-//    QList<stTrackDisplayInfo> listTracks = CDataWarehouse::getInstance()->getTrackList();
-
-//    //ui->tableWidget->clear();
-//    int row = 0;
-//    for (const stTrackDisplayInfo &track : listTracks) {
-//        ui->tableWidget->item(row, 0)->setText(QString::number(track.nTrkId));
-//        ui->tableWidget->item(row, 1)->setText(QString::number(track.range, 'f', 0));
-//        ui->tableWidget->item(row, 2)->setText(QString::number(track.azimuth, 'f', 2));
-//        ui->tableWidget->item(row, 3)->setText(QString::number(track.elevation, 'f', 1));
-//        ui->tableWidget->item(row, 4)->setText(QString::number(track.heading, 'f', 1));
-//        ui->tableWidget->item(row, 5)->setText(QString::number(track.velocity, 'f', 1));
-//        ui->tableWidget->item(row, 6)->setText(QString::number(track.snr, 'f', 1));
-//        ++row;
-//    }
-//}
-
-
-
-//#include "cmapmainwindow.h"
-//#include "ui_cmapmainwindow.h"
-//#include "cdatawarehouse.h"
-//#include "MapDisplay/ctracktablewidget.h"
-//#include <QFileDialog>
-//#include <QDebug>
-//#include <qgspoint.h>
-
-//CMapMainWindow::CMapMainWindow(QWidget *parent) :
-//    QMainWindow(parent),
-//    ui(new Ui::CMapMainWindow)
-//{
-//    ui->setupUi(this);
-//    ui->widgetMapCanvas->Initialize();
-//    setWindowTitle("Radar Display");
-
-//    // Setup rich dockable track table
-//    setupTrackTable();
-
-//    // Hide the old table widget if it exists in UI
-//    if (ui->tableWidget) {
-//        ui->tableWidget->setVisible(false);
-//    }
-
-//    ui->widget_TextualControl->setVisible(false);
-//    connect(ui->widgetMapCanvas, SIGNAL(signalMouseRead(QString)), this, SLOT(slotMouseRead(QString)));
-
-//    // Apply modern dark theme to main window
-//    applyModernTheme();
-
-//    // Start update timer for status bar
-//    connect(&_m_updateTimer, &QTimer::timeout, this, &CMapMainWindow::updateTrackTable);
-//    _m_updateTimer.start(1000);
-//}
-
-//CMapMainWindow::~CMapMainWindow()
-//{
-//    delete ui;
-//}
-
-//void CMapMainWindow::setupTrackTable()
-//{
-//    m_trackTable = new CTrackTableWidget(this);
-
-//    // Add as dockable widget to right side
-//    addDockWidget(Qt::RightDockWidgetArea, m_trackTable);
-
-//    // Make it initially visible
-//    m_trackTable->setVisible(true);
-
-//    // Allow docking on all sides
-//    m_trackTable->setAllowedAreas(Qt::AllDockWidgetAreas);
-
-//    // Enable floating
-//    m_trackTable->setFeatures(
-//        QDockWidget::DockWidgetClosable |
-//        QDockWidget::DockWidgetMovable |
-//        QDockWidget::DockWidgetFloatable
-//    );
-
-//    // Connect signals for track interaction
-//    connect(m_trackTable, &CTrackTableWidget::trackSelected,
-//            this, &CMapMainWindow::onTrackSelected);
-//    connect(m_trackTable, &CTrackTableWidget::trackDoubleClicked,
-//            this, &CMapMainWindow::onTrackDoubleClicked);
-//}
-
-//void CMapMainWindow::applyModernTheme()
-//{
-//    // Modern dark theme for the entire application
-//    setStyleSheet(
-//        "QMainWindow {"
-//        "   background-color: #1a202c;"
-//        "}"
-//        "QWidget {"
-//        "   background-color: #1a202c;"
-//        "   color: #ffffff;"
-//        "}"
-//        "QPushButton {"
-//        "   background-color: #667eea;"
-//        "   color: white;"
-//        "   border: none;"
-//        "   border-radius: 8px;"
-//        "   padding: 10px 16px;"
-//        "   font-weight: bold;"
-//        "   font-size: 12px;"
-//        "   min-height: 32px;"
-//        "}"
-//        "QPushButton:hover {"
-//        "   background-color: #5568d3;"
-//        "}"
-//        "QPushButton:pressed {"
-//        "   background-color: #4c51bf;"
-//        "}"
-//        "QPushButton:disabled {"
-//        "   background-color: #4a5568;"
-//        "   color: #a0aec0;"
-//        "}"
-//        "QStatusBar {"
-//        "   background-color: #2d3748;"
-//        "   color: #ffffff;"
-//        "   border-top: 2px solid #667eea;"
-//        "   font-size: 11px;"
-//        "   padding: 4px;"
-//        "}"
-//        "QMenuBar {"
-//        "   background-color: #2d3748;"
-//        "   color: #ffffff;"
-//        "   border-bottom: 2px solid #667eea;"
-//        "}"
-//        "QMenuBar::item {"
-//        "   background-color: transparent;"
-//        "   padding: 8px 12px;"
-//        "}"
-//        "QMenuBar::item:selected {"
-//        "   background-color: #667eea;"
-//        "}"
-//        "QMenu {"
-//        "   background-color: #2d3748;"
-//        "   color: #ffffff;"
-//        "   border: 2px solid #4a5568;"
-//        "}"
-//        "QMenu::item:selected {"
-//        "   background-color: #667eea;"
-//        "}"
-//        "QToolBar {"
-//        "   background-color: #2d3748;"
-//        "   border: none;"
-//        "   spacing: 8px;"
-//        "   padding: 4px;"
-//        "}"
-//        "QGroupBox {"
-//        "   background-color: #2d3748;"
-//        "   border: 2px solid #4a5568;"
-//        "   border-radius: 8px;"
-//        "   margin-top: 12px;"
-//        "   padding-top: 12px;"
-//        "   font-weight: bold;"
-//        "   color: #ffffff;"
-//        "}"
-//        "QGroupBox::title {"
-//        "   subcontrol-origin: margin;"
-//        "   subcontrol-position: top left;"
-//        "   padding: 4px 8px;"
-//        "   background-color: #667eea;"
-//        "   border-radius: 4px;"
-//        "   color: white;"
-//        "}"
-//    );
-//}
-
-//void CMapMainWindow::keyPressEvent(QKeyEvent *event)
-//{
-//    switch (event->key()) {
-//    case Qt::Key_F:
-//        ui->widget_TextualControl->setVisible(!ui->widget_TextualControl->isVisible());
-//        break;
-//    case Qt::Key_H:
-//        ui->widgetMapCanvas->mapHome();
-//        break;
-//    case Qt::Key_T:
-//        // Toggle track table visibility with 'T' key
-//        m_trackTable->setVisible(!m_trackTable->isVisible());
-//        break;
-//    }
-//    QMainWindow::keyPressEvent(event);
-//}
-
-//void CMapMainWindow::slotMouseRead(QString mouseRead)
-//{
-//    ui->statusBar->showMessage(mouseRead);
-//}
-
-//void CMapMainWindow::on_pushButton_MapHome_clicked()
-//{
-//    ui->widgetMapCanvas->mapHome();
-//}
-
-//void CMapMainWindow::on_pushButton_OpenMaps_clicked()
-//{
-//    QString filter = "Raster Files (*.tif *.tiff *.png *.bmp *.jpg *.TIF *.tiff *.PNG *.BMP *.JPG)";
-
-//    QString rasterPath = QFileDialog::getOpenFileName(
-//                this,
-//                "Select Raster or World-Referenced Image",
-//                QString(),
-//                filter
-//                );
-
-//    if (rasterPath.isEmpty())
-//        return;
-
-//    ui->widgetMapCanvas->importRasterMap(rasterPath);
-//}
-
-//void CMapMainWindow::on_pushButton_FLUSH_clicked()
-//{
-//    // Clear implementation if needed
-//}
-
-//void CMapMainWindow::on_pushButton_EXIT_clicked()
-//{
-//    exit(0);
-//}
-
-//void CMapMainWindow::updateTrackTable()
-//{
-//    // This method is now handled by CTrackTableWidget automatically
-//    // Keep this for backward compatibility if needed
-//    QList<stTrackDisplayInfo> listTracks = CDataWarehouse::getInstance()->getTrackList();
-
-//    // Update status bar with track count
-//    ui->statusBar->showMessage(
-//        QString("Active Tracks: %1 | Press 'T' to toggle track table | Press 'H' for home | Press 'F' for controls")
-//        .arg(listTracks.count())
-//    );
-//}
-
-//void CMapMainWindow::onTrackSelected(int trackId)
-//{
-//    qDebug() << "Track selected:" << trackId;
-
-//    // Find track info
-//    QList<stTrackDisplayInfo> tracks = CDataWarehouse::getInstance()->getTrackList();
-//    for (const stTrackDisplayInfo &track : tracks) {
-//        if (track.nTrkId == trackId) {
-//            // Update status bar with selected track info
-//            ui->statusBar->showMessage(
-//                QString("Selected Track #%1 | Range: %2 km | Heading: %3°")
-//                .arg(track.nTrkId)
-//                .arg(track.range / 1000.0, 0, 'f', 2)
-//                .arg(track.heading, 0, 'f', 1)
-//            );
-//            break;
-//        }
-//    }
-//}
-
-//void CMapMainWindow::onTrackDoubleClicked(int trackId)
-//{
-//    qDebug() << "Track double-clicked:" << trackId;
-
-//    // Find track and center map on it
-//    QList<stTrackDisplayInfo> tracks = CDataWarehouse::getInstance()->getTrackList();
-//    for (const stTrackDisplayInfo &track : tracks) {
-//        if (track.nTrkId == trackId) {
-//            // Center map on track using QGIS methods
-//            QgsPointXY centerPoint(track.lon, track.lat);
-//            ui->widgetMapCanvas->setCenter(centerPoint);
-//            ui->widgetMapCanvas->refresh();
-
-//            ui->statusBar->showMessage(
-//                QString("Centered on Track #%1 (Lat: %2°, Lon: %3°)")
-//                .arg(track.nTrkId)
-//                .arg(track.lat, 0, 'f', 5)
-//                .arg(track.lon, 0, 'f', 5),
-//                3000
-//            );
-//            break;
-//        }
-//    }
-//}
-
-
-#include "cmapmainwindow.h"
-#include "ui_cmapmainwindow.h"
 #include "cppiwindow.h"
-#include "ccontrolswindow.h"
+#include "MapDisplay/cmapcanvas.h"
+#include "MapDisplay/ctracktablewidget.h"
 #include "cdatawarehouse.h"
-#include <QFileDialog>
+#include <QApplication>
+#include <QKeyEvent>
+#include <QContextMenuEvent>
+#include <QSplitter>
+#include <QStatusBar>
+#include <QToolBar>
 #include <QDebug>
-#include <QCloseEvent>
-#include <QMessageBox>
-#include <QSettings>
-#include <QGuiApplication>
-#include <QScreen>
 
-CMapMainWindow::CMapMainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::CMapMainWindow),
-    m_ppiWindow(nullptr),
-    m_controlsWindow(nullptr),
-    m_isDualMonitor(false),
-    m_isFullscreen(false),
-    m_settings(new QSettings("RadarDisplay", "MainWindow", this))
+CPPIWindow::CPPIWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , m_centralWidget(nullptr)
+    , m_mainLayout(nullptr)
+    , m_settingsLayout(nullptr)
+    , m_mapCanvas(nullptr)
+    , m_trackTable(nullptr)
+    , m_trackContextMenu(nullptr)
+    , m_selectedTrackId(-1)
+    , m_gridVisible(true)
+    , m_compassVisible(true)
+    , m_mapEnabled(true)
+    , m_maxHistoryPoints(50)
+    , m_statusTimer(new QTimer(this))
+    , m_settings(new QSettings("RadarDisplay", "PPIWindow", this))
 {
-    ui->setupUi(this);
-    setWindowTitle("🎯 Radar Display - Window Manager");
+    setWindowTitle("🎯 PPI Display - Map & Tracks");
+    setMinimumSize(1200, 800);
     
-    setupMonitors();
-    setupDualWindows();
+    setupUI();
     applyLightTheme();
-    connectWindowSignals();
-    connectManagerButtons();
+    createTrackContextMenu();
     
-    loadWindowSettings();
+    // Setup status timer
+    connect(m_statusTimer, &QTimer::timeout, this, &CPPIWindow::updateStatusBar);
+    m_statusTimer->start(1000);
     
-    // Update status
-    ui->statusBar->showMessage(QString("Ready | Monitors: %1 | Dual Monitor: %2")
-                              .arg(m_screens.count())
-                              .arg(m_isDualMonitor ? "Available" : "Not Available"));
-    
-    // Auto-arrange for dual monitor if available
-    if (m_isDualMonitor) {
-        QTimer::singleShot(500, this, &CMapMainWindow::onArrangeDualMonitor);
-    }
+    loadSettings();
 }
 
-CMapMainWindow::~CMapMainWindow()
+CPPIWindow::~CPPIWindow()
 {
-    saveWindowSettings();
-    delete ui;
+    saveSettings();
 }
 
-void CMapMainWindow::setupDualWindows()
+void CPPIWindow::setupUI()
 {
-    // Create PPI window (Map + Track Table)
-    m_ppiWindow = new CPPIWindow();
-    m_ppiWindow->setWindowTitle("🎯 PPI Display - Map & Tracks");
+    // Create central widget with splitter
+    m_centralWidget = new QWidget(this);
+    setCentralWidget(m_centralWidget);
     
-    // Create Controls window (All control panels)
-    m_controlsWindow = new CControlsWindow();
-    m_controlsWindow->setWindowTitle("🎛️ Control Center - System Management");
+    m_mainLayout = new QVBoxLayout(m_centralWidget);
+    m_mainLayout->setContentsMargins(8, 8, 8, 8);
+    m_mainLayout->setSpacing(8);
     
-    // Show both windows
-    m_ppiWindow->show();
-    m_controlsWindow->show();
+    // Setup components
+    setupSettingsToolbar();
+    
+    // Create horizontal splitter for map and track table
+    QSplitter *splitter = new QSplitter(Qt::Horizontal, this);
+    splitter->setChildrenCollapsible(true); // Allow collapsing
+    splitter->setHandleWidth(6); // Make handle more visible
+    
+    setupMapCanvas();
+    setupTrackTable();
+    
+    // Add to splitter
+    splitter->addWidget(m_mapCanvas);
+    splitter->addWidget(m_trackTable);
+    
+    // Set splitter proportions (70% map, 30% table)
+    splitter->setSizes({700, 300});
+    splitter->setStretchFactor(0, 7);
+    splitter->setStretchFactor(1, 3);
+    
+    // Store splitter reference for later use
+    m_splitter = splitter;
+    
+    m_mainLayout->addWidget(splitter);
+    
+    // Setup status bar
+    statusBar()->setStyleSheet(
+        "QStatusBar {"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #f8fafc, stop:1 #e2e8f0);"
+        "   color: #334155;"
+        "   border-top: 2px solid #3b82f6;"
+        "   font-size: 12px;"
+        "   font-weight: 500;"
+        "   padding: 6px;"
+        "}"
+    );
 }
 
-void CMapMainWindow::connectWindowSignals()
+void CPPIWindow::setupSettingsToolbar()
 {
-    // Connect PPI window signals
-    connect(m_ppiWindow, &CPPIWindow::trackSelected,
-            this, &CMapMainWindow::onTrackSelected);
-    connect(m_ppiWindow, &CPPIWindow::trackDoubleClicked,
-            this, &CMapMainWindow::onTrackDoubleClicked);
-    connect(m_ppiWindow, &CPPIWindow::mapHomeRequested,
-            this, &CMapMainWindow::onMapHomeRequested);
-    connect(m_ppiWindow, &CPPIWindow::newMapRequested,
-            this, &CMapMainWindow::onNewMapRequested);
+    m_settingsLayout = new QHBoxLayout();
+    m_settingsLayout->setSpacing(8);
+    m_settingsLayout->setContentsMargins(4, 4, 4, 4);
     
-    // Connect Controls window signals
-    connect(m_controlsWindow, &CControlsWindow::mapHomeRequested,
-            this, &CMapMainWindow::onMapHomeRequested);
-    connect(m_controlsWindow, &CControlsWindow::openMapsRequested,
-            this, &CMapMainWindow::onOpenMapsRequested);
-    connect(m_controlsWindow, &CControlsWindow::flushRequested,
-            this, &CMapMainWindow::onFlushRequested);
-    connect(m_controlsWindow, &CControlsWindow::exitRequested,
-            this, &CMapMainWindow::onExitRequested);
-    connect(m_controlsWindow, &CControlsWindow::zoomChanged,
-            this, &CMapMainWindow::onZoomChanged);
-    connect(m_controlsWindow, &CControlsWindow::opacityChanged,
-            this, &CMapMainWindow::onOpacityChanged);
-    connect(m_controlsWindow, &CControlsWindow::trackSizeChanged,
-            this, &CMapMainWindow::onTrackSizeChanged);
-    connect(m_controlsWindow, &CControlsWindow::trackFilterChanged,
-            this, &CMapMainWindow::onTrackFilterChanged);
-    connect(m_controlsWindow, &CControlsWindow::animationSpeedChanged,
-            this, &CMapMainWindow::onAnimationSpeedChanged);
-    connect(m_controlsWindow, &CControlsWindow::gridVisibilityChanged,
-            this, &CMapMainWindow::onGridVisibilityChanged);
-    connect(m_controlsWindow, &CControlsWindow::compassVisibilityChanged,
-            this, &CMapMainWindow::onCompassVisibilityChanged);
-    connect(m_controlsWindow, &CControlsWindow::chartsRequested,
-            this, &CMapMainWindow::onChartsRequested);
+    // Create settings buttons with light theme
+    m_loadMapBtn = new QPushButton("📁 Load Map", this);
+    m_disableMapBtn = new QPushButton("🚫 Disable Map", this);
+    m_zoomFitBtn = new QPushButton("🔍 Zoom Fit", this);
+    m_homeBtn = new QPushButton("🏠 Home", this);
+    m_gridBtn = new QPushButton("📐 Grid", this);
+    m_compassBtn = new QPushButton("🧭 Compass", this);
+    m_toggleTableBtn = new QPushButton("📊 Table", this);
+    m_settingsBtn = new QPushButton("⚙️ Settings", this);
     
-    // Forward track selection to analytics widget
-    connect(this, &CMapMainWindow::onTrackSelected,
-            m_controlsWindow->getAnalyticsWidget(), &CAnalyticsWidget::onTrackSelected);
+    // Make toggle buttons checkable
+    m_gridBtn->setCheckable(true);
+    m_gridBtn->setChecked(m_gridVisible);
+    m_compassBtn->setCheckable(true);
+    m_compassBtn->setChecked(m_compassVisible);
+    m_disableMapBtn->setCheckable(true);
+    m_disableMapBtn->setChecked(!m_mapEnabled);
+    m_toggleTableBtn->setCheckable(true);
+    m_toggleTableBtn->setChecked(true);
+    
+    // Status label
+    m_statusLabel = new QLabel("Ready", this);
+    m_statusLabel->setStyleSheet(
+        "QLabel {"
+        "   color: #64748b;"
+        "   font-weight: 500;"
+        "   padding: 4px 8px;"
+        "}"
+    );
+    
+    // Add buttons to layout
+    m_settingsLayout->addWidget(m_loadMapBtn);
+    m_settingsLayout->addWidget(m_disableMapBtn);
+    m_settingsLayout->addWidget(m_zoomFitBtn);
+    m_settingsLayout->addWidget(m_homeBtn);
+    m_settingsLayout->addWidget(m_gridBtn);
+    m_settingsLayout->addWidget(m_compassBtn);
+    m_settingsLayout->addWidget(m_toggleTableBtn);
+    m_settingsLayout->addStretch();
+    m_settingsLayout->addWidget(m_statusLabel);
+    m_settingsLayout->addWidget(m_settingsBtn);
+    
+    // Connect signals
+    connect(m_loadMapBtn, &QPushButton::clicked, this, &CPPIWindow::onLoadNewMap);
+    connect(m_disableMapBtn, &QPushButton::clicked, this, &CPPIWindow::onDisableMap);
+    connect(m_zoomFitBtn, &QPushButton::clicked, this, &CPPIWindow::onZoomFitToScreen);
+    connect(m_homeBtn, &QPushButton::clicked, this, &CPPIWindow::onMapHome);
+    connect(m_gridBtn, &QPushButton::clicked, this, &CPPIWindow::onToggleGrid);
+    connect(m_compassBtn, &QPushButton::clicked, this, &CPPIWindow::onToggleCompass);
+    connect(m_toggleTableBtn, &QPushButton::clicked, this, &CPPIWindow::onToggleTrackTable);
+    connect(m_settingsBtn, &QPushButton::clicked, this, &CPPIWindow::onSettings);
+    
+    m_mainLayout->addLayout(m_settingsLayout);
 }
 
-void CMapMainWindow::connectManagerButtons()
+void CPPIWindow::setupMapCanvas()
 {
-    // Connect UI buttons to slots
-    connect(ui->showPPIButton, &QPushButton::clicked, this, &CMapMainWindow::onShowPPIWindow);
-    connect(ui->showControlsButton, &QPushButton::clicked, this, &CMapMainWindow::onShowControlsWindow);
-    connect(ui->arrangeDualButton, &QPushButton::clicked, this, &CMapMainWindow::onArrangeDualMonitor);
-    connect(ui->fullscreenButton, &QPushButton::clicked, this, &CMapMainWindow::onToggleFullscreen);
+    m_mapCanvas = new CMapCanvas(this);
+    m_mapCanvas->setMinimumSize(800, 600);
+    m_mapCanvas->Initialize();
+    
+    // Connect map canvas signals
+    connect(m_mapCanvas, SIGNAL(signalMouseRead(QString)), 
+            this, SLOT(updateStatusBar()));
 }
 
-void CMapMainWindow::applyLightTheme()
+void CPPIWindow::setupTrackTable()
 {
-    // Light theme for main window manager
-    setStyleSheet(
-        "CMapMainWindow {"
+    m_trackTable = new CTrackTableWidget(this);
+    m_trackTable->setMinimumWidth(300);
+    m_trackTable->setMaximumWidth(500);
+    
+    // Connect track table signals
+    connect(m_trackTable, &CTrackTableWidget::trackSelected,
+            this, &CPPIWindow::onTrackSelected);
+    connect(m_trackTable, &CTrackTableWidget::trackDoubleClicked,
+            this, &CPPIWindow::onTrackDoubleClicked);
+}
+
+void CPPIWindow::applyLightTheme()
+{
+    // Light theme with two primary colors: Blue (#3b82f6) and Light Gray (#f8fafc)
+    QString lightTheme = 
+        "CPPIWindow {"
         "   background-color: #f8fafc;"
         "   color: #1e293b;"
         "}"
         "QWidget {"
-        "   background-color: #ffffff;"
+        "   background-color: #f8fafc;"
         "   color: #1e293b;"
         "   font-family: 'Segoe UI', Arial, sans-serif;"
         "}"
@@ -514,275 +203,356 @@ void CMapMainWindow::applyLightTheme()
         "}"
         "QPushButton:hover {"
         "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #2563eb, stop:1 #1d4ed8);"
+        "   transform: translateY(-1px);"
+        "}"
+        "QPushButton:pressed {"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #1d4ed8, stop:1 #1e40af);"
+        "}"
+        "QPushButton:checked {"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #059669, stop:1 #047857);"
+        "   border: 2px solid #10b981;"
+        "}"
+        "QPushButton:disabled {"
+        "   background-color: #e2e8f0;"
+        "   color: #94a3b8;"
         "}"
         "QLabel {"
         "   color: #334155;"
         "   font-weight: 500;"
         "}"
-        "QStatusBar {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #f8fafc, stop:1 #e2e8f0);"
-        "   color: #334155;"
-        "   border-top: 2px solid #3b82f6;"
-        "   font-size: 12px;"
-        "   font-weight: 500;"
+        "QSplitter {"
+        "   background-color: #e2e8f0;"
+        "}"
+        "QSplitter::handle {"
+        "   background-color: #cbd5e1;"
+        "   width: 3px;"
+        "   border-radius: 1px;"
+        "}"
+        "QSplitter::handle:hover {"
+        "   background-color: #3b82f6;"
+        "}";
+    
+    setStyleSheet(lightTheme);
+}
+
+void CPPIWindow::createTrackContextMenu()
+{
+    m_trackContextMenu = new QMenu(this);
+    
+    m_focusTrackAction = m_trackContextMenu->addAction("🎯 Focus Track");
+    m_trackContextMenu->addSeparator();
+    m_toggleHistoryAction = m_trackContextMenu->addAction("📍 Toggle History (Max 50)");
+    m_highlightAction = m_trackContextMenu->addAction("✨ Highlight & Follow");
+    m_trackContextMenu->addSeparator();
+    m_loadImageAction = m_trackContextMenu->addAction("🖼️ Load Track Image");
+    m_trackContextMenu->addSeparator();
+    m_deleteTrackAction = m_trackContextMenu->addAction("🗑️ Delete Track");
+    
+    // Connect actions
+    connect(m_focusTrackAction, &QAction::triggered, this, &CPPIWindow::onFocusTrack);
+    connect(m_deleteTrackAction, &QAction::triggered, this, &CPPIWindow::onDeleteTrack);
+    connect(m_loadImageAction, &QAction::triggered, this, &CPPIWindow::onLoadTrackImage);
+    connect(m_toggleHistoryAction, &QAction::triggered, this, &CPPIWindow::onToggleTrackHistory);
+    connect(m_highlightAction, &QAction::triggered, this, &CPPIWindow::onHighlightTrack);
+    
+    // Style the context menu
+    m_trackContextMenu->setStyleSheet(
+        "QMenu {"
+        "   background-color: #ffffff;"
+        "   color: #1e293b;"
+        "   border: 2px solid #e2e8f0;"
+        "   border-radius: 8px;"
         "   padding: 6px;"
+        "}"
+        "QMenu::item {"
+        "   padding: 8px 24px;"
+        "   border-radius: 4px;"
+        "   font-weight: 500;"
+        "}"
+        "QMenu::item:selected {"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3b82f6, stop:1 #2563eb);"
+        "   color: white;"
+        "}"
+        "QMenu::separator {"
+        "   height: 1px;"
+        "   background-color: #e2e8f0;"
+        "   margin: 4px 16px;"
         "}"
     );
 }
 
-void CMapMainWindow::setupMonitors()
-{
-    m_screens = QGuiApplication::screens();
-    m_isDualMonitor = m_screens.count() >= 2;
-    
-    qDebug() << "Detected" << m_screens.count() << "monitors";
-    for (int i = 0; i < m_screens.count(); ++i) {
-        QScreen *screen = m_screens[i];
-        qDebug() << "Monitor" << i << ":" << screen->name() 
-                 << "Size:" << screen->size() 
-                 << "Geometry:" << screen->geometry();
-    }
-}
-
-void CMapMainWindow::keyPressEvent(QKeyEvent *event)
+void CPPIWindow::keyPressEvent(QKeyEvent *event)
 {
     switch (event->key()) {
-    case Qt::Key_F1:
-        onShowPPIWindow();
+    case Qt::Key_H:
+        onMapHome();
         break;
-    case Qt::Key_F2:
-        onShowControlsWindow();
+    case Qt::Key_G:
+        onToggleGrid();
         break;
-    case Qt::Key_F3:
-        onArrangeDualMonitor();
+    case Qt::Key_C:
+        onToggleCompass();
         break;
-    case Qt::Key_F4:
-        onToggleFullscreen();
+    case Qt::Key_F:
+        onZoomFitToScreen();
         break;
-    case Qt::Key_Escape:
-        if (m_isFullscreen) {
-            onToggleFullscreen();
-        }
+    case Qt::Key_L:
+        onLoadNewMap();
+        break;
+    case Qt::Key_S:
+        onSettings();
         break;
     }
     QMainWindow::keyPressEvent(event);
 }
 
-void CMapMainWindow::closeEvent(QCloseEvent *event)
+void CPPIWindow::contextMenuEvent(QContextMenuEvent *event)
 {
-    // Close all windows when main window closes
-    if (m_ppiWindow) {
-        m_ppiWindow->close();
-    }
-    if (m_controlsWindow) {
-        m_controlsWindow->close();
-    }
-    
-    saveWindowSettings();
-    event->accept();
-}
-
-// Window management slots
-void CMapMainWindow::onShowPPIWindow()
-{
-    if (m_ppiWindow) {
-        m_ppiWindow->show();
-        m_ppiWindow->raise();
-        m_ppiWindow->activateWindow();
+    if (m_selectedTrackId != -1) {
+        m_trackContextMenu->exec(event->globalPos());
     }
 }
 
-void CMapMainWindow::onShowControlsWindow()
-{
-    if (m_controlsWindow) {
-        m_controlsWindow->show();
-        m_controlsWindow->raise();
-        m_controlsWindow->activateWindow();
-    }
-}
-
-void CMapMainWindow::onArrangeDualMonitor()
-{
-    if (!m_isDualMonitor || m_screens.count() < 2) {
-        QMessageBox::information(this, "Dual Monitor", 
-            "Dual monitor setup requires at least 2 displays.\n"
-            "Currently detected: " + QString::number(m_screens.count()) + " display(s)");
-        return;
-    }
-    
-    // Arrange PPI window on first monitor
-    QScreen *primaryScreen = m_screens[0];
-    QRect primaryGeometry = primaryScreen->availableGeometry();
-    m_ppiWindow->setGeometry(primaryGeometry);
-    m_ppiWindow->showMaximized();
-    
-    // Arrange Controls window on second monitor
-    QScreen *secondaryScreen = m_screens[1];
-    QRect secondaryGeometry = secondaryScreen->availableGeometry();
-    m_controlsWindow->setGeometry(secondaryGeometry);
-    m_controlsWindow->showMaximized();
-    
-    qDebug() << "Arranged windows for dual monitor setup";
-}
-
-void CMapMainWindow::onToggleFullscreen()
-{
-    m_isFullscreen = !m_isFullscreen;
-    
-    if (m_isFullscreen) {
-        if (m_ppiWindow) m_ppiWindow->showFullScreen();
-        if (m_controlsWindow) m_controlsWindow->showFullScreen();
-    } else {
-        if (m_ppiWindow) m_ppiWindow->showNormal();
-        if (m_controlsWindow) m_controlsWindow->showNormal();
-    }
-    
-    qDebug() << "Fullscreen mode:" << m_isFullscreen;
-}
-
-// Inter-window communication slots
-void CMapMainWindow::onTrackSelected(int trackId)
-{
-    qDebug() << "Track selected:" << trackId;
-    
-    // Forward to analytics widget in controls window
-    if (m_controlsWindow && m_controlsWindow->getAnalyticsWidget()) {
-        m_controlsWindow->getAnalyticsWidget()->onTrackSelected(trackId);
-    }
-}
-
-void CMapMainWindow::onTrackDoubleClicked(int trackId)
-{
-    qDebug() << "Track double-clicked:" << trackId;
-    // Track focusing is handled by individual windows
-}
-
-void CMapMainWindow::onMapHomeRequested()
-{
-    if (m_ppiWindow && m_ppiWindow->getMapCanvas()) {
-        m_ppiWindow->getMapCanvas()->mapHome();
-    }
-    qDebug() << "Map home requested";
-}
-
-void CMapMainWindow::onNewMapRequested(const QString& mapPath)
-{
-    qDebug() << "New map requested:" << mapPath;
-    // Map loading is handled by PPI window
-}
-
-// Control panel forwarding slots
-void CMapMainWindow::onOpenMapsRequested()
+// Settings toolbar slots
+void CPPIWindow::onLoadNewMap()
 {
     QString filter = "Map Files (*.tif *.tiff *.png *.bmp *.jpg *.jpeg *.TIF *.TIFF *.PNG *.BMP *.JPG *.JPEG)";
     QString mapPath = QFileDialog::getOpenFileName(
         this,
-        "Select Map File",
+        "Load New Map",
         QString(),
         filter
     );
     
-    if (!mapPath.isEmpty() && m_ppiWindow && m_ppiWindow->getMapCanvas()) {
-        m_ppiWindow->getMapCanvas()->importRasterMap(mapPath);
-        qDebug() << "Map loaded:" << mapPath;
+    if (!mapPath.isEmpty()) {
+        m_mapCanvas->importRasterMap(mapPath);
+        m_statusLabel->setText("Map loaded: " + QFileInfo(mapPath).baseName());
+        emit newMapRequested(mapPath);
+        
+        // Auto zoom fit after loading
+        QTimer::singleShot(500, this, &CPPIWindow::onZoomFitToScreen);
     }
 }
 
-void CMapMainWindow::onFlushRequested()
+void CPPIWindow::onDisableMap()
 {
-    qDebug() << "Flush requested";
-    // TODO: Implement flush functionality
+    m_mapEnabled = !m_mapEnabled;
+    m_disableMapBtn->setChecked(!m_mapEnabled);
+    
+    if (m_mapEnabled) {
+        m_statusLabel->setText("Map enabled - Showing PPI with map layers");
+        m_disableMapBtn->setText("🚫 Disable Map");
+        m_mapCanvas->setMapLayersVisible(true);
+    } else {
+        m_statusLabel->setText("Map disabled - Showing PPI only");
+        m_disableMapBtn->setText("✅ Enable Map");
+        m_mapCanvas->setMapLayersVisible(false);
+    }
+    
+    qDebug() << "Map enabled:" << m_mapEnabled;
 }
 
-void CMapMainWindow::onExitRequested()
+void CPPIWindow::onZoomFitToScreen()
 {
-    QApplication::quit();
+    m_mapCanvas->zoomToFullExtent();
+    m_statusLabel->setText("Zoomed to fit screen");
+    qDebug() << "Zoom fit to screen requested";
 }
 
-void CMapMainWindow::onZoomChanged(double zoom)
+void CPPIWindow::onMapHome()
 {
-    qDebug() << "Zoom changed to:" << zoom;
-    // TODO: Implement zoom change
+    m_mapCanvas->mapHome();
+    m_statusLabel->setText("Map reset to home view");
+    emit mapHomeRequested();
 }
 
-void CMapMainWindow::onOpacityChanged(int opacity)
+void CPPIWindow::onToggleGrid()
 {
-    qDebug() << "Opacity changed to:" << opacity;
-    // TODO: Implement opacity change
+    m_gridVisible = !m_gridVisible;
+    m_gridBtn->setChecked(m_gridVisible);
+    m_statusLabel->setText(m_gridVisible ? "Grid enabled" : "Grid disabled");
+    
+    // TODO: Implement actual grid toggle
+    qDebug() << "Grid visibility:" << m_gridVisible;
 }
 
-void CMapMainWindow::onTrackSizeChanged(int size)
+void CPPIWindow::onToggleCompass()
 {
-    qDebug() << "Track size changed to:" << size;
-    // TODO: Implement track size change
+    m_compassVisible = !m_compassVisible;
+    m_compassBtn->setChecked(m_compassVisible);
+    m_statusLabel->setText(m_compassVisible ? "Compass enabled" : "Compass disabled");
+    
+    // TODO: Implement actual compass toggle
+    qDebug() << "Compass visibility:" << m_compassVisible;
 }
 
-void CMapMainWindow::onTrackFilterChanged(bool showFriend, bool showHostile, bool showUnknown)
+void CPPIWindow::onToggleTrackTable()
 {
-    qDebug() << "Track filter changed - Friend:" << showFriend
-             << "Hostile:" << showHostile << "Unknown:" << showUnknown;
-    // TODO: Implement track filtering
+    bool isVisible = m_trackTable->isVisible();
+    m_trackTable->setVisible(!isVisible);
+    m_toggleTableBtn->setChecked(!isVisible);
+    m_statusLabel->setText(!isVisible ? "Track table shown" : "Track table hidden");
+    qDebug() << "Track table visibility:" << !isVisible;
 }
 
-void CMapMainWindow::onAnimationSpeedChanged(int speed)
+void CPPIWindow::onSettings()
 {
-    qDebug() << "Animation speed changed to:" << speed;
-    // TODO: Implement animation speed change
+    QMessageBox::information(this, "Settings", 
+        "PPI Display Settings:\n\n"
+        "• H: Map Home\n"
+        "• G: Toggle Grid\n"
+        "• C: Toggle Compass\n"
+        "• F: Zoom Fit\n"
+        "• L: Load Map\n"
+        "• S: Settings\n\n"
+        "Right-click on tracks for context menu.\n"
+        "History points limited to " + QString::number(m_maxHistoryPoints) + " per track.");
 }
 
-void CMapMainWindow::onGridVisibilityChanged(bool visible)
+// Track context menu slots
+void CPPIWindow::onFocusTrack()
 {
-    qDebug() << "Grid visibility:" << visible;
-    // TODO: Implement grid visibility
-}
-
-void CMapMainWindow::onCompassVisibilityChanged(bool visible)
-{
-    qDebug() << "Compass visibility:" << visible;
-    // TODO: Implement compass visibility
-}
-
-void CMapMainWindow::onChartsRequested()
-{
-    if (m_controlsWindow && m_controlsWindow->getChartsWidget()) {
-        // Switch to charts tab in controls window
-        qDebug() << "Charts requested - switching to charts tab";
+    if (m_selectedTrackId == -1) return;
+    
+    // Find track and center map on it
+    QList<stTrackDisplayInfo> tracks = CDataWarehouse::getInstance()->getTrackList();
+    for (const stTrackDisplayInfo &track : tracks) {
+        if (track.nTrkId == m_selectedTrackId) {
+            QgsPointXY centerPoint(track.lon, track.lat);
+            m_mapCanvas->setCenter(centerPoint);
+            m_mapCanvas->refresh();
+            
+            m_statusLabel->setText(QString("Focused on Track #%1").arg(m_selectedTrackId));
+            break;
+        }
     }
 }
 
-void CMapMainWindow::saveWindowSettings()
+void CPPIWindow::onDeleteTrack()
+{
+    if (m_selectedTrackId == -1) return;
+    
+    int ret = QMessageBox::question(this, "Delete Track",
+        QString("Are you sure you want to delete Track #%1?").arg(m_selectedTrackId),
+        QMessageBox::Yes | QMessageBox::No);
+    
+    if (ret == QMessageBox::Yes) {
+        // TODO: Implement track deletion
+        m_statusLabel->setText(QString("Track #%1 deleted").arg(m_selectedTrackId));
+        qDebug() << "Delete track requested:" << m_selectedTrackId;
+    }
+}
+
+void CPPIWindow::onLoadTrackImage()
+{
+    if (m_selectedTrackId == -1) return;
+    
+    QString filter = "Image Files (*.png *.jpg *.jpeg *.bmp *.gif *.PNG *.JPG *.JPEG *.BMP *.GIF)";
+    QString imagePath = QFileDialog::getOpenFileName(
+        this,
+        QString("Load Image for Track #%1").arg(m_selectedTrackId),
+        QString(),
+        filter
+    );
+    
+    if (!imagePath.isEmpty()) {
+        // TODO: Implement track image loading
+        m_statusLabel->setText(QString("Image loaded for Track #%1").arg(m_selectedTrackId));
+        qDebug() << "Load image for track" << m_selectedTrackId << ":" << imagePath;
+    }
+}
+
+void CPPIWindow::onToggleTrackHistory()
+{
+    if (m_selectedTrackId == -1) return;
+    
+    // TODO: Implement track history toggle with max 50 points
+    m_statusLabel->setText(QString("History toggled for Track #%1 (Max %2 points)")
+                          .arg(m_selectedTrackId).arg(m_maxHistoryPoints));
+    qDebug() << "Toggle history for track" << m_selectedTrackId;
+}
+
+void CPPIWindow::onHighlightTrack()
+{
+    if (m_selectedTrackId == -1) return;
+    
+    // TODO: Implement track highlighting and following
+    m_statusLabel->setText(QString("Track #%1 highlighted and following").arg(m_selectedTrackId));
+    qDebug() << "Highlight and follow track" << m_selectedTrackId;
+}
+
+// Track table interaction slots
+void CPPIWindow::onTrackSelected(int trackId)
+{
+    m_selectedTrackId = trackId;
+    emit trackSelected(trackId);
+    
+    QList<stTrackDisplayInfo> tracks = CDataWarehouse::getInstance()->getTrackList();
+    for (const stTrackDisplayInfo &track : tracks) {
+        if (track.nTrkId == trackId) {
+            statusBar()->showMessage(
+                QString("Track #%1 | Range: %2 km | Heading: %3° | Pos: %4°, %5°")
+                .arg(track.nTrkId)
+                .arg(track.range / 1000.0, 0, 'f', 2)
+                .arg(track.heading, 0, 'f', 1)
+                .arg(track.lat, 0, 'f', 4)
+                .arg(track.lon, 0, 'f', 4)
+            );
+            break;
+        }
+    }
+}
+
+void CPPIWindow::onTrackDoubleClicked(int trackId)
+{
+    m_selectedTrackId = trackId;
+    emit trackDoubleClicked(trackId);
+    
+    // Auto focus on double click
+    onFocusTrack();
+}
+
+void CPPIWindow::onTrackRightClicked(int trackId, const QPoint& globalPos)
+{
+    m_selectedTrackId = trackId;
+    m_trackContextMenu->exec(globalPos);
+}
+
+void CPPIWindow::updateStatusBar()
+{
+    QList<stTrackDisplayInfo> tracks = CDataWarehouse::getInstance()->getTrackList();
+    QString statusMsg = QString("🎯 Active Tracks: %1 | Grid: %2 | Compass: %3 | Map: %4")
+        .arg(tracks.count())
+        .arg(m_gridVisible ? "ON" : "OFF")
+        .arg(m_compassVisible ? "ON" : "OFF")
+        .arg(m_mapEnabled ? "ON" : "OFF");
+    
+    statusBar()->showMessage(statusMsg);
+}
+
+void CPPIWindow::saveSettings()
 {
     m_settings->setValue("geometry", saveGeometry());
     m_settings->setValue("windowState", saveState());
-    m_settings->setValue("isDualMonitor", m_isDualMonitor);
-    m_settings->setValue("isFullscreen", m_isFullscreen);
-    
-    if (m_ppiWindow) {
-        m_settings->setValue("ppiGeometry", m_ppiWindow->saveGeometry());
-        m_settings->setValue("ppiState", m_ppiWindow->saveState());
-    }
-    
-    if (m_controlsWindow) {
-        m_settings->setValue("controlsGeometry", m_controlsWindow->saveGeometry());
-        m_settings->setValue("controlsState", m_controlsWindow->saveState());
-    }
+    m_settings->setValue("gridVisible", m_gridVisible);
+    m_settings->setValue("compassVisible", m_compassVisible);
+    m_settings->setValue("mapEnabled", m_mapEnabled);
+    m_settings->setValue("maxHistoryPoints", m_maxHistoryPoints);
 }
 
-void CMapMainWindow::loadWindowSettings()
+void CPPIWindow::loadSettings()
 {
     restoreGeometry(m_settings->value("geometry").toByteArray());
     restoreState(m_settings->value("windowState").toByteArray());
     
-    m_isDualMonitor = m_settings->value("isDualMonitor", m_isDualMonitor).toBool();
-    m_isFullscreen = m_settings->value("isFullscreen", false).toBool();
+    m_gridVisible = m_settings->value("gridVisible", true).toBool();
+    m_compassVisible = m_settings->value("compassVisible", true).toBool();
+    m_mapEnabled = m_settings->value("mapEnabled", true).toBool();
+    m_maxHistoryPoints = m_settings->value("maxHistoryPoints", 50).toInt();
     
-    if (m_ppiWindow) {
-        m_ppiWindow->restoreGeometry(m_settings->value("ppiGeometry").toByteArray());
-        m_ppiWindow->restoreState(m_settings->value("ppiState").toByteArray());
-    }
-    
-    if (m_controlsWindow) {
-        m_controlsWindow->restoreGeometry(m_settings->value("controlsGeometry").toByteArray());
-        m_controlsWindow->restoreState(m_settings->value("controlsState").toByteArray());
-    }
+    // Update UI state
+    m_gridBtn->setChecked(m_gridVisible);
+    m_compassBtn->setChecked(m_compassVisible);
+    m_disableMapBtn->setChecked(!m_mapEnabled);
+    m_disableMapBtn->setText(m_mapEnabled ? "🚫 Disable Map" : "✅ Enable Map");
 }

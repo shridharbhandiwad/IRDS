@@ -13,9 +13,6 @@
 #include <QMessageBox>
 #include <QSettings>
 #include <QSplitter>
-#include <QQuickWidget>
-#include <QQmlEngine>
-#include <QQmlContext>
 #include "MapDisplay/canalyticswidget.h"
 
 // Forward declarations
@@ -82,7 +79,6 @@ private slots:
     void onTrackSelected(int trackId);
     void onTrackDoubleClicked(int trackId);
     void onTrackRightClicked(int trackId, const QPoint& globalPos);
-    void onTrackImageLoaded(int trackId, const QString &imagePath);
     
     // Status updates
     void updateStatusBar();
@@ -103,23 +99,20 @@ private:
     void saveSettings();
     void loadSettings();
     
-    // Helper method for creating QML icon buttons
-    QQuickWidget* createIconButton(const QString& iconType, const QString& tooltip);
-    
     // UI components
     QWidget *m_centralWidget;
     QVBoxLayout *m_mainLayout;
     QHBoxLayout *m_settingsLayout;
     
-    // Settings toolbar (QML-based icons)
-    QQuickWidget *m_loadMapBtn;
-    QQuickWidget *m_disableMapBtn;
-    QQuickWidget *m_zoomFitBtn;
-    QQuickWidget *m_homeBtn;
-    QQuickWidget *m_gridBtn;
-    QQuickWidget *m_compassBtn;
-    QQuickWidget *m_toggleTableBtn;
-    QQuickWidget *m_settingsBtn;
+    // Settings toolbar
+    QPushButton *m_loadMapBtn;
+    QPushButton *m_disableMapBtn;
+    QPushButton *m_zoomFitBtn;
+    QPushButton *m_homeBtn;
+    QPushButton *m_gridBtn;
+    QPushButton *m_compassBtn;
+    QPushButton *m_toggleTableBtn;
+    QPushButton *m_settingsBtn;
     QLabel *m_statusLabel;
     
     // Main components
@@ -150,4 +143,3 @@ private:
 };
 
 #endif // CPPIWINDOW_H
-
