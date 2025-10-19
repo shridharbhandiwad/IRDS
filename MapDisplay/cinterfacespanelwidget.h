@@ -99,7 +99,7 @@ private:
     QPushButton* createStyledButton(const QString &text, const QString &icon, const QColor &color);
     QGroupBox* createStyledGroup(const QString &title);
     QString getSliderStyle();
-    QString getCheckboxStyle(const QString &color = "#667eea");
+    QString getCheckboxStyle(const QString &color = "#6a6a6a");
     
     QTabWidget *m_tabWidget;
     

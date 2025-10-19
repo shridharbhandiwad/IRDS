@@ -5,8 +5,8 @@ Button {
     id: root
     
     property string iconType: "home"
-    property color iconColor: isToggled ? "#10b981" : "#ffffff"
-    property color hoverColor: "#60a5fa"
+    property color iconColor: isToggled ? "#8a8a8a" : "#dadada"
+    property color hoverColor: "#aaaaaa"
     property real iconOpacity: 1.0
     property bool isToggled: false
     
@@ -18,10 +18,10 @@ Button {
     onClicked: root.clicked()
     
     background: Rectangle {
-        color: root.isToggled ? Qt.rgba(16/255, 185/255, 129/255, 0.2) : "transparent"
+        color: root.isToggled ? Qt.rgba(138/255, 138/255, 138/255, 0.2) : "transparent"
         radius: 8
         border.width: (root.hovered || root.isToggled) ? 2 : 0
-        border.color: root.isToggled ? "#10b981" : root.hoverColor
+        border.color: root.isToggled ? "#8a8a8a" : root.hoverColor
         
         Rectangle {
             anchors.fill: parent

@@ -87,12 +87,12 @@ void CHealthMonitorWidget::createOverviewSection()
     
     infoGrid->addWidget(new QLabel("System Uptime:"), 0, 0);
     m_uptimeLabel = new QLabel("00:00:00");
-    m_uptimeLabel->setStyleSheet("font-weight: bold; color: #4ade80;");
+    m_uptimeLabel->setStyleSheet("font-weight: bold; color: #8a8a8a;");
     infoGrid->addWidget(m_uptimeLabel, 0, 1);
     
     infoGrid->addWidget(new QLabel("Last Health Check:"), 1, 0);
     m_lastCheckLabel = new QLabel("Just now");
-    m_lastCheckLabel->setStyleSheet("font-weight: bold; color: #60a5fa;");
+    m_lastCheckLabel->setStyleSheet("font-weight: bold; color: #7a7a7a;");
     infoGrid->addWidget(m_lastCheckLabel, 1, 1);
     
     layout->addLayout(infoGrid);
@@ -165,14 +165,14 @@ QFrame* CHealthMonitorWidget::createModuleCard(const QString &moduleName, const 
     card->setFrameShape(QFrame::StyledPanel);
     card->setStyleSheet(
         "QFrame {"
-        "   background-color: #1a202c;"
+        "   background-color: #2a2a2a;"
         "   border: 2px solid #4a5568;"
         "   border-radius: 8px;"
         "   padding: 8px;"
         "}"
         "QFrame:hover {"
-        "   border-color: #667eea;"
-        "   background-color: #1e293b;"
+        "   border-color: #6a6a6a;"
+        "   background-color: #2a2a2a;"
         "}"
     );
     
@@ -190,7 +190,7 @@ QFrame* CHealthMonitorWidget::createModuleCard(const QString &moduleName, const 
     
     // Status label
     QLabel *statusLabel = new QLabel("● Operational");
-    statusLabel->setStyleSheet("color: #4ade80;");
+    statusLabel->setStyleSheet("color: #8a8a8a;");
     cardLayout->addWidget(statusLabel);
     
     // Health bar
@@ -227,7 +227,7 @@ void CHealthMonitorWidget::createPerformanceSection()
     // CPU
     layout->addWidget(new QLabel("CPU Usage:"), row, 0);
     m_cpuUsageLabel = new QLabel("0%");
-    m_cpuUsageLabel->setStyleSheet("font-weight: bold; color: #4ade80;");
+    m_cpuUsageLabel->setStyleSheet("font-weight: bold; color: #8a8a8a;");
     layout->addWidget(m_cpuUsageLabel, row, 1);
     m_cpuBar = new QProgressBar();
     m_cpuBar->setRange(0, 100);
@@ -237,7 +237,7 @@ void CHealthMonitorWidget::createPerformanceSection()
     // Memory
     layout->addWidget(new QLabel("Memory Usage:"), row, 0);
     m_memoryUsageLabel = new QLabel("0%");
-    m_memoryUsageLabel->setStyleSheet("font-weight: bold; color: #60a5fa;");
+    m_memoryUsageLabel->setStyleSheet("font-weight: bold; color: #7a7a7a;");
     layout->addWidget(m_memoryUsageLabel, row, 1);
     m_memoryBar = new QProgressBar();
     m_memoryBar->setRange(0, 100);
@@ -247,7 +247,7 @@ void CHealthMonitorWidget::createPerformanceSection()
     // Disk
     layout->addWidget(new QLabel("Disk Usage:"), row, 0);
     m_diskUsageLabel = new QLabel("0%");
-    m_diskUsageLabel->setStyleSheet("font-weight: bold; color: #fbbf24;");
+    m_diskUsageLabel->setStyleSheet("font-weight: bold; color: #8a8a8a;");
     layout->addWidget(m_diskUsageLabel, row, 1);
     m_diskBar = new QProgressBar();
     m_diskBar->setRange(0, 100);
@@ -257,7 +257,7 @@ void CHealthMonitorWidget::createPerformanceSection()
     // Network
     layout->addWidget(new QLabel("Network Usage:"), row, 0);
     m_networkUsageLabel = new QLabel("0%");
-    m_networkUsageLabel->setStyleSheet("font-weight: bold; color: #a78bfa;");
+    m_networkUsageLabel->setStyleSheet("font-weight: bold; color: #8a8a8a;");
     layout->addWidget(m_networkUsageLabel, row, 1);
     m_networkBar = new QProgressBar();
     m_networkBar->setRange(0, 100);
@@ -302,35 +302,35 @@ void CHealthMonitorWidget::applyModernStyle()
 {
     setStyleSheet(
         "QDockWidget {"
-        "   background-color: #0f172a;"
-        "   color: #ffffff;"
+        "   background-color: #1a1a1a;"
+        "   color: #f0f0f0;"
         "}"
         "QDockWidget::title {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #10b981, stop:1 #059669);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #8a8a8a, stop:1 #7a7a7a);"
         "   color: white;"
         "   padding: 10px;"
         "   font-weight: bold;"
         "   font-size: 13px;"
         "}"
         "QGroupBox {"
-        "   background-color: #1e293b;"
-        "   border: 2px solid #334155;"
+        "   background-color: #2a2a2a;"
+        "   border: 2px solid #4a4a4a;"
         "   border-radius: 10px;"
         "   margin-top: 16px;"
         "   padding-top: 18px;"
         "   font-weight: bold;"
-        "   color: #ffffff;"
+        "   color: #f0f0f0;"
         "}"
         "QGroupBox::title {"
         "   subcontrol-origin: margin;"
         "   subcontrol-position: top left;"
         "   padding: 6px 12px;"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #10b981, stop:1 #059669);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #8a8a8a, stop:1 #7a7a7a);"
         "   border-radius: 6px;"
         "   color: white;"
         "}"
         "QPushButton {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #10b981, stop:1 #059669);"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #8a8a8a, stop:1 #7a7a7a);"
         "   color: white;"
         "   border: none;"
         "   border-radius: 8px;"
@@ -338,13 +338,13 @@ void CHealthMonitorWidget::applyModernStyle()
         "   font-weight: bold;"
         "}"
         "QPushButton:hover {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #059669, stop:1 #047857);"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #7a7a7a, stop:1 #6a6a6a);"
         "}"
         "QLabel {"
-        "   color: #e2e8f0;"
+        "   color: #d0d0d0;"
         "}"
         "QProgressBar {"
-        "   background-color: #1a202c;"
+        "   background-color: #2a2a2a;"
         "   border: 2px solid #4a5568;"
         "   border-radius: 6px;"
         "   text-align: center;"
@@ -352,24 +352,24 @@ void CHealthMonitorWidget::applyModernStyle()
         "   font-weight: bold;"
         "}"
         "QProgressBar::chunk {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #10b981, stop:1 #059669);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #8a8a8a, stop:1 #7a7a7a);"
         "   border-radius: 4px;"
         "}"
         "QTableWidget {"
-        "   background-color: #1a202c;"
-        "   color: #ffffff;"
+        "   background-color: #2a2a2a;"
+        "   color: #f0f0f0;"
         "   border: 1px solid #4a5568;"
         "   gridline-color: #4a5568;"
         "}"
         "QHeaderView::section {"
-        "   background: #2d3748;"
-        "   color: #ffffff;"
+        "   background: #3a3a3a;"
+        "   color: #f0f0f0;"
         "   padding: 6px;"
         "   border: 1px solid #4a5568;"
         "   font-weight: bold;"
         "}"
         "QScrollArea {"
-        "   background-color: #0f172a;"
+        "   background-color: #1a1a1a;"
         "   border: none;"
         "}"
     );
@@ -397,15 +397,15 @@ void CHealthMonitorWidget::updateHealth()
     
     m_cpuUsageLabel->setText(QString("%1%").arg(cpu));
     m_cpuBar->setValue(cpu);
-    m_cpuUsageLabel->setStyleSheet(cpu > 80 ? "color: #ef4444; font-weight: bold;" : "color: #4ade80; font-weight: bold;");
+    m_cpuUsageLabel->setStyleSheet(cpu > 80 ? "color: #6a6a6a; font-weight: bold;" : "color: #8a8a8a; font-weight: bold;");
     
     m_memoryUsageLabel->setText(QString("%1%").arg(memory));
     m_memoryBar->setValue(memory);
-    m_memoryUsageLabel->setStyleSheet(memory > 80 ? "color: #ef4444; font-weight: bold;" : "color: #60a5fa; font-weight: bold;");
+    m_memoryUsageLabel->setStyleSheet(memory > 80 ? "color: #6a6a6a; font-weight: bold;" : "color: #7a7a7a; font-weight: bold;");
     
     m_diskUsageLabel->setText(QString("%1%").arg(disk));
     m_diskBar->setValue(disk);
-    m_diskUsageLabel->setStyleSheet(disk > 90 ? "color: #ef4444; font-weight: bold;" : "color: #fbbf24; font-weight: bold;");
+    m_diskUsageLabel->setStyleSheet(disk > 90 ? "color: #6a6a6a; font-weight: bold;" : "color: #8a8a8a; font-weight: bold;");
     
     m_networkUsageLabel->setText(QString("%1%").arg(network));
     m_networkBar->setValue(network);
@@ -426,13 +426,13 @@ void CHealthMonitorWidget::updateHealth()
     
     if (avgHealth >= 90) {
         m_systemHealthBar->setFormat("%v% - Excellent");
-        m_systemHealthBar->setStyleSheet("QProgressBar::chunk { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #10b981, stop:1 #059669); }");
+        m_systemHealthBar->setStyleSheet("QProgressBar::chunk { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #8a8a8a, stop:1 #7a7a7a); }");
     } else if (avgHealth >= 70) {
         m_systemHealthBar->setFormat("%v% - Good");
-        m_systemHealthBar->setStyleSheet("QProgressBar::chunk { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #fbbf24, stop:1 #f59e0b); }");
+        m_systemHealthBar->setStyleSheet("QProgressBar::chunk { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #8a8a8a, stop:1 #8a8a8a); }");
     } else {
         m_systemHealthBar->setFormat("%v% - Needs Attention");
-        m_systemHealthBar->setStyleSheet("QProgressBar::chunk { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #ef4444, stop:1 #dc2626); }");
+        m_systemHealthBar->setStyleSheet("QProgressBar::chunk { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #6a6a6a, stop:1 #6a6a6a); }");
     }
     
     // Update hardware cards
@@ -494,12 +494,12 @@ void CHealthMonitorWidget::simulateHealthData()
 QColor CHealthMonitorWidget::getHealthColor(HealthStatus status)
 {
     switch (status) {
-        case HEALTHY: return QColor("#4ade80");
-        case WARNING: return QColor("#fbbf24");
-        case CRITICAL: return QColor("#ef4444");
+        case HEALTHY: return QColor("#8a8a8a");
+        case WARNING: return QColor("#8a8a8a");
+        case CRITICAL: return QColor("#6a6a6a");
         case OFFLINE: return QColor("#94a3b8");
-        case MAINTENANCE: return QColor("#60a5fa");
-        default: return QColor("#ffffff");
+        case MAINTENANCE: return QColor("#7a7a7a");
+        default: return QColor("#f0f0f0");
     }
 }
 
