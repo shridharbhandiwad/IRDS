@@ -9,6 +9,10 @@
 #include <QStatusBar>
 #include <QToolBar>
 #include <QDebug>
+#include <QQuickWidget>
+#include <QQmlEngine>
+#include <QQmlContext>
+#include <QQuickItem>
 
 CPPIWindow::CPPIWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -93,52 +97,54 @@ void CPPIWindow::setupUI()
     );
 }
 
+QQuickWidget* CPPIWindow::createIconButton(const QString& iconType, const QString& tooltip)
+{
+    QQuickWidget* widget = new QQuickWidget(this);
+    widget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+    widget->setFixedSize(36, 36);
+    widget->setAttribute(Qt::WA_AlwaysStackOnTop);
+    widget->setClearColor(Qt::transparent);
+    
+    // Set QML source
+    widget->setSource(QUrl("qrc:/qml/Icons/IconButton.qml"));
+    
+    if (widget->rootObject()) {
+        widget->rootObject()->setProperty("iconType", iconType);
+        widget->rootObject()->setProperty("toolTip", tooltip);
+    }
+    
+    return widget;
+}
+
 void CPPIWindow::setupSettingsToolbar()
 {
     m_settingsLayout = new QHBoxLayout();
     m_settingsLayout->setSpacing(8);
     m_settingsLayout->setContentsMargins(4, 4, 4, 4);
     
-    // Create settings buttons with icon-only design
-    m_loadMapBtn = new QPushButton("📁", this);
-    m_disableMapBtn = new QPushButton("🚫", this);
-    m_zoomFitBtn = new QPushButton("🔍", this);
-    m_homeBtn = new QPushButton("🏠", this);
-    m_gridBtn = new QPushButton("📐", this);
-    m_compassBtn = new QPushButton("🧭", this);
-    m_toggleTableBtn = new QPushButton("📊", this);
-    m_settingsBtn = new QPushButton("⚙️", this);
+    // Create QML-based icon buttons
+    m_loadMapBtn = createIconButton("loadmap", "Load Map");
+    m_disableMapBtn = createIconButton("disablemap", "Disable Map");
+    m_zoomFitBtn = createIconButton("zoomfit", "Zoom Fit");
+    m_homeBtn = createIconButton("home", "Home");
+    m_gridBtn = createIconButton("grid", "Grid");
+    m_compassBtn = createIconButton("compass", "Compass");
+    m_toggleTableBtn = createIconButton("table", "Table");
+    m_settingsBtn = createIconButton("settings", "Settings");
     
-    // Set tooltips for hover text
-    m_loadMapBtn->setToolTip("Load Map");
-    m_disableMapBtn->setToolTip("Disable Map");
-    m_zoomFitBtn->setToolTip("Zoom Fit");
-    m_homeBtn->setToolTip("Home");
-    m_gridBtn->setToolTip("Grid");
-    m_compassBtn->setToolTip("Compass");
-    m_toggleTableBtn->setToolTip("Table");
-    m_settingsBtn->setToolTip("Settings");
-    
-    // Set fixed size for compact icon-only buttons
-    QSize iconButtonSize(36, 36);
-    m_loadMapBtn->setFixedSize(iconButtonSize);
-    m_disableMapBtn->setFixedSize(iconButtonSize);
-    m_zoomFitBtn->setFixedSize(iconButtonSize);
-    m_homeBtn->setFixedSize(iconButtonSize);
-    m_gridBtn->setFixedSize(iconButtonSize);
-    m_compassBtn->setFixedSize(iconButtonSize);
-    m_toggleTableBtn->setFixedSize(iconButtonSize);
-    m_settingsBtn->setFixedSize(iconButtonSize);
-    
-    // Make toggle buttons checkable
-    m_gridBtn->setCheckable(true);
-    m_gridBtn->setChecked(m_gridVisible);
-    m_compassBtn->setCheckable(true);
-    m_compassBtn->setChecked(m_compassVisible);
-    m_disableMapBtn->setCheckable(true);
-    m_disableMapBtn->setChecked(!m_mapEnabled);
-    m_toggleTableBtn->setCheckable(true);
-    m_toggleTableBtn->setChecked(true);
+    // Set initial toggle states
+    if (m_gridBtn->rootObject()) {
+        m_gridBtn->rootObject()->setProperty("isToggled", m_gridVisible);
+    }
+    if (m_compassBtn->rootObject()) {
+        m_compassBtn->rootObject()->setProperty("isToggled", m_compassVisible);
+    }
+    if (m_disableMapBtn->rootObject()) {
+        m_disableMapBtn->rootObject()->setProperty("isToggled", !m_mapEnabled);
+    }
+    if (m_toggleTableBtn->rootObject()) {
+        m_toggleTableBtn->rootObject()->setProperty("isToggled", true);
+    }
     
     // Status label
     m_statusLabel = new QLabel("Ready", this);
@@ -162,15 +168,31 @@ void CPPIWindow::setupSettingsToolbar()
     m_settingsLayout->addWidget(m_statusLabel);
     m_settingsLayout->addWidget(m_settingsBtn);
     
-    // Connect signals
-    connect(m_loadMapBtn, &QPushButton::clicked, this, &CPPIWindow::onLoadNewMap);
-    connect(m_disableMapBtn, &QPushButton::clicked, this, &CPPIWindow::onDisableMap);
-    connect(m_zoomFitBtn, &QPushButton::clicked, this, &CPPIWindow::onZoomFitToScreen);
-    connect(m_homeBtn, &QPushButton::clicked, this, &CPPIWindow::onMapHome);
-    connect(m_gridBtn, &QPushButton::clicked, this, &CPPIWindow::onToggleGrid);
-    connect(m_compassBtn, &QPushButton::clicked, this, &CPPIWindow::onToggleCompass);
-    connect(m_toggleTableBtn, &QPushButton::clicked, this, &CPPIWindow::onToggleTrackTable);
-    connect(m_settingsBtn, &QPushButton::clicked, this, &CPPIWindow::onSettings);
+    // Connect QML button signals
+    if (m_loadMapBtn->rootObject()) {
+        connect(m_loadMapBtn->rootObject(), SIGNAL(clicked()), this, SLOT(onLoadNewMap()));
+    }
+    if (m_disableMapBtn->rootObject()) {
+        connect(m_disableMapBtn->rootObject(), SIGNAL(clicked()), this, SLOT(onDisableMap()));
+    }
+    if (m_zoomFitBtn->rootObject()) {
+        connect(m_zoomFitBtn->rootObject(), SIGNAL(clicked()), this, SLOT(onZoomFitToScreen()));
+    }
+    if (m_homeBtn->rootObject()) {
+        connect(m_homeBtn->rootObject(), SIGNAL(clicked()), this, SLOT(onMapHome()));
+    }
+    if (m_gridBtn->rootObject()) {
+        connect(m_gridBtn->rootObject(), SIGNAL(clicked()), this, SLOT(onToggleGrid()));
+    }
+    if (m_compassBtn->rootObject()) {
+        connect(m_compassBtn->rootObject(), SIGNAL(clicked()), this, SLOT(onToggleCompass()));
+    }
+    if (m_toggleTableBtn->rootObject()) {
+        connect(m_toggleTableBtn->rootObject(), SIGNAL(clicked()), this, SLOT(onToggleTrackTable()));
+    }
+    if (m_settingsBtn->rootObject()) {
+        connect(m_settingsBtn->rootObject(), SIGNAL(clicked()), this, SLOT(onSettings()));
+    }
     
     m_mainLayout->addLayout(m_settingsLayout);
 }
@@ -214,32 +236,9 @@ void CPPIWindow::applyLightTheme()
         "   color: #1e293b;"
         "   font-family: 'Segoe UI', Arial, sans-serif;"
         "}"
-        "QPushButton {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3b82f6, stop:1 #2563eb);"
-        "   color: white;"
+        "QQuickWidget {"
+        "   background-color: transparent;"
         "   border: none;"
-        "   border-radius: 8px;"
-        "   padding: 4px;"
-        "   font-weight: 600;"
-        "   font-size: 16px;"
-        "   min-height: 32px;"
-        "   min-width: 32px;"
-        "}"
-        "QPushButton:hover {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #2563eb, stop:1 #1d4ed8);"
-        "   transform: scale(1.05);"
-        "   border: 2px solid #60a5fa;"
-        "}"
-        "QPushButton:pressed {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #1d4ed8, stop:1 #1e40af);"
-        "}"
-        "QPushButton:checked {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #059669, stop:1 #047857);"
-        "   border: 2px solid #10b981;"
-        "}"
-        "QPushButton:disabled {"
-        "   background-color: #e2e8f0;"
-        "   color: #94a3b8;"
         "}"
         "QLabel {"
         "   color: #334155;"
@@ -362,17 +361,17 @@ void CPPIWindow::onLoadNewMap()
 void CPPIWindow::onDisableMap()
 {
     m_mapEnabled = !m_mapEnabled;
-    m_disableMapBtn->setChecked(!m_mapEnabled);
+    
+    if (m_disableMapBtn->rootObject()) {
+        m_disableMapBtn->rootObject()->setProperty("isToggled", !m_mapEnabled);
+        m_disableMapBtn->rootObject()->setProperty("toolTip", m_mapEnabled ? "Disable Map" : "Enable Map");
+    }
     
     if (m_mapEnabled) {
         m_statusLabel->setText("Map enabled - Showing PPI with map layers");
-        m_disableMapBtn->setText("🚫");
-        m_disableMapBtn->setToolTip("Disable Map");
         m_mapCanvas->setMapLayersVisible(true);
     } else {
         m_statusLabel->setText("Map disabled - Showing PPI only");
-        m_disableMapBtn->setText("✅");
-        m_disableMapBtn->setToolTip("Enable Map");
         m_mapCanvas->setMapLayersVisible(false);
     }
     
@@ -396,7 +395,11 @@ void CPPIWindow::onMapHome()
 void CPPIWindow::onToggleGrid()
 {
     m_gridVisible = !m_gridVisible;
-    m_gridBtn->setChecked(m_gridVisible);
+    
+    if (m_gridBtn->rootObject()) {
+        m_gridBtn->rootObject()->setProperty("isToggled", m_gridVisible);
+    }
+    
     m_statusLabel->setText(m_gridVisible ? "Grid enabled" : "Grid disabled");
     
     // TODO: Implement actual grid toggle
@@ -406,7 +409,11 @@ void CPPIWindow::onToggleGrid()
 void CPPIWindow::onToggleCompass()
 {
     m_compassVisible = !m_compassVisible;
-    m_compassBtn->setChecked(m_compassVisible);
+    
+    if (m_compassBtn->rootObject()) {
+        m_compassBtn->rootObject()->setProperty("isToggled", m_compassVisible);
+    }
+    
     m_statusLabel->setText(m_compassVisible ? "Compass enabled" : "Compass disabled");
     
     // TODO: Implement actual compass toggle
@@ -417,7 +424,11 @@ void CPPIWindow::onToggleTrackTable()
 {
     bool isVisible = m_trackTable->isVisible();
     m_trackTable->setVisible(!isVisible);
-    m_toggleTableBtn->setChecked(!isVisible);
+    
+    if (m_toggleTableBtn->rootObject()) {
+        m_toggleTableBtn->rootObject()->setProperty("isToggled", !isVisible);
+    }
+    
     m_statusLabel->setText(!isVisible ? "Track table shown" : "Track table hidden");
     qDebug() << "Track table visibility:" << !isVisible;
 }
@@ -585,10 +596,15 @@ void CPPIWindow::loadSettings()
     m_mapEnabled = m_settings->value("mapEnabled", true).toBool();
     m_maxHistoryPoints = m_settings->value("maxHistoryPoints", 50).toInt();
     
-    // Update UI state
-    m_gridBtn->setChecked(m_gridVisible);
-    m_compassBtn->setChecked(m_compassVisible);
-    m_disableMapBtn->setChecked(!m_mapEnabled);
-    m_disableMapBtn->setText(m_mapEnabled ? "🚫" : "✅");
-    m_disableMapBtn->setToolTip(m_mapEnabled ? "Disable Map" : "Enable Map");
+    // Update UI state for QML buttons
+    if (m_gridBtn->rootObject()) {
+        m_gridBtn->rootObject()->setProperty("isToggled", m_gridVisible);
+    }
+    if (m_compassBtn->rootObject()) {
+        m_compassBtn->rootObject()->setProperty("isToggled", m_compassVisible);
+    }
+    if (m_disableMapBtn->rootObject()) {
+        m_disableMapBtn->rootObject()->setProperty("isToggled", !m_mapEnabled);
+        m_disableMapBtn->rootObject()->setProperty("toolTip", m_mapEnabled ? "Disable Map" : "Enable Map");
+    }
 }
