@@ -75,10 +75,10 @@ void CPPIWindow::setupUI()
     splitter->addWidget(m_mapCanvas);
     splitter->addWidget(m_trackTable);
     
-    // Set splitter proportions (70% map, 30% table)
-    splitter->setSizes({700, 300});
-    splitter->setStretchFactor(0, 7);
-    splitter->setStretchFactor(1, 3);
+    // Set splitter proportions (65% map, 35% table) - adjusted to accommodate wider track table
+    splitter->setSizes({650, 350});
+    splitter->setStretchFactor(0, 65);  // Map gets 65% of available space
+    splitter->setStretchFactor(1, 35);  // Track table gets 35% of available space
     
     // Store splitter reference for later use
     m_splitter = splitter;
@@ -243,8 +243,8 @@ void CPPIWindow::setupMapCanvas()
 void CPPIWindow::setupTrackTable()
 {
     m_trackTable = new CTrackTableWidget(this);
-    m_trackTable->setMinimumWidth(300);
-    m_trackTable->setMaximumWidth(500);
+    m_trackTable->setMinimumWidth(450);  // Increased from 300 to ensure all headers are visible
+    m_trackTable->setMaximumWidth(800);  // Increased from 500 to allow more space when needed
     
     // Connect track table signals
     connect(m_trackTable, &CTrackTableWidget::trackSelected,
@@ -277,15 +277,17 @@ void CPPIWindow::applyLightTheme()
         "   font-weight: 500;"
         "}"
         "QSplitter {"
-        "   background-color: #e2e8f0;"
+        "   background-color: rgba(226, 232, 240, 0.5);"  // Semi-transparent background
         "}"
         "QSplitter::handle {"
-        "   background-color: #cbd5e1;"
-        "   width: 3px;"
-        "   border-radius: 1px;"
+        "   background-color: rgba(203, 213, 225, 0.8);"  // Semi-transparent handle
+        "   width: 4px;"  // Slightly wider for better visibility
+        "   border-radius: 2px;"
+        "   margin: 2px 0px;"  // Add some margin for better appearance
         "}"
         "QSplitter::handle:hover {"
-        "   background-color: #3b82f6;"
+        "   background-color: rgba(59, 130, 246, 0.8);"  // Semi-transparent blue on hover
+        "   width: 6px;"  // Expand slightly on hover
         "}";
     
     setStyleSheet(lightTheme);
