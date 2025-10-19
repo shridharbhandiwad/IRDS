@@ -99,15 +99,30 @@ void CPPIWindow::setupSettingsToolbar()
     m_settingsLayout->setSpacing(8);
     m_settingsLayout->setContentsMargins(4, 4, 4, 4);
     
-    // Create settings buttons with light theme
-    m_loadMapBtn = new QPushButton("📁 Load Map", this);
-    m_disableMapBtn = new QPushButton("🚫 Disable Map", this);
-    m_zoomFitBtn = new QPushButton("🔍 Zoom Fit", this);
-    m_homeBtn = new QPushButton("🏠 Home", this);
-    m_gridBtn = new QPushButton("📐 Grid", this);
-    m_compassBtn = new QPushButton("🧭 Compass", this);
-    m_toggleTableBtn = new QPushButton("📊 Table", this);
-    m_settingsBtn = new QPushButton("⚙️ Settings", this);
+    // Create settings buttons with light theme - icon only with tooltips
+    m_loadMapBtn = new QPushButton("📁", this);
+    m_loadMapBtn->setToolTip("Load Map (L)");
+    
+    m_disableMapBtn = new QPushButton("🚫", this);
+    m_disableMapBtn->setToolTip("Disable Map");
+    
+    m_zoomFitBtn = new QPushButton("🔍", this);
+    m_zoomFitBtn->setToolTip("Zoom Fit (F)");
+    
+    m_homeBtn = new QPushButton("🏠", this);
+    m_homeBtn->setToolTip("Home (H)");
+    
+    m_gridBtn = new QPushButton("📐", this);
+    m_gridBtn->setToolTip("Grid (G)");
+    
+    m_compassBtn = new QPushButton("🧭", this);
+    m_compassBtn->setToolTip("Compass (C)");
+    
+    m_toggleTableBtn = new QPushButton("📊", this);
+    m_toggleTableBtn->setToolTip("Table");
+    
+    m_settingsBtn = new QPushButton("⚙️", this);
+    m_settingsBtn->setToolTip("Settings (S)");
     
     // Make toggle buttons checkable
     m_gridBtn->setCheckable(true);
@@ -198,10 +213,13 @@ void CPPIWindow::applyLightTheme()
         "   color: white;"
         "   border: none;"
         "   border-radius: 8px;"
-        "   padding: 8px 16px;"
+        "   padding: 8px 8px;"
         "   font-weight: 600;"
-        "   font-size: 12px;"
-        "   min-height: 28px;"
+        "   font-size: 20px;"
+        "   min-width: 40px;"
+        "   max-width: 40px;"
+        "   min-height: 40px;"
+        "   max-height: 40px;"
         "}"
         "QPushButton:hover {"
         "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #2563eb, stop:1 #1d4ed8);"
@@ -343,11 +361,13 @@ void CPPIWindow::onDisableMap()
     
     if (m_mapEnabled) {
         m_statusLabel->setText("Map enabled - Showing PPI with map layers");
-        m_disableMapBtn->setText("🚫 Disable Map");
+        m_disableMapBtn->setText("🚫");
+        m_disableMapBtn->setToolTip("Disable Map");
         m_mapCanvas->setMapLayersVisible(true);
     } else {
         m_statusLabel->setText("Map disabled - Showing PPI only");
-        m_disableMapBtn->setText("✅ Enable Map");
+        m_disableMapBtn->setText("✅");
+        m_disableMapBtn->setToolTip("Enable Map");
         m_mapCanvas->setMapLayersVisible(false);
     }
     
@@ -564,5 +584,6 @@ void CPPIWindow::loadSettings()
     m_gridBtn->setChecked(m_gridVisible);
     m_compassBtn->setChecked(m_compassVisible);
     m_disableMapBtn->setChecked(!m_mapEnabled);
-    m_disableMapBtn->setText(m_mapEnabled ? "🚫 Disable Map" : "✅ Enable Map");
+    m_disableMapBtn->setText(m_mapEnabled ? "🚫" : "✅");
+    m_disableMapBtn->setToolTip(m_mapEnabled ? "Disable Map" : "Enable Map");
 }
