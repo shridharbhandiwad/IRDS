@@ -9,6 +9,10 @@
 #include <QStatusBar>
 #include <QToolBar>
 #include <QDebug>
+#include <QQuickWidget>
+#include <QQmlEngine>
+#include <QQmlContext>
+#include <QQuickItem>
 #include <QLabel>
 
 CPPIWindow::CPPIWindow(QWidget *parent)
@@ -94,6 +98,25 @@ void CPPIWindow::setupUI()
     );
 }
 
+QQuickWidget* CPPIWindow::createIconButton(const QString& iconType, const QString& tooltip)
+{
+    QQuickWidget* widget = new QQuickWidget(this);
+    widget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+    widget->setFixedSize(36, 36);
+    widget->setAttribute(Qt::WA_AlwaysStackOnTop);
+    widget->setClearColor(Qt::transparent);
+    
+    // Set QML source
+    widget->setSource(QUrl("qrc:/qml/Icons/IconButton.qml"));
+    
+    if (widget->rootObject()) {
+        widget->rootObject()->setProperty("iconType", iconType);
+        widget->rootObject()->setProperty("toolTip", tooltip);
+    }
+    
+    return widget;
+}
+
 void CPPIWindow::setupSettingsToolbar()
 {
     m_settingsLayout = new QHBoxLayout();
@@ -177,15 +200,31 @@ void CPPIWindow::setupSettingsToolbar()
     m_settingsLayout->addWidget(m_statusLabel);
     m_settingsLayout->addWidget(m_settingsBtn);
     
-    // Connect signals
-    connect(m_loadMapBtn, &QPushButton::clicked, this, &CPPIWindow::onLoadNewMap);
-    connect(m_disableMapBtn, &QPushButton::clicked, this, &CPPIWindow::onDisableMap);
-    connect(m_zoomFitBtn, &QPushButton::clicked, this, &CPPIWindow::onZoomFitToScreen);
-    connect(m_homeBtn, &QPushButton::clicked, this, &CPPIWindow::onMapHome);
-    connect(m_gridBtn, &QPushButton::clicked, this, &CPPIWindow::onToggleGrid);
-    connect(m_compassBtn, &QPushButton::clicked, this, &CPPIWindow::onToggleCompass);
-    connect(m_toggleTableBtn, &QPushButton::clicked, this, &CPPIWindow::onToggleTrackTable);
-    connect(m_settingsBtn, &QPushButton::clicked, this, &CPPIWindow::onSettings);
+    // Connect QML button signals
+    if (m_loadMapBtn->rootObject()) {
+        connect(m_loadMapBtn->rootObject(), SIGNAL(clicked()), this, SLOT(onLoadNewMap()));
+    }
+    if (m_disableMapBtn->rootObject()) {
+        connect(m_disableMapBtn->rootObject(), SIGNAL(clicked()), this, SLOT(onDisableMap()));
+    }
+    if (m_zoomFitBtn->rootObject()) {
+        connect(m_zoomFitBtn->rootObject(), SIGNAL(clicked()), this, SLOT(onZoomFitToScreen()));
+    }
+    if (m_homeBtn->rootObject()) {
+        connect(m_homeBtn->rootObject(), SIGNAL(clicked()), this, SLOT(onMapHome()));
+    }
+    if (m_gridBtn->rootObject()) {
+        connect(m_gridBtn->rootObject(), SIGNAL(clicked()), this, SLOT(onToggleGrid()));
+    }
+    if (m_compassBtn->rootObject()) {
+        connect(m_compassBtn->rootObject(), SIGNAL(clicked()), this, SLOT(onToggleCompass()));
+    }
+    if (m_toggleTableBtn->rootObject()) {
+        connect(m_toggleTableBtn->rootObject(), SIGNAL(clicked()), this, SLOT(onToggleTrackTable()));
+    }
+    if (m_settingsBtn->rootObject()) {
+        connect(m_settingsBtn->rootObject(), SIGNAL(clicked()), this, SLOT(onSettings()));
+    }
     
     m_mainLayout->addLayout(m_settingsLayout);
 }
@@ -229,30 +268,9 @@ void CPPIWindow::applyLightTheme()
         "   color: #1e293b;"
         "   font-family: 'Segoe UI', Arial, sans-serif;"
         "}"
-        "QPushButton {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3b82f6, stop:1 #2563eb);"
-        "   color: white;"
+        "QQuickWidget {"
+        "   background-color: transparent;"
         "   border: none;"
-        "   border-radius: 8px;"
-        "   padding: 8px 16px;"
-        "   font-weight: 600;"
-        "   font-size: 12px;"
-        "   min-height: 28px;"
-        "}"
-        "QPushButton:hover {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #2563eb, stop:1 #1d4ed8);"
-        "   transform: translateY(-1px);"
-        "}"
-        "QPushButton:pressed {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #1d4ed8, stop:1 #1e40af);"
-        "}"
-        "QPushButton:checked {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #059669, stop:1 #047857);"
-        "   border: 2px solid #10b981;"
-        "}"
-        "QPushButton:disabled {"
-        "   background-color: #e2e8f0;"
-        "   color: #94a3b8;"
         "}"
         "QLabel {"
         "   color: #334155;"
@@ -375,7 +393,11 @@ void CPPIWindow::onLoadNewMap()
 void CPPIWindow::onDisableMap()
 {
     m_mapEnabled = !m_mapEnabled;
-    m_disableMapBtn->setChecked(!m_mapEnabled);
+    
+    if (m_disableMapBtn->rootObject()) {
+        m_disableMapBtn->rootObject()->setProperty("isToggled", !m_mapEnabled);
+        m_disableMapBtn->rootObject()->setProperty("toolTip", m_mapEnabled ? "Disable Map" : "Enable Map");
+    }
     
     if (m_mapEnabled) {
         m_statusLabel->setText("Map enabled - Showing PPI with map layers");
@@ -409,7 +431,11 @@ void CPPIWindow::onMapHome()
 void CPPIWindow::onToggleGrid()
 {
     m_gridVisible = !m_gridVisible;
-    m_gridBtn->setChecked(m_gridVisible);
+    
+    if (m_gridBtn->rootObject()) {
+        m_gridBtn->rootObject()->setProperty("isToggled", m_gridVisible);
+    }
+    
     m_statusLabel->setText(m_gridVisible ? "Grid enabled" : "Grid disabled");
     
     // TODO: Implement actual grid toggle
@@ -419,7 +445,11 @@ void CPPIWindow::onToggleGrid()
 void CPPIWindow::onToggleCompass()
 {
     m_compassVisible = !m_compassVisible;
-    m_compassBtn->setChecked(m_compassVisible);
+    
+    if (m_compassBtn->rootObject()) {
+        m_compassBtn->rootObject()->setProperty("isToggled", m_compassVisible);
+    }
+    
     m_statusLabel->setText(m_compassVisible ? "Compass enabled" : "Compass disabled");
     
     // TODO: Implement actual compass toggle
@@ -430,7 +460,11 @@ void CPPIWindow::onToggleTrackTable()
 {
     bool isVisible = m_trackTable->isVisible();
     m_trackTable->setVisible(!isVisible);
-    m_toggleTableBtn->setChecked(!isVisible);
+    
+    if (m_toggleTableBtn->rootObject()) {
+        m_toggleTableBtn->rootObject()->setProperty("isToggled", !isVisible);
+    }
+    
     m_statusLabel->setText(!isVisible ? "Track table shown" : "Track table hidden");
     qDebug() << "Track table visibility:" << !isVisible;
 }
