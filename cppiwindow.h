@@ -26,7 +26,7 @@ class CPPIWindow;
 
 /**
  * @brief PPI (Plan Position Indicator) Window for dual monitor setup
- * 
+ *
  * This window contains:
  * - Map canvas with PPI display
  * - Track table widget
@@ -67,19 +67,19 @@ private slots:
     void onToggleCompass();
     void onToggleTrackTable();
     void onSettings();
-    
+
     // Track context menu actions
     void onFocusTrack();
     void onDeleteTrack();
     void onLoadTrackImage();
     void onToggleTrackHistory();
     void onHighlightTrack();
-    
+
     // Track table interactions
     void onTrackSelected(int trackId);
     void onTrackDoubleClicked(int trackId);
     void onTrackRightClicked(int trackId, const QPoint& globalPos);
-    
+
     // Status updates
     void updateStatusBar();
 
@@ -98,12 +98,12 @@ private:
     void createTrackContextMenu();
     void saveSettings();
     void loadSettings();
-    
+
     // UI components
     QWidget *m_centralWidget;
     QVBoxLayout *m_mainLayout;
     QHBoxLayout *m_settingsLayout;
-    
+
     // Settings toolbar
     QPushButton *m_loadMapBtn;
     QPushButton *m_disableMapBtn;
@@ -114,12 +114,12 @@ private:
     QPushButton *m_toggleTableBtn;
     QPushButton *m_settingsBtn;
     QLabel *m_statusLabel;
-    
+
     // Main components
     QSplitter *m_splitter;
     CMapCanvas *m_mapCanvas;
     CTrackTableWidget *m_trackTable;
-    
+
     // Context menu
     QMenu *m_trackContextMenu;
     QAction *m_focusTrackAction;
@@ -127,19 +127,20 @@ private:
     QAction *m_loadImageAction;
     QAction *m_toggleHistoryAction;
     QAction *m_highlightAction;
-    
+
     // State
     int m_selectedTrackId;
     bool m_gridVisible;
     bool m_compassVisible;
     bool m_mapEnabled;
     int m_maxHistoryPoints;
-    
+
     // Timer for status updates
     QTimer *m_statusTimer;
-    
+
     // Settings
     QSettings *m_settings;
 };
 
 #endif // CPPIWINDOW_H
+
