@@ -75,10 +75,10 @@ void CPPIWindow::setupUI()
     splitter->addWidget(m_mapCanvas);
     splitter->addWidget(m_trackTable);
     
-    // Set splitter proportions (70% map, 30% table)
-    splitter->setSizes({700, 300});
-    splitter->setStretchFactor(0, 7);
-    splitter->setStretchFactor(1, 3);
+    // Set splitter proportions (60% map, 40% table)
+    splitter->setSizes({600, 400});
+    splitter->setStretchFactor(0, 6);
+    splitter->setStretchFactor(1, 4);
     
     // Store splitter reference for later use
     m_splitter = splitter;
@@ -243,8 +243,8 @@ void CPPIWindow::setupMapCanvas()
 void CPPIWindow::setupTrackTable()
 {
     m_trackTable = new CTrackTableWidget(this);
-    m_trackTable->setMinimumWidth(300);
-    m_trackTable->setMaximumWidth(500);
+    m_trackTable->setMinimumWidth(450);
+    m_trackTable->setMaximumWidth(750);
     
     // Connect track table signals
     connect(m_trackTable, &CTrackTableWidget::trackSelected,
@@ -257,14 +257,14 @@ void CPPIWindow::setupTrackTable()
 
 void CPPIWindow::applyLightTheme()
 {
-    // Light theme with two primary colors: Blue (#3b82f6) and Light Gray (#f8fafc)
+    // Light, transparent and attractive theme with Blue accent (#3b82f6)
     QString lightTheme = 
         "CPPIWindow {"
-        "   background-color: #f8fafc;"
+        "   background-color: rgba(248, 250, 252, 0.95);"
         "   color: #1e293b;"
         "}"
         "QWidget {"
-        "   background-color: #f8fafc;"
+        "   background-color: rgba(248, 250, 252, 0.95);"
         "   color: #1e293b;"
         "   font-family: 'Segoe UI', Arial, sans-serif;"
         "}"
@@ -277,15 +277,19 @@ void CPPIWindow::applyLightTheme()
         "   font-weight: 500;"
         "}"
         "QSplitter {"
-        "   background-color: #e2e8f0;"
+        "   background-color: rgba(226, 232, 240, 0.3);"
         "}"
         "QSplitter::handle {"
-        "   background-color: #cbd5e1;"
-        "   width: 3px;"
-        "   border-radius: 1px;"
+        "   background-color: rgba(203, 213, 225, 0.8);"
+        "   width: 4px;"
+        "   border-radius: 2px;"
+        "   margin: 2px 0px;"
         "}"
         "QSplitter::handle:hover {"
         "   background-color: #3b82f6;"
+        "}"
+        "QSplitter::handle:pressed {"
+        "   background-color: #2563eb;"
         "}";
     
     setStyleSheet(lightTheme);
