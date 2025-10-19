@@ -80,12 +80,12 @@ void CPPIWindow::setupUI()
     
     m_mainLayout->addWidget(splitter);
     
-    // Setup status bar
+    // Setup status bar (grey theme)
     statusBar()->setStyleSheet(
         "QStatusBar {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #f8fafc, stop:1 #e2e8f0);"
-        "   color: #334155;"
-        "   border-top: 2px solid #3b82f6;"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #f3f4f6, stop:1 #e5e7eb);"
+        "   color: #111827;"
+        "   border-top: 2px solid #9ca3af;"
         "   font-size: 12px;"
         "   font-weight: 500;"
         "   padding: 6px;"
@@ -180,19 +180,19 @@ void CPPIWindow::setupTrackTable()
 
 void CPPIWindow::applyLightTheme()
 {
-    // Light theme with two primary colors: Blue (#3b82f6) and Light Gray (#f8fafc)
+    // Neutral grey light theme
     QString lightTheme = 
         "CPPIWindow {"
-        "   background-color: #f8fafc;"
-        "   color: #1e293b;"
+        "   background-color: #f3f4f6;"
+        "   color: #111827;"
         "}"
         "QWidget {"
-        "   background-color: #f8fafc;"
-        "   color: #1e293b;"
+        "   background-color: #f3f4f6;"
+        "   color: #111827;"
         "   font-family: 'Segoe UI', Arial, sans-serif;"
         "}"
         "QPushButton {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3b82f6, stop:1 #2563eb);"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #9ca3af, stop:1 #6b7280);"
         "   color: white;"
         "   border: none;"
         "   border-radius: 8px;"
@@ -202,34 +202,34 @@ void CPPIWindow::applyLightTheme()
         "   min-height: 28px;"
         "}"
         "QPushButton:hover {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #2563eb, stop:1 #1d4ed8);"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #a3aab3, stop:1 #737a83);"
         "   transform: translateY(-1px);"
         "}"
         "QPushButton:pressed {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #1d4ed8, stop:1 #1e40af);"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #6b7280, stop:1 #4b5563);"
         "}"
         "QPushButton:checked {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #059669, stop:1 #047857);"
-        "   border: 2px solid #10b981;"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #6b7280, stop:1 #4b5563);"
+        "   border: 2px solid #9ca3af;"
         "}"
         "QPushButton:disabled {"
-        "   background-color: #e2e8f0;"
-        "   color: #94a3b8;"
+        "   background-color: #d1d5db;"
+        "   color: #6b7280;"
         "}"
         "QLabel {"
-        "   color: #334155;"
+        "   color: #374151;"
         "   font-weight: 500;"
         "}"
         "QSplitter {"
-        "   background-color: #e2e8f0;"
+        "   background-color: #e5e7eb;"
         "}"
         "QSplitter::handle {"
-        "   background-color: #cbd5e1;"
+        "   background-color: #d1d5db;"
         "   width: 3px;"
         "   border-radius: 1px;"
         "}"
         "QSplitter::handle:hover {"
-        "   background-color: #3b82f6;"
+        "   background-color: #6b7280;"
         "}";
     
     setStyleSheet(lightTheme);
@@ -255,12 +255,12 @@ void CPPIWindow::createTrackContextMenu()
     connect(m_toggleHistoryAction, &QAction::triggered, this, &CPPIWindow::onToggleTrackHistory);
     connect(m_highlightAction, &QAction::triggered, this, &CPPIWindow::onHighlightTrack);
     
-    // Style the context menu
+    // Style the context menu (grey)
     m_trackContextMenu->setStyleSheet(
         "QMenu {"
         "   background-color: #ffffff;"
-        "   color: #1e293b;"
-        "   border: 2px solid #e2e8f0;"
+        "   color: #111827;"
+        "   border: 2px solid #d1d5db;"
         "   border-radius: 8px;"
         "   padding: 6px;"
         "}"
@@ -270,12 +270,12 @@ void CPPIWindow::createTrackContextMenu()
         "   font-weight: 500;"
         "}"
         "QMenu::item:selected {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3b82f6, stop:1 #2563eb);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #9ca3af, stop:1 #6b7280);"
         "   color: white;"
         "}"
         "QMenu::separator {"
         "   height: 1px;"
-        "   background-color: #e2e8f0;"
+        "   background-color: #e5e7eb;"
         "   margin: 4px 16px;"
         "}"
     );
