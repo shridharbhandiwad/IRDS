@@ -50,15 +50,18 @@ void CTrackTableWidget::setupUI()
     m_filterEdit->setPlaceholderText("Search by Track ID...");
     m_filterEdit->setStyleSheet(
         "QLineEdit {"
-        "   background-color: #ffffff;"
+        "   background-color: rgba(255, 255, 255, 0.9);"  // Semi-transparent white
         "   color: #1e293b;"
-        "   border: 2px solid #e2e8f0;"
-        "   border-radius: 6px;"
-        "   padding: 6px;"
+        "   border: 1px solid rgba(226, 232, 240, 0.8);"
+        "   border-radius: 8px;"
+        "   padding: 8px 12px;"
         "   font-size: 11px;"
+        "   selection-background-color: rgba(59, 130, 246, 0.2);"
         "}"
         "QLineEdit:focus {"
-        "   border: 2px solid #3b82f6;"
+        "   border: 2px solid rgba(59, 130, 246, 0.8);"
+        "   background-color: rgba(255, 255, 255, 0.95);"
+        "   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);"
         "}"
     );
     connect(m_filterEdit, &QLineEdit::textChanged, this, &CTrackTableWidget::onFilterChanged);
@@ -72,24 +75,38 @@ void CTrackTableWidget::setupUI()
     m_identityFilter->addItem("? Unknown", TRACK_IDENTITY_UNKNOWN);
     m_identityFilter->setStyleSheet(
         "QComboBox {"
-        "   background-color: #ffffff;"
+        "   background-color: rgba(255, 255, 255, 0.9);"  // Semi-transparent white
         "   color: #1e293b;"
-        "   border: 2px solid #e2e8f0;"
-        "   border-radius: 6px;"
-        "   padding: 6px;"
+        "   border: 1px solid rgba(226, 232, 240, 0.8);"
+        "   border-radius: 8px;"
+        "   padding: 8px 12px;"
         "   font-size: 11px;"
-        "   min-width: 120px;"
+        "   min-width: 140px;"
         "}"
         "QComboBox:hover {"
-        "   border: 2px solid #3b82f6;"
+        "   border: 2px solid rgba(59, 130, 246, 0.8);"
+        "   background-color: rgba(255, 255, 255, 0.95);"
         "}"
         "QComboBox::drop-down {"
         "   border: none;"
+        "   width: 20px;"
+        "}"
+        "QComboBox::down-arrow {"
+        "   image: none;"
+        "   border: 2px solid #64748b;"
+        "   width: 6px;"
+        "   height: 6px;"
+        "   border-top: none;"
+        "   border-left: none;"
+        "   transform: rotate(45deg);"
         "}"
         "QComboBox QAbstractItemView {"
-        "   background-color: #ffffff;"
+        "   background-color: rgba(255, 255, 255, 0.95);"
         "   color: #1e293b;"
-        "   selection-background-color: #3b82f6;"
+        "   selection-background-color: rgba(59, 130, 246, 0.2);"
+        "   border: 1px solid rgba(226, 232, 240, 0.8);"
+        "   border-radius: 8px;"
+        "   padding: 4px;"
         "}"
     );
     connect(m_identityFilter, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -102,19 +119,26 @@ void CTrackTableWidget::setupUI()
     m_exportButton = new QPushButton("Export CSV");
     m_exportButton->setStyleSheet(
         "QPushButton {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3b82f6, stop:1 #2563eb);"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, "
+        "       stop:0 rgba(59, 130, 246, 0.9), stop:1 rgba(37, 99, 235, 0.9));"  // Semi-transparent gradient
         "   color: white;"
         "   border: none;"
-        "   border-radius: 6px;"
-        "   padding: 6px 12px;"
-        "   font-weight: bold;"
+        "   border-radius: 8px;"
+        "   padding: 8px 16px;"
+        "   font-weight: 600;"
         "   font-size: 11px;"
+        "   box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);"
         "}"
         "QPushButton:hover {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #2563eb, stop:1 #1d4ed8);"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, "
+        "       stop:0 rgba(37, 99, 235, 0.95), stop:1 rgba(29, 78, 216, 0.95));"
+        "   transform: translateY(-1px);"
+        "   box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);"
         "}"
         "QPushButton:pressed {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #1d4ed8, stop:1 #1e40af);"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, "
+        "       stop:0 rgba(29, 78, 216, 0.95), stop:1 rgba(30, 64, 175, 0.95));"
+        "   transform: translateY(0px);"
         "}"
     );
     connect(m_exportButton, &QPushButton::clicked, this, &CTrackTableWidget::onExportTracks);
@@ -128,7 +152,21 @@ void CTrackTableWidget::setupUI()
         "ID", "Identity", "Lat", "Lon", "Alt (m)", "Range (km)", "Heading (°)", "Azimuth (°)", "Updated"
     });
 
-    m_tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    // Set intelligent column sizing for better header visibility
+    m_tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+    m_tableWidget->horizontalHeader()->setStretchLastSection(true);
+    
+    // Set minimum column widths to ensure headers are readable
+    m_tableWidget->horizontalHeader()->setMinimumSectionSize(70);
+    m_tableWidget->setColumnWidth(0, 60);   // ID - narrower
+    m_tableWidget->setColumnWidth(1, 90);   // Identity - medium
+    m_tableWidget->setColumnWidth(2, 85);   // Lat - medium
+    m_tableWidget->setColumnWidth(3, 85);   // Lon - medium
+    m_tableWidget->setColumnWidth(4, 75);   // Alt (m) - medium
+    m_tableWidget->setColumnWidth(5, 85);   // Range (km) - medium
+    m_tableWidget->setColumnWidth(6, 85);   // Heading (°) - medium
+    m_tableWidget->setColumnWidth(7, 85);   // Azimuth (°) - medium
+    // Last column (Updated) will stretch to fill remaining space
     m_tableWidget->verticalHeader()->setVisible(false);
     m_tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -137,59 +175,71 @@ void CTrackTableWidget::setupUI()
 
     m_tableWidget->setStyleSheet(
         "QTableWidget {"
-        "   background-color: #ffffff;"
-        "   alternate-background-color: #f8fafc;"
+        "   background-color: rgba(255, 255, 255, 0.95);"  // Semi-transparent white
+        "   alternate-background-color: rgba(248, 250, 252, 0.8);"  // Semi-transparent light gray
         "   color: #1e293b;"
-        "   gridline-color: #e2e8f0;"
-        "   border: 2px solid #e2e8f0;"
-        "   border-radius: 8px;"
+        "   gridline-color: rgba(226, 232, 240, 0.6);"  // Semi-transparent gridlines
+        "   border: 1px solid rgba(226, 232, 240, 0.8);"  // Lighter border
+        "   border-radius: 12px;"  // More rounded corners
         "   font-size: 11px;"
+        "   selection-background-color: rgba(59, 130, 246, 0.2);"
         "}"
         "QTableWidget::item {"
-        "   padding: 8px;"
+        "   padding: 10px 8px;"  // Increased vertical padding
         "   color: #334155;"
+        "   border-bottom: 1px solid rgba(226, 232, 240, 0.3);"  // Subtle row separators
         "}"
         "QTableWidget::item:selected {"
-        "   background-color: #3b82f6;"
-        "   color: white;"
+        "   background-color: rgba(59, 130, 246, 0.15);"  // Light blue selection
+        "   color: #1e293b;"  // Keep text dark for readability
+        "   border: 1px solid rgba(59, 130, 246, 0.4);"
         "}"
         "QTableWidget::item:hover {"
-        "   background-color: #e0e7ff;"
+        "   background-color: rgba(224, 231, 255, 0.6);"  // Light hover effect
         "}"
         "QHeaderView::section {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #f1f5f9, stop:1 #e2e8f0);"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, "
+        "       stop:0 rgba(241, 245, 249, 0.9), "
+        "       stop:1 rgba(226, 232, 240, 0.8));"  // Semi-transparent gradient
         "   color: #1e293b;"
-        "   padding: 8px;"
+        "   padding: 12px 8px;"  // Increased padding for better visibility
         "   border: none;"
-        "   border-bottom: 2px solid #3b82f6;"
+        "   border-bottom: 2px solid rgba(59, 130, 246, 0.8);"  // Semi-transparent accent
         "   font-weight: bold;"
         "   font-size: 11px;"
+        "   min-width: 80px;"  // Ensure minimum column width
         "}"
         "QHeaderView::section:hover {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #e2e8f0, stop:1 #cbd5e1);"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, "
+        "       stop:0 rgba(226, 232, 240, 0.9), "
+        "       stop:1 rgba(203, 213, 225, 0.8));"
         "}"
         "QScrollBar:vertical {"
-        "   background-color: #f1f5f9;"
+        "   background-color: rgba(241, 245, 249, 0.7);"
         "   width: 12px;"
         "   border-radius: 6px;"
+        "   border: none;"
         "}"
         "QScrollBar::handle:vertical {"
-        "   background-color: #3b82f6;"
+        "   background-color: rgba(59, 130, 246, 0.7);"
         "   border-radius: 6px;"
         "   min-height: 20px;"
+        "   margin: 2px;"
         "}"
         "QScrollBar::handle:vertical:hover {"
-        "   background-color: #2563eb;"
+        "   background-color: rgba(37, 99, 235, 0.8);"
         "}"
         "QScrollBar:horizontal {"
-        "   background-color: #f1f5f9;"
+        "   background-color: rgba(241, 245, 249, 0.7);"
         "   height: 12px;"
         "   border-radius: 6px;"
+        "   border: none;"
         "}"
         "QScrollBar::handle:horizontal {"
-        "   background-color: #3b82f6;"
+        "   background-color: rgba(59, 130, 246, 0.7);"
         "   border-radius: 6px;"
         "   min-width: 20px;"
+        "   margin: 2px;"
         "}"
         "QScrollBar::add-line, QScrollBar::sub-line {"
         "   background: none;"
@@ -215,26 +265,35 @@ void CTrackTableWidget::setupUI()
 
     setWidget(mainWidget);
 
-    // Dock widget styling
+    // Dock widget styling - light and transparent theme
     setStyleSheet(
         "QDockWidget {"
-        "   background-color: #f8fafc;"
+        "   background-color: rgba(248, 250, 252, 0.95);"  // Semi-transparent background
         "   color: #1e293b;"
         "   font-size: 12px;"
         "   font-weight: bold;"
+        "   border: 1px solid rgba(226, 232, 240, 0.6);"
+        "   border-radius: 12px;"
         "}"
         "QDockWidget::title {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #f1f5f9, stop:1 #e2e8f0);"
-        "   padding: 8px;"
-        "   border-bottom: 2px solid #3b82f6;"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, "
+        "       stop:0 rgba(241, 245, 249, 0.9), "
+        "       stop:1 rgba(226, 232, 240, 0.8));"  // Semi-transparent gradient
+        "   padding: 10px;"
+        "   border-bottom: 2px solid rgba(59, 130, 246, 0.8);"
+        "   border-top-left-radius: 12px;"
+        "   border-top-right-radius: 12px;"
+        "   font-weight: 600;"
         "}"
         "QDockWidget::close-button, QDockWidget::float-button {"
-        "   background-color: #e2e8f0;"
-        "   border-radius: 4px;"
-        "   padding: 2px;"
+        "   background-color: rgba(226, 232, 240, 0.7);"
+        "   border-radius: 6px;"
+        "   padding: 4px;"
+        "   margin: 2px;"
         "}"
         "QDockWidget::close-button:hover, QDockWidget::float-button:hover {"
-        "   background-color: #3b82f6;"
+        "   background-color: rgba(59, 130, 246, 0.8);"
+        "   color: white;"
         "}"
     );
 }
