@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     QSplashScreen splash(splashPixmap);
     splash.setStyleSheet(
         "QSplashScreen {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #3b82f6, stop:1 #2563eb);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #6a6a6a, stop:1 #5a5a5a);"
         "   color: white;"
         "   font-family: 'Segoe UI', Arial, sans-serif;"
         "   font-size: 16px;"

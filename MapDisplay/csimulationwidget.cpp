@@ -60,7 +60,7 @@ void CSimulationWidget::createControlsSection()
     QVBoxLayout *layout = new QVBoxLayout(m_controlsGroup);
     
     // Status label
-    m_statusLabel = new QLabel("Status: <span style='color: #FFA500;'>Ready</span>");
+    m_statusLabel = new QLabel("Status: <span style='color: #8a8a8a;'>Ready</span>");
     m_statusLabel->setAlignment(Qt::AlignCenter);
     QFont statusFont = m_statusLabel->font();
     statusFont.setPointSize(12);
@@ -216,17 +216,17 @@ void CSimulationWidget::createStatusSection()
     
     layout->addWidget(new QLabel("Active Tracks:"), row, 0);
     m_activeTracksLabel = new QLabel("0");
-    m_activeTracksLabel->setStyleSheet("font-weight: bold; color: #4ade80;");
+    m_activeTracksLabel->setStyleSheet("font-weight: bold; color: #8a8a8a;");
     layout->addWidget(m_activeTracksLabel, row++, 1);
     
     layout->addWidget(new QLabel("Packets Sent:"), row, 0);
     m_packetsSentLabel = new QLabel("0");
-    m_packetsSentLabel->setStyleSheet("font-weight: bold; color: #60a5fa;");
+    m_packetsSentLabel->setStyleSheet("font-weight: bold; color: #7a7a7a;");
     layout->addWidget(m_packetsSentLabel, row++, 1);
     
     layout->addWidget(new QLabel("Simulation Time:"), row, 0);
     m_simulationTimeLabel = new QLabel("00:00:00");
-    m_simulationTimeLabel->setStyleSheet("font-weight: bold; color: #fbbf24;");
+    m_simulationTimeLabel->setStyleSheet("font-weight: bold; color: #8a8a8a;");
     layout->addWidget(m_simulationTimeLabel, row++, 1);
     
     layout->addWidget(new QLabel("CPU Usage:"), row, 0);
@@ -243,12 +243,12 @@ void CSimulationWidget::applyModernStyle()
 {
     setStyleSheet(
         "QDockWidget {"
-        "   background-color: #1e293b;"
-        "   color: #ffffff;"
+        "   background-color: #2a2a2a;"
+        "   color: #f0f0f0;"
         "   border: 1px solid #475569;"
         "}"
         "QDockWidget::title {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #667eea, stop:1 #764ba2);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #6a6a6a, stop:1 #764ba2);"
         "   color: white;"
         "   padding: 10px;"
         "   font-weight: bold;"
@@ -256,25 +256,25 @@ void CSimulationWidget::applyModernStyle()
         "   border-radius: 4px;"
         "}"
         "QGroupBox {"
-        "   background-color: #2d3748;"
+        "   background-color: #3a3a3a;"
         "   border: 2px solid #4a5568;"
         "   border-radius: 10px;"
         "   margin-top: 16px;"
         "   padding-top: 18px;"
         "   font-weight: bold;"
-        "   color: #ffffff;"
+        "   color: #f0f0f0;"
         "}"
         "QGroupBox::title {"
         "   subcontrol-origin: margin;"
         "   subcontrol-position: top left;"
         "   padding: 6px 12px;"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #667eea, stop:1 #764ba2);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #6a6a6a, stop:1 #764ba2);"
         "   border-radius: 6px;"
         "   color: white;"
         "   font-size: 12px;"
         "}"
         "QPushButton {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #667eea, stop:1 #764ba2);"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #6a6a6a, stop:1 #764ba2);"
         "   color: white;"
         "   border: none;"
         "   border-radius: 8px;"
@@ -290,26 +290,26 @@ void CSimulationWidget::applyModernStyle()
         "}"
         "QPushButton:disabled {"
         "   background-color: #4a5568;"
-        "   color: #a0aec0;"
+        "   color: #9a9a9a;"
         "}"
         "QSpinBox, QDoubleSpinBox, QComboBox {"
-        "   background-color: #1a202c;"
-        "   color: #ffffff;"
+        "   background-color: #2a2a2a;"
+        "   color: #f0f0f0;"
         "   border: 2px solid #4a5568;"
         "   border-radius: 6px;"
         "   padding: 6px;"
         "   font-size: 11px;"
         "}"
         "QSpinBox:focus, QDoubleSpinBox:focus, QComboBox:focus {"
-        "   border: 2px solid #667eea;"
+        "   border: 2px solid #6a6a6a;"
         "}"
         "QLabel {"
-        "   color: #e2e8f0;"
+        "   color: #d0d0d0;"
         "   font-size: 11px;"
         "}"
         "QTableWidget {"
-        "   background-color: #1a202c;"
-        "   color: #ffffff;"
+        "   background-color: #2a2a2a;"
+        "   color: #f0f0f0;"
         "   border: 1px solid #4a5568;"
         "   border-radius: 6px;"
         "   gridline-color: #4a5568;"
@@ -318,19 +318,19 @@ void CSimulationWidget::applyModernStyle()
         "   padding: 4px;"
         "}"
         "QTableWidget::item:selected {"
-        "   background-color: #667eea;"
+        "   background-color: #6a6a6a;"
         "   color: white;"
         "}"
         "QHeaderView::section {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #2d3748, stop:1 #1a202c);"
-        "   color: #ffffff;"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3a3a3a, stop:1 #2a2a2a);"
+        "   color: #f0f0f0;"
         "   padding: 6px;"
         "   border: 1px solid #4a5568;"
         "   font-weight: bold;"
         "   font-size: 10px;"
         "}"
         "QCheckBox {"
-        "   color: #e2e8f0;"
+        "   color: #d0d0d0;"
         "   spacing: 8px;"
         "}"
         "QCheckBox::indicator {"
@@ -338,14 +338,14 @@ void CSimulationWidget::applyModernStyle()
         "   height: 18px;"
         "   border: 2px solid #4a5568;"
         "   border-radius: 4px;"
-        "   background-color: #1a202c;"
+        "   background-color: #2a2a2a;"
         "}"
         "QCheckBox::indicator:checked {"
-        "   background-color: #667eea;"
-        "   border: 2px solid #667eea;"
+        "   background-color: #6a6a6a;"
+        "   border: 2px solid #6a6a6a;"
         "}"
         "QProgressBar {"
-        "   background-color: #1a202c;"
+        "   background-color: #2a2a2a;"
         "   border: 2px solid #4a5568;"
         "   border-radius: 6px;"
         "   text-align: center;"
@@ -353,7 +353,7 @@ void CSimulationWidget::applyModernStyle()
         "   font-weight: bold;"
         "}"
         "QProgressBar::chunk {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #667eea, stop:1 #764ba2);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #6a6a6a, stop:1 #764ba2);"
         "   border-radius: 4px;"
         "}"
     );
@@ -365,7 +365,7 @@ void CSimulationWidget::startSimulation()
         // Resume from pause
         m_isPaused = false;
         m_simulationTimer->start(m_updateRate);
-        m_statusLabel->setText("Status: <span style='color: #4ade80;'>Running</span>");
+        m_statusLabel->setText("Status: <span style='color: #8a8a8a;'>Running</span>");
         m_pauseButton->setText("⏸ Pause");
     } else {
         // Start new simulation
@@ -381,7 +381,7 @@ void CSimulationWidget::startSimulation()
         m_simulationTimer->start(m_updateRate);
         
         // Update UI
-        m_statusLabel->setText("Status: <span style='color: #4ade80;'>Running</span>");
+        m_statusLabel->setText("Status: <span style='color: #8a8a8a;'>Running</span>");
         m_startButton->setEnabled(false);
         m_stopButton->setEnabled(true);
         m_pauseButton->setEnabled(true);
@@ -400,7 +400,7 @@ void CSimulationWidget::stopSimulation()
     m_simulationTimer->stop();
     
     // Update UI
-    m_statusLabel->setText("Status: <span style='color: #ef4444;'>Stopped</span>");
+    m_statusLabel->setText("Status: <span style='color: #6a6a6a;'>Stopped</span>");
     m_startButton->setEnabled(true);
     m_stopButton->setEnabled(false);
     m_pauseButton->setEnabled(false);
@@ -419,7 +419,7 @@ void CSimulationWidget::pauseSimulation()
     } else {
         m_isPaused = true;
         m_simulationTimer->stop();
-        m_statusLabel->setText("Status: <span style='color: #fbbf24;'>Paused</span>");
+        m_statusLabel->setText("Status: <span style='color: #8a8a8a;'>Paused</span>");
         m_pauseButton->setText("▶ Resume");
         qDebug() << "[Simulation] Paused";
     }
@@ -440,7 +440,7 @@ void CSimulationWidget::resetSimulation()
     m_simulationTimeLabel->setText("00:00:00");
     m_cpuUsageBar->setValue(0);
     
-    m_statusLabel->setText("Status: <span style='color: #FFA500;'>Ready</span>");
+    m_statusLabel->setText("Status: <span style='color: #8a8a8a;'>Ready</span>");
     
     qDebug() << "[Simulation] Reset";
 }
@@ -634,7 +634,7 @@ void CSimulationWidget::updateTrackTable()
         // Status
         QTableWidgetItem *statusItem = new QTableWidgetItem("✓ Active");
         statusItem->setTextAlignment(Qt::AlignCenter);
-        statusItem->setForeground(QBrush(QColor("#4ade80")));
+        statusItem->setForeground(QBrush(QColor("#8a8a8a")));
         m_trackTable->setItem(i, 6, statusItem);
     }
 }

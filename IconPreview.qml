@@ -8,13 +8,13 @@ ApplicationWindow {
     height: 400
     visible: true
     title: "Sophisticated Icon Preview"
-    color: "#0a0d1a"
+    color: "#1a1a1a"
     
     Rectangle {
         anchors.fill: parent
         gradient: Gradient {
-            GradientStop { position: 0.0; color: "#1e293b" }
-            GradientStop { position: 1.0; color: "#0f172a" }
+            GradientStop { position: 0.0; color: "#3a3a3a" }
+            GradientStop { position: 1.0; color: "#2a2a2a" }
         }
         
         Column {
@@ -112,7 +112,7 @@ ApplicationWindow {
             
             Text {
                 text: "✨ Features:\n• Transparent backgrounds\n• Smooth hover animations\n• Toggle state indicators\n• Ripple click effects\n• Sophisticated vector graphics"
-                color: "#94a3b8"
+                color: "#9a9a9a"
                 font.pixelSize: 14
                 lineHeight: 1.5
                 anchors.horizontalCenter: parent.horizontalCenter

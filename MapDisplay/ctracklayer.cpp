@@ -258,9 +258,9 @@ void CTrackLayer::createContextMenu()
     // Style the context menu
     m_contextMenu->setStyleSheet(
         "QMenu {"
-        "   background-color: #ffffff;"
-        "   color: #1e293b;"
-        "   border: 2px solid #e2e8f0;"
+        "   background-color: #f0f0f0;"
+        "   color: #2a2a2a;"
+        "   border: 2px solid #d0d0d0;"
         "   border-radius: 8px;"
         "   padding: 6px;"
         "}"
@@ -270,12 +270,12 @@ void CTrackLayer::createContextMenu()
         "   font-weight: 500;"
         "}"
         "QMenu::item:selected {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3b82f6, stop:1 #2563eb);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #6a6a6a, stop:1 #5a5a5a);"
         "   color: white;"
         "}"
         "QMenu::separator {"
         "   height: 1px;"
-        "   background-color: #e2e8f0;"
+        "   background-color: #d0d0d0;"
         "   margin: 4px 16px;"
         "}"
     );

@@ -77,12 +77,12 @@ void CPredictiveMaintenanceWidget::createOverviewSection()
     
     infoGrid->addWidget(new QLabel("Next Maintenance:"), 0, 0);
     m_upcomingMaintenanceLabel = new QLabel("In 15 days");
-    m_upcomingMaintenanceLabel->setStyleSheet("font-weight: bold; color: #fbbf24;");
+    m_upcomingMaintenanceLabel->setStyleSheet("font-weight: bold; color: #8a8a8a;");
     infoGrid->addWidget(m_upcomingMaintenanceLabel, 0, 1);
     
     infoGrid->addWidget(new QLabel("Critical Components:"), 1, 0);
     m_criticalComponentsLabel = new QLabel("0");
-    m_criticalComponentsLabel->setStyleSheet("font-weight: bold; color: #4ade80;");
+    m_criticalComponentsLabel->setStyleSheet("font-weight: bold; color: #8a8a8a;");
     infoGrid->addWidget(m_criticalComponentsLabel, 1, 1);
     
     layout->addLayout(infoGrid);
@@ -111,7 +111,7 @@ void CPredictiveMaintenanceWidget::createComponentsSection()
     QVBoxLayout *layout = new QVBoxLayout(m_componentsGroup);
     
     QLabel *infoLabel = new QLabel("Click on a component for detailed information");
-    infoLabel->setStyleSheet("color: #94a3b8; font-style: italic;");
+    infoLabel->setStyleSheet("color: #9a9a9a; font-style: italic;");
     layout->addWidget(infoLabel);
     
     m_componentsList = new QListWidget();
@@ -165,7 +165,7 @@ void CPredictiveMaintenanceWidget::applyModernStyle()
 {
     setStyleSheet(
         "QDockWidget {"
-        "   background-color: #0f172a;"
+        "   background-color: #1a1a1a;"
         "   color: #ffffff;"
         "}"
         "QDockWidget::title {"
@@ -176,7 +176,7 @@ void CPredictiveMaintenanceWidget::applyModernStyle()
         "   font-size: 13px;"
         "}"
         "QGroupBox {"
-        "   background-color: #1e293b;"
+        "   background-color: #2a2a2a;"
         "   border: 2px solid #334155;"
         "   border-radius: 10px;"
         "   margin-top: 16px;"
@@ -207,8 +207,8 @@ void CPredictiveMaintenanceWidget::applyModernStyle()
         "   color: #e2e8f0;"
         "}"
         "QProgressBar {"
-        "   background-color: #1a202c;"
-        "   border: 2px solid #4a5568;"
+        "   background-color: #2a2a2a;"
+        "   border: 2px solid #5a5a5a;"
         "   border-radius: 6px;"
         "   text-align: center;"
         "   color: white;"
@@ -219,13 +219,13 @@ void CPredictiveMaintenanceWidget::applyModernStyle()
         "   border-radius: 4px;"
         "}"
         "QListWidget {"
-        "   background-color: #1a202c;"
+        "   background-color: #2a2a2a;"
         "   color: #ffffff;"
-        "   border: 1px solid #4a5568;"
+        "   border: 1px solid #5a5a5a;"
         "}"
         "QListWidget::item {"
         "   padding: 10px;"
-        "   border-bottom: 1px solid #4a5568;"
+        "   border-bottom: 1px solid #5a5a5a;"
         "}"
         "QListWidget::item:selected {"
         "   background-color: #8b5cf6;"
@@ -235,20 +235,20 @@ void CPredictiveMaintenanceWidget::applyModernStyle()
         "   background-color: #374151;"
         "}"
         "QTableWidget {"
-        "   background-color: #1a202c;"
+        "   background-color: #2a2a2a;"
         "   color: #ffffff;"
-        "   border: 1px solid #4a5568;"
-        "   gridline-color: #4a5568;"
+        "   border: 1px solid #5a5a5a;"
+        "   gridline-color: #5a5a5a;"
         "}"
         "QHeaderView::section {"
         "   background: #2d3748;"
         "   color: #ffffff;"
         "   padding: 6px;"
-        "   border: 1px solid #4a5568;"
+        "   border: 1px solid #5a5a5a;"
         "   font-weight: bold;"
         "}"
         "QScrollArea {"
-        "   background-color: #0f172a;"
+        "   background-color: #1a1a1a;"
         "   border: none;"
         "}"
     );
@@ -358,20 +358,20 @@ void CPredictiveMaintenanceWidget::updateStatus()
     // Update overview
     m_criticalComponentsLabel->setText(QString::number(criticalCount));
     if (criticalCount > 0) {
-        m_criticalComponentsLabel->setStyleSheet("font-weight: bold; color: #ef4444;");
+        m_criticalComponentsLabel->setStyleSheet("font-weight: bold; color: #6a6a6a;");
     } else {
-        m_criticalComponentsLabel->setStyleSheet("font-weight: bold; color: #4ade80;");
+        m_criticalComponentsLabel->setStyleSheet("font-weight: bold; color: #8a8a8a;");
     }
     
     if (minDays < 7) {
         m_upcomingMaintenanceLabel->setText(QString("In %1 days - URGENT").arg(minDays));
-        m_upcomingMaintenanceLabel->setStyleSheet("font-weight: bold; color: #ef4444;");
+        m_upcomingMaintenanceLabel->setStyleSheet("font-weight: bold; color: #6a6a6a;");
     } else if (minDays < 30) {
         m_upcomingMaintenanceLabel->setText(QString("In %1 days").arg(minDays));
-        m_upcomingMaintenanceLabel->setStyleSheet("font-weight: bold; color: #fbbf24;");
+        m_upcomingMaintenanceLabel->setStyleSheet("font-weight: bold; color: #8a8a8a;");
     } else {
         m_upcomingMaintenanceLabel->setText(QString("In %1 days").arg(minDays));
-        m_upcomingMaintenanceLabel->setStyleSheet("font-weight: bold; color: #4ade80;");
+        m_upcomingMaintenanceLabel->setStyleSheet("font-weight: bold; color: #8a8a8a;");
     }
     
     // Calculate overall condition
@@ -457,12 +457,12 @@ QListWidgetItem* CPredictiveMaintenanceWidget::createComponentItem(const Compone
 QColor CPredictiveMaintenanceWidget::getMaintenanceColor(MaintenanceStatus status)
 {
     switch (status) {
-        case EXCELLENT: return QColor("#4ade80");
-        case GOOD: return QColor("#60a5fa");
-        case FAIR: return QColor("#fbbf24");
-        case POOR: return QColor("#fb923c");
-        case SERVICE_REQUIRED: return QColor("#f97316");
-        case CRITICAL: return QColor("#ef4444");
+        case EXCELLENT: return QColor("#8a8a8a");
+        case GOOD: return QColor("#7a7a7a");
+        case FAIR: return QColor("#8a8a8a");
+        case POOR: return QColor("#7a7a7a");
+        case SERVICE_REQUIRED: return QColor("#6a6a6a");
+        case CRITICAL: return QColor("#6a6a6a");
         default: return QColor("#ffffff");
     }
 }

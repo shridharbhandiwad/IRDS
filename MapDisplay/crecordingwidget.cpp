@@ -74,7 +74,7 @@ void CRecordingWidget::createRecordingSection()
     QVBoxLayout *layout = new QVBoxLayout(m_recordingGroup);
     
     // Status labels
-    m_recordStatusLabel = new QLabel("Status: <span style='color: #94a3b8;'>Idle</span>");
+    m_recordStatusLabel = new QLabel("Status: <span style='color: #9a9a9a;'>Idle</span>");
     m_recordStatusLabel->setAlignment(Qt::AlignCenter);
     QFont font = m_recordStatusLabel->font();
     font.setPointSize(11);
@@ -123,7 +123,7 @@ void CRecordingWidget::createReplaySection()
     QVBoxLayout *layout = new QVBoxLayout(m_replayGroup);
     
     // Status labels
-    m_replayStatusLabel = new QLabel("Status: <span style='color: #94a3b8;'>Idle</span>");
+    m_replayStatusLabel = new QLabel("Status: <span style='color: #9a9a9a;'>Idle</span>");
     m_replayStatusLabel->setAlignment(Qt::AlignCenter);
     QFont font = m_replayStatusLabel->font();
     font.setPointSize(11);
@@ -225,12 +225,12 @@ void CRecordingWidget::applyModernStyle()
 {
     setStyleSheet(
         "QDockWidget {"
-        "   background-color: #1e293b;"
-        "   color: #ffffff;"
+        "   background-color: #2a2a2a;"
+        "   color: #f0f0f0;"
         "   border: 1px solid #475569;"
         "}"
         "QDockWidget::title {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #667eea, stop:1 #764ba2);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #6a6a6a, stop:1 #764ba2);"
         "   color: white;"
         "   padding: 10px;"
         "   font-weight: bold;"
@@ -238,25 +238,25 @@ void CRecordingWidget::applyModernStyle()
         "   border-radius: 4px;"
         "}"
         "QGroupBox {"
-        "   background-color: #2d3748;"
-        "   border: 2px solid #4a5568;"
+        "   background-color: #3a3a3a;"
+        "   border: 2px solid #5a5a5a;"
         "   border-radius: 10px;"
         "   margin-top: 16px;"
         "   padding-top: 18px;"
         "   font-weight: bold;"
-        "   color: #ffffff;"
+        "   color: #f0f0f0;"
         "}"
         "QGroupBox::title {"
         "   subcontrol-origin: margin;"
         "   subcontrol-position: top left;"
         "   padding: 6px 12px;"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #667eea, stop:1 #764ba2);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #6a6a6a, stop:1 #764ba2);"
         "   border-radius: 6px;"
         "   color: white;"
         "   font-size: 12px;"
         "}"
         "QPushButton {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #667eea, stop:1 #764ba2);"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #6a6a6a, stop:1 #764ba2);"
         "   color: white;"
         "   border: none;"
         "   border-radius: 8px;"
@@ -268,34 +268,34 @@ void CRecordingWidget::applyModernStyle()
         "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #5568d3, stop:1 #6b3fa0);"
         "}"
         "QPushButton:disabled {"
-        "   background-color: #4a5568;"
+        "   background-color: #5a5a5a;"
         "   color: #a0aec0;"
         "}"
         "QLabel {"
-        "   color: #e2e8f0;"
+        "   color: #d0d0d0;"
         "   font-size: 11px;"
         "}"
         "QListWidget {"
-        "   background-color: #1a202c;"
-        "   color: #ffffff;"
-        "   border: 1px solid #4a5568;"
+        "   background-color: #2a2a2a;"
+        "   color: #f0f0f0;"
+        "   border: 1px solid #5a5a5a;"
         "   border-radius: 6px;"
         "}"
         "QListWidget::item {"
         "   padding: 8px;"
-        "   border-bottom: 1px solid #4a5568;"
+        "   border-bottom: 1px solid #5a5a5a;"
         "}"
         "QListWidget::item:selected {"
-        "   background-color: #667eea;"
+        "   background-color: #6a6a6a;"
         "   color: white;"
         "}"
         "QListWidget::item:hover {"
-        "   background-color: #374151;"
+        "   background-color: #4a4a4a;"
         "}"
         "QComboBox {"
-        "   background-color: #1a202c;"
-        "   color: #ffffff;"
-        "   border: 2px solid #4a5568;"
+        "   background-color: #2a2a2a;"
+        "   color: #f0f0f0;"
+        "   border: 2px solid #5a5a5a;"
         "   border-radius: 6px;"
         "   padding: 4px;"
         "}"
@@ -330,7 +330,7 @@ void CRecordingWidget::startRecording()
     
     m_recordTimer->start(RECORD_INTERVAL);
     
-    m_recordStatusLabel->setText("Status: <span style='color: #667eea;'>● Recording</span>");
+    m_recordStatusLabel->setText("Status: <span style='color: #6a6a6a;'>● Recording</span>");
     m_recordButton->setEnabled(false);
     m_pauseRecordButton->setEnabled(true);
     m_stopRecordButton->setEnabled(true);
@@ -357,7 +357,7 @@ void CRecordingWidget::stopRecording()
         m_recordingFile = nullptr;
     }
     
-    m_recordStatusLabel->setText("Status: <span style='color: #4ade80;'>Saved</span>");
+    m_recordStatusLabel->setText("Status: <span style='color: #8a8a8a;'>Saved</span>");
     m_recordButton->setEnabled(true);
     m_pauseRecordButton->setEnabled(false);
     m_stopRecordButton->setEnabled(false);
@@ -378,12 +378,12 @@ void CRecordingWidget::pauseRecording()
     if (m_isRecordingPaused) {
         m_recordTimer->start(RECORD_INTERVAL);
         m_isRecordingPaused = false;
-        m_recordStatusLabel->setText("Status: <span style='color: #667eea;'>● Recording</span>");
+        m_recordStatusLabel->setText("Status: <span style='color: #6a6a6a;'>● Recording</span>");
         m_pauseRecordButton->setText("⏸ Pause");
     } else {
         m_recordTimer->stop();
         m_isRecordingPaused = true;
-        m_recordStatusLabel->setText("Status: <span style='color: #fbbf24;'>⏸ Paused</span>");
+        m_recordStatusLabel->setText("Status: <span style='color: #8a8a8a;'>⏸ Paused</span>");
         m_pauseRecordButton->setText("▶ Resume");
     }
 }
@@ -433,7 +433,7 @@ void CRecordingWidget::startReplay()
     if (m_isReplayPaused) {
         m_isReplayPaused = false;
         m_replayTimer->start(RECORD_INTERVAL / m_replaySpeed);
-        m_replayStatusLabel->setText("Status: <span style='color: #4ade80;'>▶ Playing</span>");
+        m_replayStatusLabel->setText("Status: <span style='color: #8a8a8a;'>▶ Playing</span>");
         m_pausePlayButton->setText("⏸ Pause");
         return;
     }
@@ -508,7 +508,7 @@ void CRecordingWidget::startReplay()
     
     m_replayTimer->start(RECORD_INTERVAL / m_replaySpeed);
     
-    m_replayStatusLabel->setText("Status: <span style='color: #4ade80;'>▶ Playing</span>");
+    m_replayStatusLabel->setText("Status: <span style='color: #8a8a8a;'>▶ Playing</span>");
     m_playButton->setEnabled(false);
     m_pausePlayButton->setEnabled(true);
     m_stopPlayButton->setEnabled(true);
@@ -538,7 +538,7 @@ void CRecordingWidget::stopReplay()
     m_replayFrames.clear();
     m_currentReplayFrame = 0;
     
-    m_replayStatusLabel->setText("Status: <span style='color: #94a3b8;'>Idle</span>");
+    m_replayStatusLabel->setText("Status: <span style='color: #9a9a9a;'>Idle</span>");
     m_replayProgressLabel->setText("Progress: 0 / 0");
     m_playButton->setEnabled(true);
     m_pausePlayButton->setEnabled(false);
@@ -555,12 +555,12 @@ void CRecordingWidget::pauseReplay()
     if (m_isReplayPaused) {
         m_replayTimer->start(RECORD_INTERVAL / m_replaySpeed);
         m_isReplayPaused = false;
-        m_replayStatusLabel->setText("Status: <span style='color: #4ade80;'>▶ Playing</span>");
+        m_replayStatusLabel->setText("Status: <span style='color: #8a8a8a;'>▶ Playing</span>");
         m_pausePlayButton->setText("⏸ Pause");
     } else {
         m_replayTimer->stop();
         m_isReplayPaused = true;
-        m_replayStatusLabel->setText("Status: <span style='color: #fbbf24;'>⏸ Paused</span>");
+        m_replayStatusLabel->setText("Status: <span style='color: #8a8a8a;'>⏸ Paused</span>");
         m_pausePlayButton->setText("▶ Resume");
     }
 }

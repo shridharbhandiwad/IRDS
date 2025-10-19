@@ -66,8 +66,8 @@ QPushButton* CInterfacesPanelWidget::createStyledButton(const QString &text, con
         "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 %4, stop:1 %2);"
         "}"
         "QPushButton:disabled {"
-        "   background-color: #4a5568;"
-        "   color: #a0aec0;"
+        "   background-color: #5a5a5a;"
+        "   color: #9a9a9a;"
         "}"
     ).arg(colorHex).arg(color.darker(110).name()).arg(hoverColor).arg(pressColor));
     
@@ -79,20 +79,20 @@ QGroupBox* CInterfacesPanelWidget::createStyledGroup(const QString &title)
     QGroupBox *group = new QGroupBox(title);
     group->setStyleSheet(
         "QGroupBox {"
-        "   background-color: #2d3748;"
-        "   border: 2px solid #4a5568;"
+        "   background-color: #3a3a3a;"
+        "   border: 2px solid #5a5a5a;"
         "   border-radius: 12px;"
         "   margin-top: 16px;"
         "   padding: 16px;"
         "   font-weight: bold;"
-        "   color: #ffffff;"
+        "   color: #f0f0f0;"
         "   font-size: 13px;"
         "}"
         "QGroupBox::title {"
         "   subcontrol-origin: margin;"
         "   subcontrol-position: top left;"
         "   padding: 6px 12px;"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #667eea, stop:1 #764ba2);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #6a6a6a, stop:1 #764ba2);"
         "   border-radius: 6px;"
         "   color: white;"
         "   font-size: 12px;"
@@ -105,19 +105,19 @@ QString CInterfacesPanelWidget::getSliderStyle()
 {
     return QString(
         "QSlider::groove:horizontal {"
-        "   background: #1a202c;"
+        "   background: #2a2a2a;"
         "   height: 8px;"
         "   border-radius: 4px;"
         "}"
         "QSlider::handle:horizontal {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #667eea, stop:1 #764ba2);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #6a6a6a, stop:1 #764ba2);"
         "   width: 18px;"
         "   height: 18px;"
         "   margin: -5px 0;"
         "   border-radius: 9px;"
         "}"
         "QSlider::sub-page:horizontal {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #667eea, stop:1 #764ba2);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #6a6a6a, stop:1 #764ba2);"
         "   border-radius: 4px;"
         "}"
     );
@@ -127,7 +127,7 @@ QString CInterfacesPanelWidget::getCheckboxStyle(const QString &color)
 {
     return QString(
         "QCheckBox {"
-        "   color: #ffffff;"
+        "   color: #f0f0f0;"
         "   font-size: 12px;"
         "   font-weight: bold;"
         "   spacing: 8px;"
@@ -136,8 +136,8 @@ QString CInterfacesPanelWidget::getCheckboxStyle(const QString &color)
         "   width: 20px;"
         "   height: 20px;"
         "   border-radius: 4px;"
-        "   border: 2px solid #4a5568;"
-        "   background-color: #1a202c;"
+        "   border: 2px solid #5a5a5a;"
+        "   background-color: #2a2a2a;"
         "}"
         "QCheckBox::indicator:checked {"
         "   background-color: %1;"
@@ -162,7 +162,7 @@ void CInterfacesPanelWidget::createServoTab()
     posLayout->setSpacing(10);
     
     QLabel *lblAz = new QLabel("Azimuth (°):");
-    lblAz->setStyleSheet("color: #e2e8f0; font-size: 12px;");
+    lblAz->setStyleSheet("color: #d0d0d0; font-size: 12px;");
     posLayout->addWidget(lblAz, 0, 0);
     
     m_spinServoAz = new QDoubleSpinBox();
@@ -170,20 +170,20 @@ void CInterfacesPanelWidget::createServoTab()
     m_spinServoAz->setValue(0.0);
     m_spinServoAz->setDecimals(2);
     m_spinServoAz->setStyleSheet(
-        "QDoubleSpinBox { background-color: #1a202c; color: #ffffff; border: 2px solid #4a5568; "
+        "QDoubleSpinBox { background-color: #2a2a2a; color: #f0f0f0; border: 2px solid #5a5a5a; "
         "border-radius: 6px; padding: 8px; font-size: 12px; }"
-        "QDoubleSpinBox:focus { border: 2px solid #667eea; }"
+        "QDoubleSpinBox:focus { border: 2px solid #6a6a6a; }"
     );
     connect(m_spinServoAz, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
             this, &CInterfacesPanelWidget::servoAzimuthChanged);
     posLayout->addWidget(m_spinServoAz, 0, 1);
     
     m_lblServoAzPos = new QLabel("Current: 0.00°");
-    m_lblServoAzPos->setStyleSheet("color: #48bb78; font-size: 11px; font-weight: bold;");
+    m_lblServoAzPos->setStyleSheet("color: #7a7a7a; font-size: 11px; font-weight: bold;");
     posLayout->addWidget(m_lblServoAzPos, 0, 2);
     
     QLabel *lblEl = new QLabel("Elevation (°):");
-    lblEl->setStyleSheet("color: #e2e8f0; font-size: 12px;");
+    lblEl->setStyleSheet("color: #d0d0d0; font-size: 12px;");
     posLayout->addWidget(lblEl, 1, 0);
     
     m_spinServoEl = new QDoubleSpinBox();
@@ -196,7 +196,7 @@ void CInterfacesPanelWidget::createServoTab()
     posLayout->addWidget(m_spinServoEl, 1, 1);
     
     m_lblServoElPos = new QLabel("Current: 0.00°");
-    m_lblServoElPos->setStyleSheet("color: #48bb78; font-size: 11px; font-weight: bold;");
+    m_lblServoElPos->setStyleSheet("color: #7a7a7a; font-size: 11px; font-weight: bold;");
     posLayout->addWidget(m_lblServoElPos, 1, 2);
     
     layout->addWidget(posGroup);
@@ -207,7 +207,7 @@ void CInterfacesPanelWidget::createServoTab()
     speedLayout->setSpacing(10);
     
     QLabel *lblSpeed = new QLabel("Speed:");
-    lblSpeed->setStyleSheet("color: #e2e8f0; font-size: 12px;");
+    lblSpeed->setStyleSheet("color: #d0d0d0; font-size: 12px;");
     speedLayout->addWidget(lblSpeed, 0, 0);
     
     m_sliderServoSpeed = new QSlider(Qt::Horizontal);
@@ -222,7 +222,7 @@ void CInterfacesPanelWidget::createServoTab()
     m_spinServoSpeed->setSuffix(" %");
     m_spinServoSpeed->setMaximumWidth(70);
     m_spinServoSpeed->setStyleSheet(
-        "QSpinBox { background-color: #1a202c; color: #ffffff; border: 2px solid #4a5568; "
+        "QSpinBox { background-color: #2a2a2a; color: #f0f0f0; border: 2px solid #5a5a5a; "
         "border-radius: 6px; padding: 4px; }"
     );
     speedLayout->addWidget(m_spinServoSpeed, 0, 2);
@@ -244,9 +244,9 @@ void CInterfacesPanelWidget::createServoTab()
     m_progressServo->setTextVisible(true);
     m_progressServo->setFormat("Movement: %p%");
     m_progressServo->setStyleSheet(
-        "QProgressBar { background-color: #1a202c; border: 2px solid #4a5568; border-radius: 6px; "
+        "QProgressBar { background-color: #2a2a2a; border: 2px solid #5a5a5a; border-radius: 6px; "
         "text-align: center; color: white; font-weight: bold; }"
-        "QProgressBar::chunk { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #667eea, stop:1 #764ba2); "
+        "QProgressBar::chunk { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #6a6a6a, stop:1 #764ba2); "
         "border-radius: 4px; }"
     );
     statusLayout->addWidget(m_progressServo);
@@ -293,17 +293,17 @@ void CInterfacesPanelWidget::createRadarTab()
     modeLayout->setSpacing(10);
     
     QLabel *lblMode = new QLabel("Operating Mode:");
-    lblMode->setStyleSheet("color: #e2e8f0; font-size: 12px;");
+    lblMode->setStyleSheet("color: #d0d0d0; font-size: 12px;");
     modeLayout->addWidget(lblMode);
     
     m_comboRadarMode = new QComboBox();
     m_comboRadarMode->addItems({"🔍 Search", "🎯 Track", "📡 Surveillance", "🌊 Weather", "⚡ Combat"});
     m_comboRadarMode->setStyleSheet(
-        "QComboBox { background-color: #1a202c; color: #ffffff; border: 2px solid #4a5568; "
+        "QComboBox { background-color: #2a2a2a; color: #f0f0f0; border: 2px solid #5a5a5a; "
         "border-radius: 8px; padding: 10px; font-size: 12px; }"
-        "QComboBox:hover { border: 2px solid #667eea; }"
-        "QComboBox QAbstractItemView { background-color: #2d3748; color: #ffffff; "
-        "selection-background-color: #667eea; border: 2px solid #4a5568; }"
+        "QComboBox:hover { border: 2px solid #6a6a6a; }"
+        "QComboBox QAbstractItemView { background-color: #3a3a3a; color: #f0f0f0; "
+        "selection-background-color: #6a6a6a; border: 2px solid #5a5a5a; }"
     );
     connect(m_comboRadarMode, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &CInterfacesPanelWidget::radarModeChanged);
@@ -317,7 +317,7 @@ void CInterfacesPanelWidget::createRadarTab()
     rangeLayout->setSpacing(10);
     
     QLabel *lblRange = new QLabel("Range (km):");
-    lblRange->setStyleSheet("color: #e2e8f0; font-size: 12px;");
+    lblRange->setStyleSheet("color: #d0d0d0; font-size: 12px;");
     rangeLayout->addWidget(lblRange, 0, 0);
     
     m_spinRadarRange = new QDoubleSpinBox();
@@ -325,7 +325,7 @@ void CInterfacesPanelWidget::createRadarTab()
     m_spinRadarRange->setValue(50.0);
     m_spinRadarRange->setDecimals(1);
     m_spinRadarRange->setStyleSheet(
-        "QDoubleSpinBox { background-color: #1a202c; color: #ffffff; border: 2px solid #4a5568; "
+        "QDoubleSpinBox { background-color: #2a2a2a; color: #f0f0f0; border: 2px solid #5a5a5a; "
         "border-radius: 6px; padding: 8px; }"
     );
     connect(m_spinRadarRange, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
@@ -333,7 +333,7 @@ void CInterfacesPanelWidget::createRadarTab()
     rangeLayout->addWidget(m_spinRadarRange, 0, 1);
     
     QLabel *lblGain = new QLabel("Gain:");
-    lblGain->setStyleSheet("color: #e2e8f0; font-size: 12px;");
+    lblGain->setStyleSheet("color: #d0d0d0; font-size: 12px;");
     rangeLayout->addWidget(lblGain, 1, 0);
     
     m_sliderRadarGain = new QSlider(Qt::Horizontal);
@@ -347,8 +347,8 @@ void CInterfacesPanelWidget::createRadarTab()
     m_spinRadarGain->setValue(70);
     m_spinRadarGain->setSuffix(" dB");
     m_spinRadarGain->setMaximumWidth(70);
-    m_spinRadarGain->setStyleSheet("QSpinBox { background-color: #1a202c; color: #ffffff; "
-                                    "border: 2px solid #4a5568; border-radius: 6px; padding: 4px; }");
+    m_spinRadarGain->setStyleSheet("QSpinBox { background-color: #2a2a2a; color: #f0f0f0; "
+                                    "border: 2px solid #5a5a5a; border-radius: 6px; padding: 4px; }");
     rangeLayout->addWidget(m_spinRadarGain, 1, 2);
     
     connect(m_sliderRadarGain, &QSlider::valueChanged, m_spinRadarGain, &QSpinBox::setValue);
@@ -363,18 +363,18 @@ void CInterfacesPanelWidget::createRadarTab()
     statusLayout->setSpacing(8);
     
     m_lblRadarStatus = new QLabel("Status: ⚪ Standby");
-    m_lblRadarStatus->setStyleSheet("color: #fbbf24; font-size: 13px; font-weight: bold; "
-                                     "background-color: #1a202c; padding: 10px; border-radius: 6px;");
+    m_lblRadarStatus->setStyleSheet("color: #8a8a8a; font-size: 13px; font-weight: bold; "
+                                     "background-color: #2a2a2a; padding: 10px; border-radius: 6px;");
     statusLayout->addWidget(m_lblRadarStatus);
     
     m_chkRadarDoppler = new QCheckBox("Doppler Processing");
     m_chkRadarDoppler->setChecked(true);
-    m_chkRadarDoppler->setStyleSheet(getCheckboxStyle("#3b82f6"));
+    m_chkRadarDoppler->setStyleSheet(getCheckboxStyle("#6a6a6a"));
     statusLayout->addWidget(m_chkRadarDoppler);
     
     m_chkRadarMTI = new QCheckBox("MTI Filter");
     m_chkRadarMTI->setChecked(false);
-    m_chkRadarMTI->setStyleSheet(getCheckboxStyle("#3b82f6"));
+    m_chkRadarMTI->setStyleSheet(getCheckboxStyle("#6a6a6a"));
     statusLayout->addWidget(m_chkRadarMTI);
     
     layout->addWidget(statusGroup);
@@ -415,21 +415,21 @@ void CInterfacesPanelWidget::createGunTab()
     targetLayout->setSpacing(10);
     
     QLabel *lblGunAz = new QLabel("Azimuth (°):");
-    lblGunAz->setStyleSheet("color: #e2e8f0; font-size: 12px;");
+    lblGunAz->setStyleSheet("color: #d0d0d0; font-size: 12px;");
     targetLayout->addWidget(lblGunAz, 0, 0);
     
     m_spinGunAz = new QDoubleSpinBox();
     m_spinGunAz->setRange(-180.0, 180.0);
     m_spinGunAz->setValue(0.0);
     m_spinGunAz->setDecimals(2);
-    m_spinGunAz->setStyleSheet("QDoubleSpinBox { background-color: #1a202c; color: #ffffff; "
-                                "border: 2px solid #4a5568; border-radius: 6px; padding: 8px; }");
+    m_spinGunAz->setStyleSheet("QDoubleSpinBox { background-color: #2a2a2a; color: #f0f0f0; "
+                                "border: 2px solid #5a5a5a; border-radius: 6px; padding: 8px; }");
     connect(m_spinGunAz, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
             this, &CInterfacesPanelWidget::gunAzimuthChanged);
     targetLayout->addWidget(m_spinGunAz, 0, 1);
     
     QLabel *lblGunEl = new QLabel("Elevation (°):");
-    lblGunEl->setStyleSheet("color: #e2e8f0; font-size: 12px;");
+    lblGunEl->setStyleSheet("color: #d0d0d0; font-size: 12px;");
     targetLayout->addWidget(lblGunEl, 1, 0);
     
     m_spinGunEl = new QDoubleSpinBox();
@@ -449,21 +449,21 @@ void CInterfacesPanelWidget::createGunTab()
     ammoLayout->setSpacing(10);
     
     QLabel *lblRounds = new QLabel("Burst Size:");
-    lblRounds->setStyleSheet("color: #e2e8f0; font-size: 12px;");
+    lblRounds->setStyleSheet("color: #d0d0d0; font-size: 12px;");
     ammoLayout->addWidget(lblRounds, 0, 0);
     
     m_spinGunRounds = new QSpinBox();
     m_spinGunRounds->setRange(1, 100);
     m_spinGunRounds->setValue(10);
     m_spinGunRounds->setSuffix(" rounds");
-    m_spinGunRounds->setStyleSheet("QSpinBox { background-color: #1a202c; color: #ffffff; "
-                                    "border: 2px solid #4a5568; border-radius: 6px; padding: 8px; }");
+    m_spinGunRounds->setStyleSheet("QSpinBox { background-color: #2a2a2a; color: #f0f0f0; "
+                                    "border: 2px solid #5a5a5a; border-radius: 6px; padding: 8px; }");
     connect(m_spinGunRounds, QOverload<int>::of(&QSpinBox::valueChanged),
             this, &CInterfacesPanelWidget::gunRoundsChanged);
     ammoLayout->addWidget(m_spinGunRounds, 0, 1);
     
     m_lblGunRoundsRemaining = new QLabel("Remaining: 1000 rounds");
-    m_lblGunRoundsRemaining->setStyleSheet("color: #48bb78; font-size: 12px; font-weight: bold;");
+    m_lblGunRoundsRemaining->setStyleSheet("color: #7a7a7a; font-size: 12px; font-weight: bold;");
     ammoLayout->addWidget(m_lblGunRoundsRemaining, 1, 0, 1, 2);
     
     layout->addWidget(ammoGroup);
@@ -474,7 +474,7 @@ void CInterfacesPanelWidget::createGunTab()
     statusLayout->setSpacing(8);
     
     QLabel *lblTemp = new QLabel("Barrel Temperature:");
-    lblTemp->setStyleSheet("color: #e2e8f0; font-size: 12px;");
+    lblTemp->setStyleSheet("color: #d0d0d0; font-size: 12px;");
     statusLayout->addWidget(lblTemp);
     
     m_progressGunTemp = new QProgressBar();
@@ -483,16 +483,16 @@ void CInterfacesPanelWidget::createGunTab()
     m_progressGunTemp->setTextVisible(true);
     m_progressGunTemp->setFormat("%p% (Safe)");
     m_progressGunTemp->setStyleSheet(
-        "QProgressBar { background-color: #1a202c; border: 2px solid #4a5568; border-radius: 6px; "
+        "QProgressBar { background-color: #2a2a2a; border: 2px solid #5a5a5a; border-radius: 6px; "
         "text-align: center; color: white; font-weight: bold; }"
         "QProgressBar::chunk { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, "
-        "stop:0 #48bb78, stop:0.7 #fbbf24, stop:1 #ef4444); border-radius: 4px; }"
+        "stop:0 #7a7a7a, stop:0.7 #8a8a8a, stop:1 #6a6a6a); border-radius: 4px; }"
     );
     statusLayout->addWidget(m_progressGunTemp);
     
     m_chkGunSafety = new QCheckBox("🔒 Safety Lock (ON)");
     m_chkGunSafety->setChecked(true);
-    m_chkGunSafety->setStyleSheet(getCheckboxStyle("#ef4444"));
+    m_chkGunSafety->setStyleSheet(getCheckboxStyle("#6a6a6a"));
     connect(m_chkGunSafety, &QCheckBox::toggled, this, [this](bool checked) {
         m_chkGunSafety->setText(checked ? "🔒 Safety Lock (ON)" : "🔓 Safety Lock (OFF)");
         emit gunSafetyToggled(checked);
@@ -541,17 +541,17 @@ void CInterfacesPanelWidget::createMissileTab()
     selectLayout->setSpacing(10);
     
     QLabel *lblType = new QLabel("Missile Type:");
-    lblType->setStyleSheet("color: #e2e8f0; font-size: 12px;");
+    lblType->setStyleSheet("color: #d0d0d0; font-size: 12px;");
     selectLayout->addWidget(lblType);
     
     m_comboMissileType = new QComboBox();
     m_comboMissileType->addItems({"🚀 AIM-120 AMRAAM", "🎯 AIM-9 Sidewinder", "💣 AGM-88 HARM", 
                                    "🌊 Harpoon", "⚡ SM-2"});
     m_comboMissileType->setStyleSheet(
-        "QComboBox { background-color: #1a202c; color: #ffffff; border: 2px solid #4a5568; "
+        "QComboBox { background-color: #2a2a2a; color: #f0f0f0; border: 2px solid #5a5a5a; "
         "border-radius: 8px; padding: 10px; font-size: 12px; }"
-        "QComboBox QAbstractItemView { background-color: #2d3748; color: #ffffff; "
-        "selection-background-color: #667eea; }"
+        "QComboBox QAbstractItemView { background-color: #3a3a3a; color: #f0f0f0; "
+        "selection-background-color: #6a6a6a; }"
     );
     connect(m_comboMissileType, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &CInterfacesPanelWidget::missileTypeChanged);
@@ -565,21 +565,21 @@ void CInterfacesPanelWidget::createMissileTab()
     targetLayout->setSpacing(10);
     
     QLabel *lblTarget = new QLabel("Target Track ID:");
-    lblTarget->setStyleSheet("color: #e2e8f0; font-size: 12px;");
+    lblTarget->setStyleSheet("color: #d0d0d0; font-size: 12px;");
     targetLayout->addWidget(lblTarget, 0, 0);
     
     m_spinMissileTarget = new QSpinBox();
     m_spinMissileTarget->setRange(1, 999);
     m_spinMissileTarget->setValue(1);
     m_spinMissileTarget->setPrefix("TID: ");
-    m_spinMissileTarget->setStyleSheet("QSpinBox { background-color: #1a202c; color: #ffffff; "
-                                        "border: 2px solid #4a5568; border-radius: 6px; padding: 8px; }");
+    m_spinMissileTarget->setStyleSheet("QSpinBox { background-color: #2a2a2a; color: #f0f0f0; "
+                                        "border: 2px solid #5a5a5a; border-radius: 6px; padding: 8px; }");
     connect(m_spinMissileTarget, QOverload<int>::of(&QSpinBox::valueChanged),
             this, &CInterfacesPanelWidget::missileTargetLocked);
     targetLayout->addWidget(m_spinMissileTarget, 0, 1);
     
     QLabel *lblLock = new QLabel("Target Lock:");
-    lblLock->setStyleSheet("color: #e2e8f0; font-size: 12px;");
+    lblLock->setStyleSheet("color: #d0d0d0; font-size: 12px;");
     targetLayout->addWidget(lblLock, 1, 0);
     
     m_progressMissileLock = new QProgressBar();
@@ -588,10 +588,10 @@ void CInterfacesPanelWidget::createMissileTab()
     m_progressMissileLock->setTextVisible(true);
     m_progressMissileLock->setFormat("Lock Quality: %p%");
     m_progressMissileLock->setStyleSheet(
-        "QProgressBar { background-color: #1a202c; border: 2px solid #4a5568; border-radius: 6px; "
+        "QProgressBar { background-color: #2a2a2a; border: 2px solid #5a5a5a; border-radius: 6px; "
         "text-align: center; color: white; font-weight: bold; }"
         "QProgressBar::chunk { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, "
-        "stop:0 #ef4444, stop:0.5 #fbbf24, stop:1 #48bb78); border-radius: 4px; }"
+        "stop:0 #6a6a6a, stop:0.5 #8a8a8a, stop:1 #7a7a7a); border-radius: 4px; }"
     );
     targetLayout->addWidget(m_progressMissileLock, 1, 1);
     
@@ -603,13 +603,13 @@ void CInterfacesPanelWidget::createMissileTab()
     statusLayout->setSpacing(8);
     
     m_lblMissileStatus = new QLabel("Status: ⚪ Safe");
-    m_lblMissileStatus->setStyleSheet("color: #fbbf24; font-size: 13px; font-weight: bold; "
-                                       "background-color: #1a202c; padding: 10px; border-radius: 6px;");
+    m_lblMissileStatus->setStyleSheet("color: #8a8a8a; font-size: 13px; font-weight: bold; "
+                                       "background-color: #2a2a2a; padding: 10px; border-radius: 6px;");
     statusLayout->addWidget(m_lblMissileStatus);
     
     m_chkMissileArm = new QCheckBox("⚠️ ARM Missile");
     m_chkMissileArm->setChecked(false);
-    m_chkMissileArm->setStyleSheet(getCheckboxStyle("#ef4444"));
+    m_chkMissileArm->setStyleSheet(getCheckboxStyle("#6a6a6a"));
     connect(m_chkMissileArm, &QCheckBox::toggled, this, &CInterfacesPanelWidget::missileArmToggled);
     statusLayout->addWidget(m_chkMissileArm);
     
@@ -656,7 +656,7 @@ void CInterfacesPanelWidget::createEOTSTab()
     opticalLayout->setSpacing(10);
     
     QLabel *lblZoom = new QLabel("Zoom:");
-    lblZoom->setStyleSheet("color: #e2e8f0; font-size: 12px;");
+    lblZoom->setStyleSheet("color: #d0d0d0; font-size: 12px;");
     opticalLayout->addWidget(lblZoom, 0, 0);
     
     m_spinEOTSZoom = new QDoubleSpinBox();
@@ -664,14 +664,14 @@ void CInterfacesPanelWidget::createEOTSTab()
     m_spinEOTSZoom->setValue(1.0);
     m_spinEOTSZoom->setDecimals(1);
     m_spinEOTSZoom->setSuffix("x");
-    m_spinEOTSZoom->setStyleSheet("QDoubleSpinBox { background-color: #1a202c; color: #ffffff; "
-                                   "border: 2px solid #4a5568; border-radius: 6px; padding: 8px; }");
+    m_spinEOTSZoom->setStyleSheet("QDoubleSpinBox { background-color: #2a2a2a; color: #f0f0f0; "
+                                   "border: 2px solid #5a5a5a; border-radius: 6px; padding: 8px; }");
     connect(m_spinEOTSZoom, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
             this, &CInterfacesPanelWidget::eotsZoomChanged);
     opticalLayout->addWidget(m_spinEOTSZoom, 0, 1);
     
     QLabel *lblBrightness = new QLabel("Brightness:");
-    lblBrightness->setStyleSheet("color: #e2e8f0; font-size: 12px;");
+    lblBrightness->setStyleSheet("color: #d0d0d0; font-size: 12px;");
     opticalLayout->addWidget(lblBrightness, 1, 0);
     
     m_sliderEOTSBrightness = new QSlider(Qt::Horizontal);
@@ -684,8 +684,8 @@ void CInterfacesPanelWidget::createEOTSTab()
     m_spinEOTSBrightness->setRange(0, 100);
     m_spinEOTSBrightness->setValue(50);
     m_spinEOTSBrightness->setMaximumWidth(60);
-    m_spinEOTSBrightness->setStyleSheet("QSpinBox { background-color: #1a202c; color: #ffffff; "
-                                         "border: 2px solid #4a5568; border-radius: 6px; padding: 4px; }");
+    m_spinEOTSBrightness->setStyleSheet("QSpinBox { background-color: #2a2a2a; color: #f0f0f0; "
+                                         "border: 2px solid #5a5a5a; border-radius: 6px; padding: 4px; }");
     opticalLayout->addWidget(m_spinEOTSBrightness, 1, 2);
     
     connect(m_sliderEOTSBrightness, &QSlider::valueChanged, m_spinEOTSBrightness, &QSpinBox::setValue);
@@ -693,7 +693,7 @@ void CInterfacesPanelWidget::createEOTSTab()
     connect(m_sliderEOTSBrightness, &QSlider::valueChanged, this, &CInterfacesPanelWidget::eotsBrightnessChanged);
     
     QLabel *lblContrast = new QLabel("Contrast:");
-    lblContrast->setStyleSheet("color: #e2e8f0; font-size: 12px;");
+    lblContrast->setStyleSheet("color: #d0d0d0; font-size: 12px;");
     opticalLayout->addWidget(lblContrast, 2, 0);
     
     m_sliderEOTSContrast = new QSlider(Qt::Horizontal);
@@ -724,15 +724,15 @@ void CInterfacesPanelWidget::createEOTSTab()
     m_comboEOTSMode->addItems({"📷 Visual", "🌡️ Thermal (FLIR)", "🌃 Night Vision", 
                                 "🎨 False Color", "📊 Edge Enhance"});
     m_comboEOTSMode->setStyleSheet(
-        "QComboBox { background-color: #1a202c; color: #ffffff; border: 2px solid #4a5568; "
+        "QComboBox { background-color: #2a2a2a; color: #f0f0f0; border: 2px solid #5a5a5a; "
         "border-radius: 8px; padding: 10px; font-size: 12px; }"
-        "QComboBox QAbstractItemView { background-color: #2d3748; color: #ffffff; "
-        "selection-background-color: #667eea; }"
+        "QComboBox QAbstractItemView { background-color: #3a3a3a; color: #f0f0f0; "
+        "selection-background-color: #6a6a6a; }"
     );
     modeLayout->addWidget(m_comboEOTSMode);
     
     m_chkEOTSIR = new QCheckBox("IR Mode (Thermal)");
-    m_chkEOTSIR->setStyleSheet(getCheckboxStyle("#ef4444"));
+    m_chkEOTSIR->setStyleSheet(getCheckboxStyle("#6a6a6a"));
     connect(m_chkEOTSIR, &QCheckBox::toggled, this, &CInterfacesPanelWidget::eotsIRModeToggled);
     modeLayout->addWidget(m_chkEOTSIR);
     
@@ -753,7 +753,7 @@ void CInterfacesPanelWidget::createEOTSTab()
     laserLayout->addWidget(m_btnEOTSLaser);
     
     QLabel *lblLaserWarning = new QLabel("⚠️ Laser radiation hazard");
-    lblLaserWarning->setStyleSheet("color: #fbbf24; font-size: 10px; font-style: italic;");
+    lblLaserWarning->setStyleSheet("color: #8a8a8a; font-size: 10px; font-style: italic;");
     laserLayout->addWidget(lblLaserWarning);
     
     layout->addWidget(laserGroup);
@@ -777,14 +777,14 @@ void CInterfacesPanelWidget::createLoggingTab()
     // Log level selection
     QHBoxLayout *logLevelLayout = new QHBoxLayout();
     QLabel *lblLogLevel = new QLabel("Log Level:");
-    lblLogLevel->setStyleSheet("color: #e2e8f0; font-size: 12px;");
+    lblLogLevel->setStyleSheet("color: #d0d0d0; font-size: 12px;");
     logLevelLayout->addWidget(lblLogLevel);
     
     m_comboLogLevel = new QComboBox();
     m_comboLogLevel->addItems({"🔍 Debug", "ℹ️ Info", "⚠️ Warning", "❌ Error", "💥 Critical"});
     m_comboLogLevel->setCurrentIndex(1);
     m_comboLogLevel->setStyleSheet(
-        "QComboBox { background-color: #1a202c; color: #ffffff; border: 2px solid #4a5568; "
+        "QComboBox { background-color: #2a2a2a; color: #f0f0f0; border: 2px solid #5a5a5a; "
         "border-radius: 6px; padding: 6px; font-size: 11px; }"
     );
     logLevelLayout->addWidget(m_comboLogLevel);
@@ -793,12 +793,12 @@ void CInterfacesPanelWidget::createLoggingTab()
     // Log options
     m_chkLogTimestamp = new QCheckBox("Show Timestamp");
     m_chkLogTimestamp->setChecked(true);
-    m_chkLogTimestamp->setStyleSheet(getCheckboxStyle("#3b82f6"));
+    m_chkLogTimestamp->setStyleSheet(getCheckboxStyle("#6a6a6a"));
     logLayout->addWidget(m_chkLogTimestamp);
     
     m_chkLogLevel = new QCheckBox("Show Log Level");
     m_chkLogLevel->setChecked(true);
-    m_chkLogLevel->setStyleSheet(getCheckboxStyle("#3b82f6"));
+    m_chkLogLevel->setStyleSheet(getCheckboxStyle("#6a6a6a"));
     logLayout->addWidget(m_chkLogLevel);
     
     // Log text area
@@ -806,7 +806,7 @@ void CInterfacesPanelWidget::createLoggingTab()
     m_textLog->setReadOnly(true);
     m_textLog->setMaximumHeight(200);
     m_textLog->setStyleSheet(
-        "QTextEdit { background-color: #0a0e1a; color: #48bb78; border: 2px solid #4a5568; "
+        "QTextEdit { background-color: #0a0e1a; color: #7a7a7a; border: 2px solid #5a5a5a; "
         "border-radius: 8px; padding: 10px; font-family: 'Courier New', monospace; font-size: 11px; }"
     );
     m_textLog->append("[" + QDateTime::currentDateTime().toString("HH:mm:ss") + "] System initialized");
@@ -845,8 +845,8 @@ void CInterfacesPanelWidget::createLoggingTab()
     recLayout->setSpacing(10);
     
     m_lblRecStatus = new QLabel("Status: ⚪ Idle");
-    m_lblRecStatus->setStyleSheet("color: #a0aec0; font-size: 12px; font-weight: bold; "
-                                   "background-color: #1a202c; padding: 8px; border-radius: 6px;");
+    m_lblRecStatus->setStyleSheet("color: #9a9a9a; font-size: 12px; font-weight: bold; "
+                                   "background-color: #2a2a2a; padding: 8px; border-radius: 6px;");
     recLayout->addWidget(m_lblRecStatus);
     
     m_progressRecTime = new QProgressBar();
@@ -854,10 +854,10 @@ void CInterfacesPanelWidget::createLoggingTab()
     m_progressRecTime->setValue(0);
     m_progressRecTime->setFormat("Duration: %v seconds");
     m_progressRecTime->setStyleSheet(
-        "QProgressBar { background-color: #1a202c; border: 2px solid #4a5568; border-radius: 6px; "
+        "QProgressBar { background-color: #2a2a2a; border: 2px solid #5a5a5a; border-radius: 6px; "
         "text-align: center; color: white; }"
         "QProgressBar::chunk { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, "
-        "stop:0 #667eea, stop:1 #764ba2); border-radius: 4px; }"
+        "stop:0 #6a6a6a, stop:1 #764ba2); border-radius: 4px; }"
     );
     recLayout->addWidget(m_progressRecTime);
     
@@ -896,7 +896,7 @@ void CInterfacesPanelWidget::createLoggingTab()
     
     QGridLayout *replaySpeedLayout = new QGridLayout();
     QLabel *lblSpeed = new QLabel("Speed:");
-    lblSpeed->setStyleSheet("color: #e2e8f0; font-size: 12px;");
+    lblSpeed->setStyleSheet("color: #d0d0d0; font-size: 12px;");
     replaySpeedLayout->addWidget(lblSpeed, 0, 0);
     
     m_sliderReplaySpeed = new QSlider(Qt::Horizontal);
@@ -911,8 +911,8 @@ void CInterfacesPanelWidget::createLoggingTab()
     m_spinReplaySpeed->setDecimals(1);
     m_spinReplaySpeed->setSuffix("x");
     m_spinReplaySpeed->setMaximumWidth(70);
-    m_spinReplaySpeed->setStyleSheet("QDoubleSpinBox { background-color: #1a202c; color: #ffffff; "
-                                      "border: 2px solid #4a5568; border-radius: 6px; padding: 4px; }");
+    m_spinReplaySpeed->setStyleSheet("QDoubleSpinBox { background-color: #2a2a2a; color: #f0f0f0; "
+                                      "border: 2px solid #5a5a5a; border-radius: 6px; padding: 4px; }");
     replaySpeedLayout->addWidget(m_spinReplaySpeed, 0, 2);
     
     connect(m_sliderReplaySpeed, &QSlider::valueChanged, this, [this](int value) {
@@ -957,15 +957,15 @@ void CInterfacesPanelWidget::applyRichStyle()
 {
     setStyleSheet(
         "QDockWidget {"
-        "   background-color: #1a202c;"
-        "   color: #ffffff;"
+        "   background-color: #2a2a2a;"
+        "   color: #f0f0f0;"
         "   font-size: 13px;"
         "   font-weight: bold;"
         "}"
         "QDockWidget::title {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #667eea, stop:1 #764ba2);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #6a6a6a, stop:1 #764ba2);"
         "   padding: 10px;"
-        "   border-bottom: 2px solid #4a5568;"
+        "   border-bottom: 2px solid #5a5a5a;"
         "   text-align: center;"
         "}"
         "QDockWidget::close-button, QDockWidget::float-button {"
@@ -980,14 +980,14 @@ void CInterfacesPanelWidget::applyRichStyle()
     
     m_tabWidget->setStyleSheet(
         "QTabWidget::pane {"
-        "   background-color: #1a202c;"
-        "   border: 2px solid #4a5568;"
+        "   background-color: #2a2a2a;"
+        "   border: 2px solid #5a5a5a;"
         "   border-radius: 8px;"
         "   top: -2px;"
         "}"
         "QTabBar::tab {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #2d3748, stop:1 #1a202c);"
-        "   color: #a0aec0;"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3a3a3a, stop:1 #2a2a2a);"
+        "   color: #9a9a9a;"
         "   padding: 15px 10px;"
         "   margin: 2px;"
         "   border-top-left-radius: 8px;"
@@ -998,12 +998,12 @@ void CInterfacesPanelWidget::applyRichStyle()
         "   text-align: center;"
         "}"
         "QTabBar::tab:selected {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #667eea, stop:1 #764ba2);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #6a6a6a, stop:1 #764ba2);"
         "   color: white;"
         "}"
         "QTabBar::tab:hover:!selected {"
-        "   background: #2d3748;"
-        "   color: #ffffff;"
+        "   background: #3a3a3a;"
+        "   color: #f0f0f0;"
         "}"
     );
 }

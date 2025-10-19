@@ -39,7 +39,7 @@ void CChartsWidget::setupUI()
     QHBoxLayout *toolbarLayout = new QHBoxLayout();
 
     QLabel *lblTitle = new QLabel("📊 Radar Display Charts");
-    lblTitle->setStyleSheet("color: #ffffff; font-size: 14px; font-weight: bold;");
+    lblTitle->setStyleSheet("color: #f0f0f0; font-size: 14px; font-weight: bold;");
     toolbarLayout->addWidget(lblTitle);
 
     toolbarLayout->addStretch();
@@ -47,7 +47,7 @@ void CChartsWidget::setupUI()
     QPushButton *btnExport = new QPushButton("Export");
     btnExport->setStyleSheet(
         "QPushButton {"
-        "   background-color: #667eea;"
+        "   background-color: #6a6a6a;"
         "   color: white;"
         "   border: none;"
         "   border-radius: 6px;"
@@ -55,7 +55,7 @@ void CChartsWidget::setupUI()
         "   font-weight: bold;"
         "}"
         "QPushButton:hover {"
-        "   background-color: #5568d3;"
+        "   background-color: #5a5a5a;"
         "}"
     );
     connect(btnExport, &QPushButton::clicked, this, &CChartsWidget::exportChart);
@@ -138,7 +138,7 @@ void CChartsWidget::createTimeSeriesTab()
     // Selector for time series type
     QHBoxLayout *selectorLayout = new QHBoxLayout();
     QLabel *lblSelect = new QLabel("Chart Type:");
-    lblSelect->setStyleSheet("color: #ffffff; font-weight: bold;");
+    lblSelect->setStyleSheet("color: #f0f0f0; font-weight: bold;");
     selectorLayout->addWidget(lblSelect);
 
     m_comboTimeSeriesType = new QComboBox();
@@ -151,19 +151,19 @@ void CChartsWidget::createTimeSeriesTab()
     });
     m_comboTimeSeriesType->setStyleSheet(
         "QComboBox {"
-        "   background-color: #2d3748;"
-        "   color: #ffffff;"
+        "   background-color: #3a3a3a;"
+        "   color: #f0f0f0;"
         "   border: 2px solid #4a5568;"
         "   border-radius: 6px;"
         "   padding: 6px;"
         "}"
         "QComboBox:hover {"
-        "   border: 2px solid #667eea;"
+        "   border: 2px solid #6a6a6a;"
         "}"
         "QComboBox QAbstractItemView {"
-        "   background-color: #2d3748;"
-        "   color: #ffffff;"
-        "   selection-background-color: #667eea;"
+        "   background-color: #3a3a3a;"
+        "   color: #f0f0f0;"
+        "   selection-background-color: #6a6a6a;"
         "}"
     );
     connect(m_comboTimeSeriesType, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -237,11 +237,11 @@ void CChartsWidget::applyRichStyle()
 {
     setStyleSheet(
         "QDockWidget {"
-        "   background-color: #1a202c;"
-        "   color: #ffffff;"
+        "   background-color: #2a2a2a;"
+        "   color: #f0f0f0;"
         "}"
         "QDockWidget::title {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #667eea, stop:1 #764ba2);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #6a6a6a, stop:1 #764ba2);"
         "   padding: 10px;"
         "   text-align: center;"
         "}"
@@ -249,12 +249,12 @@ void CChartsWidget::applyRichStyle()
 
     m_tabWidget->setStyleSheet(
         "QTabWidget::pane {"
-        "   background-color: #1a202c;"
+        "   background-color: #2a2a2a;"
         "   border: 2px solid #4a5568;"
         "   border-radius: 8px;"
         "}"
         "QTabBar::tab {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #2d3748, stop:1 #1a202c);"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3a3a3a, stop:1 #2a2a2a);"
         "   color: #a0aec0;"
         "   padding: 12px 20px;"
         "   margin: 2px;"
@@ -264,12 +264,12 @@ void CChartsWidget::applyRichStyle()
         "   font-weight: bold;"
         "}"
         "QTabBar::tab:selected {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #667eea, stop:1 #764ba2);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #6a6a6a, stop:1 #764ba2);"
         "   color: white;"
         "}"
         "QTabBar::tab:hover:!selected {"
-        "   background: #2d3748;"
-        "   color: #ffffff;"
+        "   background: #3a3a3a;"
+        "   color: #f0f0f0;"
         "}"
     );
 }
@@ -289,7 +289,7 @@ CCustomChart::CCustomChart(ChartType type, QWidget *parent)
     setMouseTracking(true);
     setCursor(Qt::CrossCursor);
 
-    setStyleSheet("background-color: #0f172a; border-radius: 8px;");
+    setStyleSheet("background-color: #1a1a1a; border-radius: 8px;");
 }
 
 CCustomChart::~CCustomChart()
