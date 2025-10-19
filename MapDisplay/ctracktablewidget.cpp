@@ -128,7 +128,20 @@ void CTrackTableWidget::setupUI()
         "ID", "Identity", "Lat", "Lon", "Alt (m)", "Range (km)", "Heading (°)", "Azimuth (°)", "Updated"
     });
 
-    m_tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    // Set resize mode to interactive for better control, but stretch last column
+    m_tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+    m_tableWidget->horizontalHeader()->setStretchLastSection(true);
+    
+    // Set minimum column widths to ensure all headers are visible
+    m_tableWidget->setColumnWidth(0, 60);   // ID
+    m_tableWidget->setColumnWidth(1, 110);  // Identity
+    m_tableWidget->setColumnWidth(2, 95);   // Lat
+    m_tableWidget->setColumnWidth(3, 95);   // Lon
+    m_tableWidget->setColumnWidth(4, 85);   // Alt (m)
+    m_tableWidget->setColumnWidth(5, 100);  // Range (km)
+    m_tableWidget->setColumnWidth(6, 105);  // Heading (°)
+    m_tableWidget->setColumnWidth(7, 110);  // Azimuth (°)
+    // Updated column will stretch
     m_tableWidget->verticalHeader()->setVisible(false);
     m_tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -137,13 +150,14 @@ void CTrackTableWidget::setupUI()
 
     m_tableWidget->setStyleSheet(
         "QTableWidget {"
-        "   background-color: #ffffff;"
-        "   alternate-background-color: #f8fafc;"
+        "   background-color: rgba(255, 255, 255, 0.95);"
+        "   alternate-background-color: rgba(248, 250, 252, 0.95);"
         "   color: #1e293b;"
         "   gridline-color: #e2e8f0;"
-        "   border: 2px solid #e2e8f0;"
+        "   border: 2px solid #cbd5e1;"
         "   border-radius: 8px;"
         "   font-size: 11px;"
+        "   selection-background-color: #3b82f6;"
         "}"
         "QTableWidget::item {"
         "   padding: 8px;"
@@ -157,13 +171,14 @@ void CTrackTableWidget::setupUI()
         "   background-color: #e0e7ff;"
         "}"
         "QHeaderView::section {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #f1f5f9, stop:1 #e2e8f0);"
-        "   color: #1e293b;"
-        "   padding: 8px;"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(241, 245, 249, 0.95), stop:1 rgba(226, 232, 240, 0.95));"
+        "   color: #0f172a;"
+        "   padding: 10px;"
         "   border: none;"
         "   border-bottom: 2px solid #3b82f6;"
         "   font-weight: bold;"
         "   font-size: 11px;"
+        "   text-align: center;"
         "}"
         "QHeaderView::section:hover {"
         "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #e2e8f0, stop:1 #cbd5e1);"
@@ -215,21 +230,24 @@ void CTrackTableWidget::setupUI()
 
     setWidget(mainWidget);
 
-    // Dock widget styling
+    // Dock widget styling with light transparent theme
     setStyleSheet(
         "QDockWidget {"
-        "   background-color: #f8fafc;"
+        "   background-color: rgba(248, 250, 252, 0.95);"
         "   color: #1e293b;"
         "   font-size: 12px;"
         "   font-weight: bold;"
         "}"
         "QDockWidget::title {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #f1f5f9, stop:1 #e2e8f0);"
-        "   padding: 8px;"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(241, 245, 249, 0.95), stop:1 rgba(226, 232, 240, 0.95));"
+        "   padding: 10px;"
         "   border-bottom: 2px solid #3b82f6;"
+        "   border-radius: 6px 6px 0px 0px;"
+        "   color: #0f172a;"
+        "   font-weight: 600;"
         "}"
         "QDockWidget::close-button, QDockWidget::float-button {"
-        "   background-color: #e2e8f0;"
+        "   background-color: rgba(226, 232, 240, 0.9);"
         "   border-radius: 4px;"
         "   padding: 2px;"
         "}"
