@@ -35,8 +35,8 @@ int main(int argc, char *argv[])
     QSplashScreen splash(splashPixmap);
     splash.setStyleSheet(
         "QSplashScreen {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #3b82f6, stop:1 #2563eb);"
-        "   color: white;"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #FFE4B5, stop:1 #FFDEAD);"
+        "   color: #000000;"
         "   font-family: 'Segoe UI', Arial, sans-serif;"
         "   font-size: 16px;"
         "   font-weight: 600;"
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     );
     
     splash.show();
-    splash.showMessage("🎯 Initializing Radar Display System...", Qt::AlignCenter | Qt::AlignBottom, Qt::white);
+    splash.showMessage("🎯 Initializing Radar Display System...", Qt::AlignCenter | Qt::AlignBottom, Qt::black);
     app.processEvents();
 
     // Initialize main window manager
@@ -52,12 +52,12 @@ int main(int argc, char *argv[])
     
     // Update splash
     QTimer::singleShot(1000, [&]() {
-        splash.showMessage("🖥️  Setting up dual monitor layout...", Qt::AlignCenter | Qt::AlignBottom, Qt::white);
+        splash.showMessage("🖥️  Setting up dual monitor layout...", Qt::AlignCenter | Qt::AlignBottom, Qt::black);
         app.processEvents();
     });
     
     QTimer::singleShot(2000, [&]() {
-        splash.showMessage("✅ System ready!", Qt::AlignCenter | Qt::AlignBottom, Qt::white);
+        splash.showMessage("✅ System ready!", Qt::AlignCenter | Qt::AlignBottom, Qt::black);
         app.processEvents();
     });
     

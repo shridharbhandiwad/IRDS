@@ -35,7 +35,7 @@ CMapCanvas::CMapCanvas(QWidget *parent) : QgsMapCanvas(parent),
         fixedWorldExtent.xMaximum() + padX,
         fixedWorldExtent.yMaximum() + padY);
 
-    setCanvasColor(QColor("#e0e7ff")); // Light blue-gray background
+    setCanvasColor(QColor("#FFF8E7")); // Creamy background
     enableAntiAliasing(true);
     setRenderFlag(true);
     freeze(false);
@@ -276,14 +276,14 @@ void CMapCanvas::setMapLayersVisible(bool visible)
             layer->setCustomProperty("userHidden", false);
         }
         setLayers(projectLayers);
-        setCanvasColor(QColor("#e0e7ff")); // Light blue-gray background
+        setCanvasColor(QColor("#FFF8E7")); // Creamy background
     } else {
         // Hide map layers, keep only PPI and track layers
         for (QgsMapLayer* layer : projectLayers) {
             layer->setCustomProperty("userHidden", true);
         }
         setLayers(QList<QgsMapLayer*>()); // Clear all layers
-        setCanvasColor(QColor("#1a1a2e")); // Dark background for PPI-only mode
+        setCanvasColor(QColor("#FFF8E7")); // Creamy background for PPI-only mode
     }
     
     // Ensure PPI and track layers are always visible

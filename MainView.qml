@@ -32,8 +32,8 @@ Rectangle {
             // Line Chart
             ChartView {
                 antialiasing: true
-                theme: ChartView.ChartThemeDark
-                backgroundColor: "#111"
+                theme: ChartView.ChartThemeLight
+                backgroundColor: "#FFF8E7"
                 LineSeries {
                     name: "Signal"
                    // points: [Qt.point(0,1), Qt.point(1,3), Qt.point(2,1), Qt.point(3,4)]
@@ -49,13 +49,13 @@ Rectangle {
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            color: "#111"
+            color: "#FFF8E7"
             radius: 10
-            border.color: "#00ffff"
+            border.color: "#DEB887"
             Text {
                 anchors.centerIn: parent
                 text: "Radar Placeholder"
-                color: "#00ffff"
+                color: "#000000"
             }
         }
     }

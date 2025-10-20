@@ -165,14 +165,14 @@ QFrame* CHealthMonitorWidget::createModuleCard(const QString &moduleName, const 
     card->setFrameShape(QFrame::StyledPanel);
     card->setStyleSheet(
         "QFrame {"
-        "   background-color: #1a202c;"
-        "   border: 2px solid #4a5568;"
+        "   background-color: #FFFAF0;"
+        "   border: 2px solid #A0826D;"
         "   border-radius: 8px;"
         "   padding: 8px;"
         "}"
         "QFrame:hover {"
-        "   border-color: #667eea;"
-        "   background-color: #1e293b;"
+        "   border-color: #FFD700;"
+        "   background-color: #000000;"
         "}"
     );
     
@@ -302,74 +302,74 @@ void CHealthMonitorWidget::applyModernStyle()
 {
     setStyleSheet(
         "QDockWidget {"
-        "   background-color: #0f172a;"
-        "   color: #ffffff;"
+        "   background-color: #000000;"
+        "   color: #FFF8E7;"
         "}"
         "QDockWidget::title {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #10b981, stop:1 #059669);"
-        "   color: white;"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #8B4513, stop:1 #8B7355);"
+        "   color: #000000;"
         "   padding: 10px;"
         "   font-weight: bold;"
         "   font-size: 13px;"
         "}"
         "QGroupBox {"
-        "   background-color: #1e293b;"
-        "   border: 2px solid #334155;"
+        "   background-color: #000000;"
+        "   border: 2px solid #000000;"
         "   border-radius: 10px;"
         "   margin-top: 16px;"
         "   padding-top: 18px;"
         "   font-weight: bold;"
-        "   color: #ffffff;"
+        "   color: #FFF8E7;"
         "}"
         "QGroupBox::title {"
         "   subcontrol-origin: margin;"
         "   subcontrol-position: top left;"
         "   padding: 6px 12px;"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #10b981, stop:1 #059669);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #8B4513, stop:1 #8B7355);"
         "   border-radius: 6px;"
-        "   color: white;"
+        "   color: #000000;"
         "}"
         "QPushButton {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #10b981, stop:1 #059669);"
-        "   color: white;"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #8B4513, stop:1 #8B7355);"
+        "   color: #000000;"
         "   border: none;"
         "   border-radius: 8px;"
         "   padding: 8px 12px;"
         "   font-weight: bold;"
         "}"
         "QPushButton:hover {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #059669, stop:1 #047857);"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #8B7355, stop:1 #8B4513);"
         "}"
         "QLabel {"
-        "   color: #e2e8f0;"
+        "   color: #F5DEB3;"
         "}"
         "QProgressBar {"
-        "   background-color: #1a202c;"
-        "   border: 2px solid #4a5568;"
+        "   background-color: #FFFAF0;"
+        "   border: 2px solid #A0826D;"
         "   border-radius: 6px;"
         "   text-align: center;"
-        "   color: white;"
+        "   color: #000000;"
         "   font-weight: bold;"
         "}"
         "QProgressBar::chunk {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #10b981, stop:1 #059669);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #8B4513, stop:1 #8B7355);"
         "   border-radius: 4px;"
         "}"
         "QTableWidget {"
-        "   background-color: #1a202c;"
-        "   color: #ffffff;"
-        "   border: 1px solid #4a5568;"
-        "   gridline-color: #4a5568;"
+        "   background-color: #FFFAF0;"
+        "   color: #FFF8E7;"
+        "   border: 1px solid #A0826D;"
+        "   gridline-color: #A0826D;"
         "}"
         "QHeaderView::section {"
-        "   background: #2d3748;"
-        "   color: #ffffff;"
+        "   background: #FFF8E7;"
+        "   color: #FFF8E7;"
         "   padding: 6px;"
-        "   border: 1px solid #4a5568;"
+        "   border: 1px solid #A0826D;"
         "   font-weight: bold;"
         "}"
         "QScrollArea {"
-        "   background-color: #0f172a;"
+        "   background-color: #000000;"
         "   border: none;"
         "}"
     );
@@ -426,7 +426,7 @@ void CHealthMonitorWidget::updateHealth()
     
     if (avgHealth >= 90) {
         m_systemHealthBar->setFormat("%v% - Excellent");
-        m_systemHealthBar->setStyleSheet("QProgressBar::chunk { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #10b981, stop:1 #059669); }");
+        m_systemHealthBar->setStyleSheet("QProgressBar::chunk { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #8B4513, stop:1 #8B7355); }");
     } else if (avgHealth >= 70) {
         m_systemHealthBar->setFormat("%v% - Good");
         m_systemHealthBar->setStyleSheet("QProgressBar::chunk { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #fbbf24, stop:1 #f59e0b); }");
@@ -497,9 +497,9 @@ QColor CHealthMonitorWidget::getHealthColor(HealthStatus status)
         case HEALTHY: return QColor("#4ade80");
         case WARNING: return QColor("#fbbf24");
         case CRITICAL: return QColor("#ef4444");
-        case OFFLINE: return QColor("#94a3b8");
+        case OFFLINE: return QColor("#000000");
         case MAINTENANCE: return QColor("#60a5fa");
-        default: return QColor("#ffffff");
+        default: return QColor("#FFF8E7");
     }
 }
 
