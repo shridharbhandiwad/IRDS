@@ -42,7 +42,7 @@ void CAnalyticsWidget::setupUI()
     m_controlsLayout = new QHBoxLayout();
     
     QLabel *timeWindowLabel = new QLabel("Time Window:");
-    timeWindowLabel->setStyleSheet("color: #ffffff; font-weight: bold;");
+    timeWindowLabel->setStyleSheet("color: #FFF8E7; font-weight: bold;");
     m_controlsLayout->addWidget(timeWindowLabel);
     
     m_timeWindowCombo = new QComboBox();
@@ -132,13 +132,13 @@ void CAnalyticsWidget::createOverallStatsSection()
     // Separator line
     QFrame *separator = new QFrame();
     separator->setFrameShape(QFrame::HLine);
-    separator->setStyleSheet("color: #4a5568;");
+    separator->setStyleSheet("color: #A0826D;");
     layout->addWidget(separator, 4, 0, 1, 4);
     
     // Range statistics
     layout->addWidget(new QLabel("📏 Avg Range:"), 5, 0);
     m_avgRangeLabel = new QLabel("0.0 km");
-    m_avgRangeLabel->setStyleSheet("color: #ffffff; font-weight: bold;");
+    m_avgRangeLabel->setStyleSheet("color: #FFF8E7; font-weight: bold;");
     layout->addWidget(m_avgRangeLabel, 5, 1);
     
     layout->addWidget(new QLabel("📏 Max Range:"), 5, 2);
@@ -154,7 +154,7 @@ void CAnalyticsWidget::createOverallStatsSection()
     // Speed statistics
     layout->addWidget(new QLabel("⚡ Avg Speed:"), 6, 2);
     m_avgSpeedLabel = new QLabel("0.0 m/s");
-    m_avgSpeedLabel->setStyleSheet("color: #ffffff; font-weight: bold;");
+    m_avgSpeedLabel->setStyleSheet("color: #FFF8E7; font-weight: bold;");
     layout->addWidget(m_avgSpeedLabel, 6, 3);
     
     layout->addWidget(new QLabel("⚡ Max Speed:"), 7, 0);
@@ -172,7 +172,7 @@ void CAnalyticsWidget::createSelectedTrackSection()
     // Track ID and Identity
     layout->addWidget(new QLabel("Track ID:"), 0, 0);
     m_selectedTrackIdLabel = new QLabel("None Selected");
-    m_selectedTrackIdLabel->setStyleSheet("color: #a0aec0; font-weight: bold; font-size: 14px;");
+    m_selectedTrackIdLabel->setStyleSheet("color: #000000; font-weight: bold; font-size: 14px;");
     layout->addWidget(m_selectedTrackIdLabel, 0, 1);
     
     layout->addWidget(new QLabel("Identity:"), 0, 2);
@@ -183,42 +183,42 @@ void CAnalyticsWidget::createSelectedTrackSection()
     // Position and Range
     layout->addWidget(new QLabel("📏 Range:"), 1, 0);
     m_selectedTrackRangeLabel = new QLabel("-");
-    m_selectedTrackRangeLabel->setStyleSheet("color: #ffffff; font-weight: bold;");
+    m_selectedTrackRangeLabel->setStyleSheet("color: #FFF8E7; font-weight: bold;");
     layout->addWidget(m_selectedTrackRangeLabel, 1, 1);
     
     layout->addWidget(new QLabel("🧭 Azimuth:"), 1, 2);
     m_selectedTrackAzimuthLabel = new QLabel("-");
-    m_selectedTrackAzimuthLabel->setStyleSheet("color: #ffffff; font-weight: bold;");
+    m_selectedTrackAzimuthLabel->setStyleSheet("color: #FFF8E7; font-weight: bold;");
     layout->addWidget(m_selectedTrackAzimuthLabel, 1, 3);
     
     layout->addWidget(new QLabel("📐 Elevation:"), 2, 0);
     m_selectedTrackElevationLabel = new QLabel("-");
-    m_selectedTrackElevationLabel->setStyleSheet("color: #ffffff; font-weight: bold;");
+    m_selectedTrackElevationLabel->setStyleSheet("color: #FFF8E7; font-weight: bold;");
     layout->addWidget(m_selectedTrackElevationLabel, 2, 1);
     
     layout->addWidget(new QLabel("⚡ Speed:"), 2, 2);
     m_selectedTrackSpeedLabel = new QLabel("-");
-    m_selectedTrackSpeedLabel->setStyleSheet("color: #ffffff; font-weight: bold;");
+    m_selectedTrackSpeedLabel->setStyleSheet("color: #FFF8E7; font-weight: bold;");
     layout->addWidget(m_selectedTrackSpeedLabel, 2, 3);
     
     layout->addWidget(new QLabel("🧭 Heading:"), 3, 0);
     m_selectedTrackHeadingLabel = new QLabel("-");
-    m_selectedTrackHeadingLabel->setStyleSheet("color: #ffffff; font-weight: bold;");
+    m_selectedTrackHeadingLabel->setStyleSheet("color: #FFF8E7; font-weight: bold;");
     layout->addWidget(m_selectedTrackHeadingLabel, 3, 1);
     
     layout->addWidget(new QLabel("📶 SNR:"), 3, 2);
     m_selectedTrackSNRLabel = new QLabel("-");
-    m_selectedTrackSNRLabel->setStyleSheet("color: #ffffff; font-weight: bold;");
+    m_selectedTrackSNRLabel->setStyleSheet("color: #FFF8E7; font-weight: bold;");
     layout->addWidget(m_selectedTrackSNRLabel, 3, 3);
     
     layout->addWidget(new QLabel("📍 Position:"), 4, 0);
     m_selectedTrackPositionLabel = new QLabel("-");
-    m_selectedTrackPositionLabel->setStyleSheet("color: #ffffff; font-weight: bold;");
+    m_selectedTrackPositionLabel->setStyleSheet("color: #FFF8E7; font-weight: bold;");
     layout->addWidget(m_selectedTrackPositionLabel, 4, 1, 1, 2);
     
     layout->addWidget(new QLabel("⏰ Last Update:"), 5, 0);
     m_selectedTrackTimeLabel = new QLabel("-");
-    m_selectedTrackTimeLabel->setStyleSheet("color: #ffffff; font-weight: bold;");
+    m_selectedTrackTimeLabel->setStyleSheet("color: #FFF8E7; font-weight: bold;");
     layout->addWidget(m_selectedTrackTimeLabel, 5, 1, 1, 2);
     
     // Clear selection button
@@ -484,9 +484,9 @@ void CAnalyticsWidget::clearSelectedTrack()
     
     // Clear selected track display
     m_selectedTrackIdLabel->setText("None Selected");
-    m_selectedTrackIdLabel->setStyleSheet("color: #a0aec0; font-weight: bold; font-size: 14px;");
+    m_selectedTrackIdLabel->setStyleSheet("color: #000000; font-weight: bold; font-size: 14px;");
     m_selectedTrackIdentityLabel->setText("-");
-    m_selectedTrackIdentityLabel->setStyleSheet("color: #a0aec0; font-weight: bold; font-size: 14px;");
+    m_selectedTrackIdentityLabel->setStyleSheet("color: #000000; font-weight: bold; font-size: 14px;");
     m_selectedTrackRangeLabel->setText("-");
     m_selectedTrackAzimuthLabel->setText("-");
     m_selectedTrackElevationLabel->setText("-");
@@ -598,40 +598,40 @@ void CAnalyticsWidget::applyModernStyle()
 {
     setStyleSheet(
         "QDockWidget {"
-        "   background-color: #1a202c;"
-        "   color: #ffffff;"
+        "   background-color: #FFFAF0;"
+        "   color: #FFF8E7;"
         "}"
         "QDockWidget::title {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #667eea, stop:1 #764ba2);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #FFD700, stop:1 #DEB887);"
         "   padding: 10px;"
         "   text-align: center;"
-        "   color: white;"
+        "   color: #000000;"
         "   font-weight: bold;"
         "}"
         "QGroupBox {"
-        "   background-color: #2d3748;"
-        "   border: 2px solid #4a5568;"
+        "   background-color: #FFF8E7;"
+        "   border: 2px solid #A0826D;"
         "   border-radius: 8px;"
         "   margin-top: 12px;"
         "   padding-top: 12px;"
         "   font-weight: bold;"
-        "   color: #ffffff;"
+        "   color: #FFF8E7;"
         "}"
         "QGroupBox::title {"
         "   subcontrol-origin: margin;"
         "   subcontrol-position: top left;"
         "   padding: 4px 8px;"
-        "   background-color: #667eea;"
+        "   background-color: #FFD700;"
         "   border-radius: 4px;"
-        "   color: white;"
+        "   color: #000000;"
         "}"
         "QLabel {"
-        "   color: #a0aec0;"
+        "   color: #000000;"
         "   font-size: 12px;"
         "}"
         "QProgressBar {"
-        "   background-color: #4a5568;"
-        "   border: 1px solid #2d3748;"
+        "   background-color: #A0826D;"
+        "   border: 1px solid #FFF8E7;"
         "   border-radius: 4px;"
         "   text-align: center;"
         "}"
@@ -639,8 +639,8 @@ void CAnalyticsWidget::applyModernStyle()
         "   border-radius: 3px;"
         "}"
         "QPushButton {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #667eea, stop:1 #764ba2);"
-        "   color: white;"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #FFD700, stop:1 #DEB887);"
+        "   color: #000000;"
         "   border: none;"
         "   border-radius: 6px;"
         "   padding: 8px 12px;"
@@ -654,46 +654,46 @@ void CAnalyticsWidget::applyModernStyle()
         "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #4c51bf, stop:1 #5a32a3);"
         "}"
         "QComboBox {"
-        "   background-color: #2d3748;"
-        "   color: #ffffff;"
-        "   border: 2px solid #4a5568;"
+        "   background-color: #FFF8E7;"
+        "   color: #FFF8E7;"
+        "   border: 2px solid #A0826D;"
         "   border-radius: 6px;"
         "   padding: 6px;"
         "   font-size: 11px;"
         "}"
         "QComboBox:hover {"
-        "   border: 2px solid #667eea;"
+        "   border: 2px solid #FFD700;"
         "}"
         "QComboBox QAbstractItemView {"
-        "   background-color: #2d3748;"
-        "   color: #ffffff;"
-        "   selection-background-color: #667eea;"
+        "   background-color: #FFF8E7;"
+        "   color: #FFF8E7;"
+        "   selection-background-color: #FFD700;"
         "}"
         "QTableWidget {"
-        "   background-color: #1a202c;"
-        "   alternate-background-color: #2d3748;"
-        "   gridline-color: #4a5568;"
-        "   color: #ffffff;"
+        "   background-color: #FFFAF0;"
+        "   alternate-background-color: #FFF8E7;"
+        "   gridline-color: #A0826D;"
+        "   color: #FFF8E7;"
         "   font-size: 11px;"
-        "   border: 1px solid #4a5568;"
+        "   border: 1px solid #A0826D;"
         "   border-radius: 6px;"
         "}"
         "QHeaderView::section {"
-        "   background-color: #667eea;"
-        "   color: white;"
+        "   background-color: #FFD700;"
+        "   color: #000000;"
         "   font-size: 12px;"
         "   font-weight: bold;"
         "   padding: 8px;"
         "   border: none;"
         "}"
         "QTableWidget::item:selected {"
-        "   background-color: #667eea;"
+        "   background-color: #FFD700;"
         "}"
         "QSplitter::handle {"
-        "   background-color: #4a5568;"
+        "   background-color: #A0826D;"
         "}"
         "QFrame {"
-        "   color: #4a5568;"
+        "   color: #A0826D;"
         "}"
     );
 }

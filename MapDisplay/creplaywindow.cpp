@@ -95,7 +95,7 @@ void CReplayWindow::createVideoArea()
 {
     m_videoWidget = new QVideoWidget();
     m_videoWidget->setMinimumHeight(300);
-    m_videoWidget->setStyleSheet("background-color: #000000; border: 2px solid #4a5568;");
+    m_videoWidget->setStyleSheet("background-color: #000000; border: 2px solid #A0826D;");
     m_mainLayout->addWidget(m_videoWidget, 1);
 }
 
@@ -201,27 +201,27 @@ void CReplayWindow::applyModernStyle()
 {
     setStyleSheet(
         "CReplayWindow {"
-        "   background-color: #1e293b;"
-        "   border: 2px solid #4a5568;"
+        "   background-color: #000000;"
+        "   border: 2px solid #A0826D;"
         "   border-radius: 12px;"
         "}"
         
         "#titleBar {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #667eea, stop:1 #764ba2);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #FFD700, stop:1 #DEB887);"
         "   border-top-left-radius: 10px;"
         "   border-top-right-radius: 10px;"
-        "   border-bottom: 2px solid #4a5568;"
+        "   border-bottom: 2px solid #A0826D;"
         "}"
         
         "#titleLabel {"
-        "   color: white;"
+        "   color: #000000;"
         "   font-weight: bold;"
         "   font-size: 14px;"
         "}"
         
         "#minimizeButton, #maximizeButton {"
         "   background-color: rgba(255, 255, 255, 0.1);"
-        "   color: white;"
+        "   color: #000000;"
         "   border: none;"
         "   border-radius: 15px;"
         "   font-weight: bold;"
@@ -234,7 +234,7 @@ void CReplayWindow::applyModernStyle()
         
         "#closeButton {"
         "   background-color: rgba(239, 68, 68, 0.8);"
-        "   color: white;"
+        "   color: #000000;"
         "   border: none;"
         "   border-radius: 15px;"
         "   font-weight: bold;"
@@ -246,26 +246,26 @@ void CReplayWindow::applyModernStyle()
         "}"
         
         "#controlsFrame {"
-        "   background-color: #2d3748;"
+        "   background-color: #FFF8E7;"
         "   border-bottom-left-radius: 10px;"
         "   border-bottom-right-radius: 10px;"
-        "   border-top: 1px solid #4a5568;"
+        "   border-top: 1px solid #A0826D;"
         "}"
         
         "#progressBar {"
-        "   background-color: #1a202c;"
-        "   border: 1px solid #4a5568;"
+        "   background-color: #FFFAF0;"
+        "   border: 1px solid #A0826D;"
         "   border-radius: 3px;"
         "}"
         
         "#progressBar::chunk {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #667eea, stop:1 #764ba2);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #FFD700, stop:1 #DEB887);"
         "   border-radius: 2px;"
         "}"
         
         "#playButton, #pauseButton, #stopButton {"
-        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #667eea, stop:1 #764ba2);"
-        "   color: white;"
+        "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #FFD700, stop:1 #DEB887);"
+        "   color: #000000;"
         "   border: none;"
         "   border-radius: 8px;"
         "   font-weight: bold;"
@@ -277,12 +277,12 @@ void CReplayWindow::applyModernStyle()
         "}"
         
         "#playButton:disabled, #pauseButton:disabled, #stopButton:disabled {"
-        "   background-color: #4a5568;"
-        "   color: #a0aec0;"
+        "   background-color: #A0826D;"
+        "   color: #000000;"
         "}"
         
         "#timeLabel, #durationLabel, #speedLabel, #speedValueLabel {"
-        "   color: #e2e8f0;"
+        "   color: #F5DEB3;"
         "   font-size: 12px;"
         "   font-weight: bold;"
         "}"
@@ -292,14 +292,14 @@ void CReplayWindow::applyModernStyle()
         "}"
         
         "#positionSlider::groove:horizontal, #speedSlider::groove:horizontal {"
-        "   background: #1a202c;"
+        "   background: #FFFAF0;"
         "   height: 6px;"
         "   border-radius: 3px;"
-        "   border: 1px solid #4a5568;"
+        "   border: 1px solid #A0826D;"
         "}"
         
         "#positionSlider::handle:horizontal, #speedSlider::handle:horizontal {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #667eea, stop:1 #764ba2);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #FFD700, stop:1 #DEB887);"
         "   width: 16px;"
         "   height: 16px;"
         "   margin: -5px 0;"
@@ -308,7 +308,7 @@ void CReplayWindow::applyModernStyle()
         "}"
         
         "#positionSlider::sub-page:horizontal, #speedSlider::sub-page:horizontal {"
-        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #667eea, stop:1 #764ba2);"
+        "   background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #FFD700, stop:1 #DEB887);"
         "   border-radius: 3px;"
         "}"
     );
