@@ -98,6 +98,10 @@ void CUdpReceiver::_processPendingDatagrams()
             stTrackRecvInfo stTrack;
             memcpy(&stTrack, baDatagram.constData(), sizeof(stTrackRecvInfo));
 
+            qDebug() << "[CUdpReceiver] Received track data - ID:" << stTrack.nTrkId 
+                     << "X:" << stTrack.x << "Y:" << stTrack.y 
+                     << "Heading:" << stTrack.heading << "Velocity:" << stTrack.velocity;
+
             // Emit signal with parsed track
             emit signalUpdateTrackData(stTrack);
         } else {
