@@ -1010,6 +1010,8 @@ void CTrackLayer::paint(QPainter *pPainter)
     const QgsMapToPixel &mapToPixel = m_canvas->mapSettings().mapToPixel();
 
     QList<stTrackDisplayInfo> listTracks = CDataWarehouse::getInstance()->getTrackList();
+    
+    qDebug() << "[CTrackLayer] Paint called, track count:" << listTracks.size();
 
     stTrackDisplayInfo hoveredTrack;
     bool hasHoveredTrack = false;
@@ -1066,66 +1068,28 @@ void CTrackLayer::paint(QPainter *pPainter)
                 pPainter->drawEllipse(ptScreen, trackSize + 8, trackSize + 8);
             }
 
-            bool drawnCustomImage = false;
-            // Draw custom image if available for this track
-            if (!track.imagePath.isEmpty()) {
-                // Ensure pixmap cached; if not, attempt load
+            // Draw drone image if available and track has a drone, otherwise draw core dot
+            bool useDroneImage = false;
+            QPixmap imageToUse;
+            
+            // Check if this track has a custom image loaded
+            if (m_trackImages.contains(track.nTrkId)) {
+                imageToUse = m_trackImages[track.nTrkId];
+                useDroneImage = true;
+            }
+            // Check if track has a custom image path set
+            else if (!track.imagePath.isEmpty()) {
+                // Load and cache the image
                 if (!m_trackPixmaps.contains(track.nTrkId)) {
                     QPixmap pix(track.imagePath);
                     if (!pix.isNull()) {
                         m_trackPixmaps.insert(track.nTrkId, pix);
                     }
                 }
-
                 if (m_trackPixmaps.contains(track.nTrkId)) {
-                    const QPixmap &pix = m_trackPixmaps.value(track.nTrkId);
-                    // Scale to a reasonable on-screen size based on focus/highlight
-                    int baseSize = isFocused ? 40 : (isHighlighted ? 32 : 24);
-                    QPixmap scaled = pix.scaled(baseSize, baseSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-
-                    // Rotate so that image points along heading (assume up=0°, clockwise)
-                    QTransform transform;
-                    transform.translate(scaled.width() / 2.0, scaled.height() / 2.0);
-                    transform.rotate(-track.heading); // Qt rotates counter-clockwise; invert to align
-                    transform.translate(-scaled.width() / 2.0, -scaled.height() / 2.0);
-                    QPixmap rotated = scaled.transformed(transform, Qt::SmoothTransformation);
-
-                    // Draw centered at ptScreen
-                    QPointF topLeft(ptScreen.x() - rotated.width() / 2.0,
-                                    ptScreen.y() - rotated.height() / 2.0);
-                    pPainter->drawPixmap(topLeft, rotated);
-                    drawnCustomImage = true;
+                    imageToUse = m_trackPixmaps.value(track.nTrkId);
+                    useDroneImage = true;
                 }
-            }
-
-            if (!drawnCustomImage) {
-                // Fallback: draw a small default drone-like marker oriented by heading
-                int baseSize = isFocused ? 28 : (isHighlighted ? 22 : 16);
-                // Generate default icon tinted by identity color (cache by color+size)
-                QString cacheKey = QString("%1x%2_%3").arg(baseSize).arg(baseSize).arg(clr.name());
-                QPixmap defaultIcon;
-                if (m_defaultIconCache.contains(cacheKey)) {
-                    defaultIcon = m_defaultIconCache.value(cacheKey);
-                } else {
-                    defaultIcon = getDefaultDronePixmap(baseSize, clr, Qt::white);
-                    m_defaultIconCache.insert(cacheKey, defaultIcon);
-                }
-                QTransform transform;
-                transform.translate(defaultIcon.width() / 2.0, defaultIcon.height() / 2.0);
-                transform.rotate(-track.heading);
-                transform.translate(-defaultIcon.width() / 2.0, -defaultIcon.height() / 2.0);
-                QPixmap rotated = defaultIcon.transformed(transform, Qt::SmoothTransformation);
-                QPointF topLeft(ptScreen.x() - rotated.width() / 2.0,
-                                ptScreen.y() - rotated.height() / 2.0);
-                pPainter->drawPixmap(topLeft, rotated);
-            // Draw drone image if available and track has a drone, otherwise draw core dot
-            bool useDroneImage = false;
-            QPixmap imageToUse;
-            
-            // Check if this track has a custom image
-            if (m_trackImages.contains(track.nTrkId)) {
-                imageToUse = m_trackImages[track.nTrkId];
-                useDroneImage = true;
             }
             // Otherwise use default drone icon if track has an associated drone
             else if (track.pDrone && !m_droneIcon.isNull()) {
@@ -1253,7 +1217,6 @@ void CTrackLayer::paint(QPainter *pPainter)
     if (hasHoveredTrack && m_hoveredTrackId != -1 && m_hoveredTrackId != m_focusedTrackId) {
         drawTooltip(pPainter, hoveredTrack, m_mousePos);
     }
-}
 }
 
 QPixmap CTrackLayer::getDefaultDronePixmap(int size, const QColor &color, const QColor &accent)

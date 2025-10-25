@@ -103,6 +103,10 @@ void CDataWarehouse::slotUpdateTrackData(stTrackRecvInfo trackRecvInfo) {
     _m_CoordConv.env2polar(&info.range,&info.azimuth,&info.elevation,
                            trackRecvInfo.x,trackRecvInfo.y,trackRecvInfo.z);
     
+    qDebug() << "[CDataWarehouse] Updated track" << info.nTrkId 
+             << "Lat:" << info.lat << "Lon:" << info.lon 
+             << "Range:" << info.range << "Heading:" << info.heading;
+    
     // Create or get drone for this track
     if (!_m_mapDrones.contains(trackRecvInfo.nTrkId)) {
         CDrone* pDrone = new CDrone(trackRecvInfo.nTrkId, this);
