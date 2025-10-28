@@ -22,24 +22,24 @@ CReplayWindow::CReplayWindow(QWidget *parent)
     setupUI();
     applyModernStyle();
     
-    // Initialize media player
-    m_mediaPlayer = new QMediaPlayer(this);
-    m_mediaPlayer->setVideoOutput(m_videoWidget);
+    // Initialize media player (temporarily commented out)
+    m_mediaPlayer = new QWidget(this);  // Placeholder
+    // m_mediaPlayer->setVideoOutput(m_videoWidget);
     
-    // Connect media player signals
-    connect(m_mediaPlayer, &QMediaPlayer::positionChanged,
-            this, &CReplayWindow::onPositionChanged);
-    connect(m_mediaPlayer, &QMediaPlayer::durationChanged,
-            this, &CReplayWindow::onDurationChanged);
-    connect(m_mediaPlayer, QOverload<QMediaPlayer::State>::of(&QMediaPlayer::stateChanged),
-            this, &CReplayWindow::onStateChanged);
+    // Connect media player signals (temporarily commented out)
+    // connect(m_mediaPlayer, &QMediaPlayer::positionChanged,
+    //         this, &CReplayWindow::onPositionChanged);
+    // connect(m_mediaPlayer, &QMediaPlayer::durationChanged,
+    //         this, &CReplayWindow::onDurationChanged);
+    // connect(m_mediaPlayer, QOverload<QMediaPlayer::State>::of(&QMediaPlayer::stateChanged),
+    //         this, &CReplayWindow::onStateChanged);
 }
 
 CReplayWindow::~CReplayWindow()
 {
-    if (m_mediaPlayer) {
-        m_mediaPlayer->stop();
-    }
+    // if (m_mediaPlayer) {
+    //     m_mediaPlayer->stop();
+    // }
 }
 
 void CReplayWindow::setupUI()
@@ -93,7 +93,7 @@ void CReplayWindow::createTitleBar()
 
 void CReplayWindow::createVideoArea()
 {
-    m_videoWidget = new QVideoWidget();
+    m_videoWidget = new QWidget();  // Placeholder
     m_videoWidget->setMinimumHeight(300);
     m_videoWidget->setStyleSheet("background-color: #000000; border: 2px solid #A0826D;");
     m_mainLayout->addWidget(m_videoWidget, 1);
@@ -153,13 +153,13 @@ void CReplayWindow::createControlsArea()
     m_positionSlider->setRange(0, 0);
     m_positionSlider->setObjectName("positionSlider");
     connect(m_positionSlider, &QSlider::sliderPressed, this, [this]() {
-        m_mediaPlayer->pause();
+        // m_mediaPlayer->pause();
     });
     connect(m_positionSlider, &QSlider::sliderReleased, this, [this]() {
         seekToPosition(m_positionSlider->value());
-        if (m_mediaPlayer->state() == QMediaPlayer::PausedState) {
-            m_mediaPlayer->play();
-        }
+        // if (m_mediaPlayer->state() == QMediaPlayer::PausedState) {
+        //     m_mediaPlayer->play();
+        // }
     });
     m_playbackLayout->addWidget(m_positionSlider, 1);
     
@@ -317,7 +317,7 @@ void CReplayWindow::applyModernStyle()
 void CReplayWindow::setVideoFile(const QString &filePath)
 {
     if (QFileInfo::exists(filePath)) {
-        m_mediaPlayer->setMedia(QUrl::fromLocalFile(filePath));
+        // m_mediaPlayer->setMedia(QUrl::fromLocalFile(filePath));
         m_titleLabel->setText("🎬 " + QFileInfo(filePath).baseName());
     }
 }
@@ -331,17 +331,17 @@ void CReplayWindow::showReplayWindow()
 
 void CReplayWindow::playVideo()
 {
-    m_mediaPlayer->play();
+    // m_mediaPlayer->play();
 }
 
 void CReplayWindow::pauseVideo()
 {
-    m_mediaPlayer->pause();
+    // m_mediaPlayer->pause();
 }
 
 void CReplayWindow::stopVideo()
 {
-    m_mediaPlayer->stop();
+    // m_mediaPlayer->stop();
     m_positionSlider->setValue(0);
     updateTimeDisplay();
 }
@@ -349,7 +349,7 @@ void CReplayWindow::stopVideo()
 void CReplayWindow::setPlaybackSpeed(double speed)
 {
     m_playbackSpeed = speed;
-    m_mediaPlayer->setPlaybackRate(speed);
+    // m_mediaPlayer->setPlaybackRate(speed);
     m_speedValueLabel->setText(QString::number(speed, 'f', 1) + "x");
 }
 
@@ -357,7 +357,7 @@ void CReplayWindow::seekToPosition(int position)
 {
     if (m_duration > 0) {
         qint64 seekPosition = (position * m_duration) / 100;
-        m_mediaPlayer->setPosition(seekPosition);
+        // m_mediaPlayer->setPosition(seekPosition);
     }
 }
 
@@ -378,26 +378,26 @@ void CReplayWindow::onDurationChanged(qint64 duration)
     updateTimeDisplay();
 }
 
-void CReplayWindow::onStateChanged(QMediaPlayer::State state)
-{
-    switch (state) {
-    case QMediaPlayer::PlayingState:
-        m_playButton->setEnabled(false);
-        m_pauseButton->setEnabled(true);
-        m_stopButton->setEnabled(true);
-        break;
-    case QMediaPlayer::PausedState:
-        m_playButton->setEnabled(true);
-        m_pauseButton->setEnabled(false);
-        m_stopButton->setEnabled(true);
-        break;
-    case QMediaPlayer::StoppedState:
-        m_playButton->setEnabled(true);
-        m_pauseButton->setEnabled(false);
-        m_stopButton->setEnabled(false);
-        break;
-    }
-}
+// void CReplayWindow::onStateChanged(QMediaPlayer::State state)
+// {
+//     switch (state) {
+//     case QMediaPlayer::PlayingState:
+//         m_playButton->setEnabled(false);
+//         m_pauseButton->setEnabled(true);
+//         m_stopButton->setEnabled(true);
+//         break;
+//     case QMediaPlayer::PausedState:
+//         m_playButton->setEnabled(true);
+//         m_pauseButton->setEnabled(false);
+//         m_stopButton->setEnabled(true);
+//         break;
+//     case QMediaPlayer::StoppedState:
+//         m_playButton->setEnabled(true);
+//         m_pauseButton->setEnabled(false);
+//         m_stopButton->setEnabled(false);
+//         break;
+//     }
+// }
 
 void CReplayWindow::onSpeedChanged(int value)
 {
@@ -407,7 +407,8 @@ void CReplayWindow::onSpeedChanged(int value)
 
 void CReplayWindow::updateTimeDisplay()
 {
-    qint64 position = m_mediaPlayer->position();
+    // qint64 position = m_mediaPlayer->position();
+    qint64 position = 0;  // Placeholder
     
     QTime currentTime = QTime(0, 0).addMSecs(position);
     m_timeLabel->setText(currentTime.toString("mm:ss"));
@@ -470,9 +471,9 @@ void CReplayWindow::mouseReleaseEvent(QMouseEvent *event)
 
 void CReplayWindow::closeEvent(QCloseEvent *event)
 {
-    if (m_mediaPlayer) {
-        m_mediaPlayer->stop();
-    }
+    // if (m_mediaPlayer) {
+    //     m_mediaPlayer->stop();
+    // }
     emit windowClosed();
     event->accept();
 }
