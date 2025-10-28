@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui widgets xml network concurrent qml quick quickwidgets quickcontrols2 charts
+QT       += core gui widgets xml network concurrent qml quick quickwidgets quickcontrols2 charts multimedia multimediawidgets
 
 
 OBJECTS_DIR = ../obj/OBJ
@@ -47,6 +47,7 @@ SOURCES += \
         MapDisplay/cpredictivemaintenancewidget.cpp \
         MapDisplay/cppilayer.cpp \
         MapDisplay/crecordingwidget.cpp \
+        MapDisplay/creplaywindow.cpp \
         MapDisplay/csearchbeamlayer.cpp \
         MapDisplay/csimulationwidget.cpp \
         MapDisplay/ctracklayer.cpp \
@@ -72,6 +73,7 @@ HEADERS += \
         MapDisplay/cpredictivemaintenancewidget.h \
         MapDisplay/cppilayer.h \
         MapDisplay/crecordingwidget.h \
+        MapDisplay/creplaywindow.h \
         MapDisplay/csearchbeamlayer.h \
         MapDisplay/csimulationwidget.h \
         MapDisplay/ctracklayer.h \
