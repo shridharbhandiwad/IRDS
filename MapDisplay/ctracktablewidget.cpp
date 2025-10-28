@@ -123,9 +123,9 @@ void CTrackTableWidget::setupUI()
     mainLayout->addLayout(toolbarLayout);
 
     // Table
-    m_tableWidget = new QTableWidget(0, 9, this);
+    m_tableWidget = new QTableWidget(0, 8, this);
     m_tableWidget->setHorizontalHeaderLabels({
-        "ID", "Identity", "Lat", "Lon", "Alt (m)", "Range (km)", "Heading (°)", "Azimuth (°)", "Updated"
+        "ID", "Range (km)", "Azimuth (°)", "Elevation (°)", "Alt (m)", "Speed (m/s)", "Span (s)", "Identity"
     });
 
     // Set resize mode to interactive for better control, but stretch last column
@@ -134,13 +134,13 @@ void CTrackTableWidget::setupUI()
     
     // Set minimum column widths to ensure all headers are visible
     m_tableWidget->setColumnWidth(0, 60);   // ID
-    m_tableWidget->setColumnWidth(1, 110);  // Identity
-    m_tableWidget->setColumnWidth(2, 95);   // Lat
-    m_tableWidget->setColumnWidth(3, 95);   // Lon
+    m_tableWidget->setColumnWidth(1, 100);  // Range (km)
+    m_tableWidget->setColumnWidth(2, 110);  // Azimuth (°)
+    m_tableWidget->setColumnWidth(3, 110);  // Elevation (°)
     m_tableWidget->setColumnWidth(4, 85);   // Alt (m)
-    m_tableWidget->setColumnWidth(5, 100);  // Range (km)
-    m_tableWidget->setColumnWidth(6, 105);  // Heading (°)
-    m_tableWidget->setColumnWidth(7, 110);  // Azimuth (°)
+    m_tableWidget->setColumnWidth(5, 105);  // Speed (m/s)
+    m_tableWidget->setColumnWidth(6, 95);   // Span (s)
+    m_tableWidget->setColumnWidth(7, 110);  // Identity
     // Updated column will stretch
     m_tableWidget->verticalHeader()->setVisible(false);
     m_tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -307,48 +307,44 @@ void CTrackTableWidget::updateTrackTable()
         idItem->setFont(QFont("Segoe UI", 10, QFont::Bold));
         m_tableWidget->setItem(row, 0, idItem);
 
+        // Range (km)
+        QTableWidgetItem *rangeItem = new QTableWidgetItem(QString::number(track.range / 1000.0, 'f', 2));
+        rangeItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        m_tableWidget->setItem(row, 1, rangeItem);
+
+        // Azimuth (°)
+        QTableWidgetItem *azItem = new QTableWidgetItem(QString::number(track.azimuth, 'f', 2));
+        azItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        m_tableWidget->setItem(row, 2, azItem);
+
+        // Elevation (°)
+        QTableWidgetItem *elItem = new QTableWidgetItem(QString::number(track.elevation, 'f', 2));
+        elItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        m_tableWidget->setItem(row, 3, elItem);
+
+        // Altitude (m)
+        QTableWidgetItem *altItem = new QTableWidgetItem(QString::number(track.alt, 'f', 0));
+        altItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        m_tableWidget->setItem(row, 4, altItem);
+
+        // Speed (m/s)
+        QTableWidgetItem *spdItem = new QTableWidgetItem(QString::number(track.velocity, 'f', 1));
+        spdItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        m_tableWidget->setItem(row, 5, spdItem);
+
+        // Track Span (s)
+        qint64 nowSecs = QDateTime::currentDateTime().toSecsSinceEpoch();
+        qint64 spanSecs = (track.firstSeenTime > 0) ? (nowSecs - track.firstSeenTime) : 0;
+        QTableWidgetItem *spanItem = new QTableWidgetItem(QString::number(spanSecs));
+        spanItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        m_tableWidget->setItem(row, 6, spanItem);
+
         // Identity
         QTableWidgetItem *identItem = new QTableWidgetItem(getIdentityString(track.nTrackIden));
         identItem->setTextAlignment(Qt::AlignCenter);
         identItem->setForeground(QBrush(getIdentityColor(track.nTrackIden)));
         identItem->setFont(QFont("Segoe UI", 10, QFont::Bold));
-        m_tableWidget->setItem(row, 1, identItem);
-
-        // Latitude
-        QTableWidgetItem *latItem = new QTableWidgetItem(QString::number(track.lat, 'f', 5));
-        latItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-        m_tableWidget->setItem(row, 2, latItem);
-
-        // Longitude
-        QTableWidgetItem *lonItem = new QTableWidgetItem(QString::number(track.lon, 'f', 5));
-        lonItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-        m_tableWidget->setItem(row, 3, lonItem);
-
-        // Altitude
-        QTableWidgetItem *altItem = new QTableWidgetItem(QString::number(track.alt, 'f', 0));
-        altItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-        m_tableWidget->setItem(row, 4, altItem);
-
-        // Range
-        QTableWidgetItem *rangeItem = new QTableWidgetItem(QString::number(track.range / 1000.0, 'f', 2));
-        rangeItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-        m_tableWidget->setItem(row, 5, rangeItem);
-
-        // Heading
-        QTableWidgetItem *headItem = new QTableWidgetItem(QString::number(track.heading, 'f', 1));
-        headItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-        m_tableWidget->setItem(row, 6, headItem);
-
-        // Azimuth
-        QTableWidgetItem *azItem = new QTableWidgetItem(QString::number(track.azimuth, 'f', 2));
-        azItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-        m_tableWidget->setItem(row, 7, azItem);
-
-        // Last Update
-        QDateTime updateTime = QDateTime::fromSecsSinceEpoch(track.nTrackTime);
-        QTableWidgetItem *timeItem = new QTableWidgetItem(updateTime.toString("hh:mm:ss"));
-        timeItem->setTextAlignment(Qt::AlignCenter);
-        m_tableWidget->setItem(row, 8, timeItem);
+        m_tableWidget->setItem(row, 7, identItem);
 
         row++;
     }
@@ -407,7 +403,7 @@ void CTrackTableWidget::onExportTracks()
     QTextStream out(&file);
 
     // Write header
-    out << "Track ID,Identity,Latitude,Longitude,Altitude (m),Range (km),Heading (°),Azimuth (°),Last Update\n";
+    out << "Track ID,Range (km),Azimuth (°),Elevation (°),Altitude (m),Speed (m/s),Span (s),Identity\n";
 
     // Write data
     for (int row = 0; row < m_tableWidget->rowCount(); ++row) {
